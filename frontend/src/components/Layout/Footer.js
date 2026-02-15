@@ -1,9 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { GiSpellBook } from "react-icons/gi";
 import { FiHeart, FiMail, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiSend } from "react-icons/fi";
 
 const Footer = () => {
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
   return (
     <footer className="bg-gradient-to-br from-primary-50 via-white to-accent-50 text-primary-900 mt-auto relative overflow-hidden border-t-2 border-accent-200">
       {/* Decorative Background */}
@@ -13,28 +16,30 @@ const Footer = () => {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Newsletter Section */}
-        <div className="py-8 border-b border-accent-100">
-          <div className="grid md:grid-cols-2 gap-6 items-center">
-            <div>
-              <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-primary-900">
-                <FiMail className="text-accent-500" />
-                Subscribe to Our Newsletter
-              </h3>
-              <p className="text-primary-700">Get the latest books and exclusive offers delivered to your inbox</p>
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2 rounded-lg bg-white border border-accent-200 text-primary-900 placeholder-primary-500 focus:outline-none focus:border-accent-500 focus:bg-primary-50 transition-all text-sm"
-              />
-              <button className="bg-accent-100 hover:bg-accent-200 px-5 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2 shadow-sm border border-accent-200 text-accent-700 text-sm">
-                <FiSend /> Subscribe
-              </button>
+        {/* Newsletter Section - Only show on home page */}
+        {isHomePage && (
+          <div className="py-8 border-b border-accent-100">
+            <div className="grid md:grid-cols-2 gap-6 items-center">
+              <div>
+                <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-primary-900">
+                  <FiMail className="text-accent-500" />
+                  Subscribe to Our Newsletter
+                </h3>
+                <p className="text-primary-700">Get the latest books and exclusive offers delivered to your inbox</p>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 py-2 rounded-lg bg-white border border-accent-200 text-primary-900 placeholder-primary-500 focus:outline-none focus:border-accent-500 focus:bg-primary-50 transition-all text-sm"
+                />
+                <button className="bg-accent-100 hover:bg-accent-200 px-5 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2 shadow-sm border border-accent-200 text-accent-700 text-sm">
+                  <FiSend /> Subscribe
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Main Footer Content */}
         <div className="py-8">

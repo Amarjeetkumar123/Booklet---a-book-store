@@ -1,703 +1,406 @@
 {
-    "available": 4128826,
+    "available": 1473,
     "number": 50,
     "offset": 0,
     "books": [
         [
             {
-                "id": 20136320,
-                "title": "Jewell's wholesale price list surplus, March 1944",
-                "subtitle": "surplus, March 1944",
-                "image": "https://covers.openlibrary.org/b/id/11552000-M.jpg",
+                "id": 15353712,
+                "title": "The Hunger Games by Suzanne Collins",
+                "image": "https://covers.openlibrary.org/b/id/7890713-M.jpg",
                 "authors": [
                     {
-                        "id": 14593696,
-                        "name": "Jewell Nurseries"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 17496594,
-                "title": "The 2007-2012 World Outlook for Ceiling, Wall-Mounted, and Floor-Mounted Refrigeration Coolers with 6,001 to 8,000 BTU Per Hour",
-                "image": "https://covers.openlibrary.org/b/id/2440023-M.jpg",
-                "authors": [
-                    {
-                        "id": 13033190,
-                        "name": "Philip M. Parker"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 13469330,
-                "title": "The bar-tender's guide",
-                "subtitle": "or How to mix all kinds of plain and fancy drinks, containing...directions for mixing all the beverages used in the United States, together with the most popular British, French, German, Italian, Russian, and Spanish recipes; embracing punches, juleps, cobblers, etc. ...",
-                "image": "https://covers.openlibrary.org/b/id/9789375-M.jpg",
-                "authors": [
-                    {
-                        "id": 13469324,
-                        "name": "Jerry Thomas"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 18691528,
-                "title": "Talk Dirty to Me",
-                "subtitle": "An Intimate Philosophy of Sex",
-                "image": "https://covers.openlibrary.org/b/id/240640-M.jpg",
-                "authors": [
-                    {
-                        "id": 13186574,
-                        "name": "Sallie Tisdale"
+                        "id": 13102494,
+                        "name": "Suzanne Collins"
                     }
                 ],
                 "rating": {
-                    "average": 0.7739999890327454
+                    "average": 0.8659999966621399
                 }
             }
         ],
         [
             {
-                "id": 14664264,
-                "title": "101 stupid things employees do to sabotage success",
-                "image": "https://covers.openlibrary.org/b/id/2083414-M.jpg",
+                "id": 15768210,
+                "title": "To Kill a Mockingbird",
+                "image": "https://covers.openlibrary.org/b/id/8410894-M.jpg",
                 "authors": [
                     {
-                        "id": 14664244,
-                        "name": "Richard Baisner"
+                        "id": 15104910,
+                        "name": "Harper Lee"
                     }
                 ],
                 "rating": {
-                    "average": 0.0
+                    "average": 0.8539999723434448
                 }
             }
         ],
         [
             {
-                "id": 19886462,
-                "title": "Getting grilled",
-                "image": "https://covers.openlibrary.org/b/id/10758394-M.jpg",
+                "id": 28024178,
+                "title": "Great Gatsby",
                 "authors": [
                     {
-                        "id": 19886456,
-                        "name": "Wade Christensen"
+                        "id": 28023376,
+                        "name": "F. Scott Fitzgerald"
                     }
                 ],
                 "rating": {
-                    "average": 0.0
+                    "average": 0.7860000133514404
                 }
             }
         ],
         [
             {
-                "id": 22468934,
-                "title": "Lullaby",
-                "image": "https://covers.openlibrary.org/b/id/4325692-M.jpg",
+                "id": 27085786,
+                "title": "The Great Gatsby - F. Scott Fitzgerald Book #3",
+                "image": "https://covers.openlibrary.org/b/id/13775284-M.jpg",
                 "authors": [
                     {
-                        "id": 14109824,
-                        "name": "Oakley M. Hall"
+                        "id": 13259474,
+                        "name": "F. Scott Fitzgerald"
                     }
                 ],
                 "rating": {
-                    "average": 0.6000000238418579
+                    "average": 0.7860000133514404
                 }
             }
         ],
         [
             {
-                "id": 17054132,
-                "title": "Knowing God's Will Made Easier",
-                "image": "https://covers.openlibrary.org/b/id/804348-M.jpg",
+                "id": 18917694,
+                "title": "1984",
+                "image": "https://covers.openlibrary.org/b/id/8579186-M.jpg",
                 "authors": [
                     {
-                        "id": 13162318,
-                        "name": "Mark Water"
+                        "id": 13244072,
+                        "name": "George Orwell"
                     }
                 ],
                 "rating": {
-                    "average": 0.800000011920929
+                    "average": 0.8379999995231628
                 }
             }
         ],
         [
             {
-                "id": 18441670,
-                "title": "Manual of primary eye care",
-                "image": "https://covers.openlibrary.org/b/id/1399613-M.jpg",
+                "id": 24999118,
+                "title": "The Great Gatsby CD’LI",
+                "image": "https://covers.openlibrary.org/b/id/12278163-M.jpg",
                 "authors": [
                     {
-                        "id": 18441660,
-                        "name": "Narciss Okhravi"
+                        "id": 13259474,
+                        "name": "F. Scott Fitzgerald"
                     }
                 ],
                 "rating": {
-                    "average": 0.0
+                    "average": 0.7860000133514404
                 }
             }
         ],
         [
             {
-                "id": 14414406,
-                "title": "An Indian odyssey",
-                "subtitle": "tribulations, trials and triumphs of Gibson Band of the Mohawk tribe of the Iroquois Confederacy",
-                "image": "https://covers.openlibrary.org/b/id/13264593-M.jpg",
+                "id": 27469566,
+                "title": "Pride and Prejudice A Romantic Novel by Jane Austen",
+                "subtitle": "A Romantic Novel by Jane Austen",
                 "authors": [
                     {
-                        "id": 14414402,
-                        "name": "Sylvia DuVernet"
+                        "id": 13073504,
+                        "name": "Jane Austen"
                     }
                 ],
                 "rating": {
-                    "average": 0.0
+                    "average": 0.8579999804496765
                 }
             }
         ],
         [
             {
-                "id": 22276330,
-                "title": "Sense and sensibilia",
-                "image": "https://covers.openlibrary.org/b/id/7015771-M.jpg",
+                "id": 24999110,
+                "title": "Gatsby le Magnifique = The Great Gatsby",
+                "image": "https://covers.openlibrary.org/b/id/13310378-M.jpg",
                 "authors": [
                     {
-                        "id": 16140962,
-                        "name": "J. L. Austin"
-                    }
-                ],
-                "rating": {
-                    "average": 0.8140000104904175
-                }
-            }
-        ],
-        [
-            {
-                "id": 14221802,
-                "title": "52, Vol. 2",
-                "image": "https://covers.openlibrary.org/b/id/1729449-M.jpg",
-                "authors": [
-                    {
-                        "id": 13550308,
-                        "name": "Mark Waid"
+                        "id": 13259474,
+                        "name": "F. Scott Fitzgerald"
                     },
                     {
-                        "id": 13754444,
-                        "name": "Grant Morrison"
+                        "id": 24999108,
+                        "name": "Philippe Jaworski"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7860000133514404
+                }
+            }
+        ],
+        [
+            {
+                "id": 24999126,
+                "title": "The Great Gatsby, with eBook",
+                "image": "https://covers.openlibrary.org/b/id/14097662-M.jpg",
+                "authors": [
+                    {
+                        "id": 13259474,
+                        "name": "F. Scott Fitzgerald"
                     },
                     {
-                        "id": 14102970,
-                        "name": "Geoff Johns"
+                        "id": 24999124,
+                        "name": "Robertson Dean"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7860000133514404
+                }
+            }
+        ],
+        [
+            {
+                "id": 24999094,
+                "title": "The Great Gatsby",
+                "image": "https://covers.openlibrary.org/b/id/11577074-M.jpg",
+                "authors": [
+                    {
+                        "id": 13259474,
+                        "name": "F. Scott Fitzgerald"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7860000133514404
+                }
+            }
+        ],
+        [
+            {
+                "id": 24999104,
+                "title": "THE GREAT GATSBY",
+                "image": "https://covers.openlibrary.org/b/id/13499494-M.jpg",
+                "authors": [
+                    {
+                        "id": 13259474,
+                        "name": "F. Scott Fitzgerald"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7860000133514404
+                }
+            }
+        ],
+        [
+            {
+                "id": 24999086,
+                "title": "The Great Gatsby",
+                "image": "https://covers.openlibrary.org/b/id/13869870-M.jpg",
+                "authors": [
+                    {
+                        "id": 13259474,
+                        "name": "F. Scott Fitzgerald"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7860000133514404
+                }
+            }
+        ],
+        [
+            {
+                "id": 24999098,
+                "title": "The Great Gatsby",
+                "image": "https://covers.openlibrary.org/b/id/13822215-M.jpg",
+                "authors": [
+                    {
+                        "id": 13259474,
+                        "name": "F. Scott Fitzgerald"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7860000133514404
+                }
+            }
+        ],
+        [
+            {
+                "id": 18111388,
+                "title": "The Great Gatsby",
+                "image": "https://covers.openlibrary.org/b/id/13263945-M.jpg",
+                "authors": [
+                    {
+                        "id": 13259474,
+                        "name": "F. Scott Fitzgerald"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7860000133514404
+                }
+            }
+        ],
+        [
+            {
+                "id": 18810398,
+                "title": "The Hobbit",
+                "subtitle": "or, There and back again",
+                "image": "https://covers.openlibrary.org/b/id/394001-M.jpg",
+                "authors": [
+                    {
+                        "id": 13038776,
+                        "name": "J.R.R. Tolkien"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8560000061988831
+                }
+            }
+        ],
+        [
+            {
+                "id": 17757956,
+                "title": "Catching Fire",
+                "subtitle": "Catching Fire",
+                "image": "https://covers.openlibrary.org/b/id/12878041-M.jpg",
+                "authors": [
+                    {
+                        "id": 13102494,
+                        "name": "Suzanne Collins"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8619999885559082
+                }
+            }
+        ],
+        [
+            {
+                "id": 17887818,
+                "title": "Pride and Prejudice",
+                "image": "https://covers.openlibrary.org/b/id/8085575-M.jpg",
+                "authors": [
+                    {
+                        "id": 13073504,
+                        "name": "Jane Austen"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8560000061988831
+                }
+            }
+        ],
+        [
+            {
+                "id": 17331276,
+                "title": "Pride and Prejudice Annotated",
+                "subtitle": "Annotated",
+                "image": "https://covers.openlibrary.org/b/id/13283996-M.jpg",
+                "authors": [
+                    {
+                        "id": 13073504,
+                        "name": "Jane Austen"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8560000061988831
+                }
+            }
+        ],
+        [
+            {
+                "id": 17285422,
+                "title": "Jane Austen's Pride and prejudice",
+                "image": "https://covers.openlibrary.org/b/id/12648559-M.jpg",
+                "authors": [
+                    {
+                        "id": 13073504,
+                        "name": "Jane Austen"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8560000061988831
+                }
+            }
+        ],
+        [
+            {
+                "id": 20837092,
+                "title": "Pride and Prejudice By Jane Austen",
+                "subtitle": "By Jane Austen",
+                "image": "https://covers.openlibrary.org/b/id/13290989-M.jpg",
+                "authors": [
+                    {
+                        "id": 13073504,
+                        "name": "Jane Austen"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8560000061988831
+                }
+            }
+        ],
+        [
+            {
+                "id": 16296092,
+                "title": "Pride and Prejudice",
+                "subtitle": "An Authoritative Text, Backgrounds and Sources, Criticism",
+                "image": "https://covers.openlibrary.org/b/id/8467244-M.jpg",
+                "authors": [
+                    {
+                        "id": 13073504,
+                        "name": "Jane Austen"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8560000061988831
+                }
+            }
+        ],
+        [
+            {
+                "id": 14409172,
+                "title": "Pride and prejudice",
+                "image": "https://covers.openlibrary.org/b/id/9277929-M.jpg",
+                "authors": [
+                    {
+                        "id": 13073504,
+                        "name": "Jane Austen"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8560000061988831
+                }
+            }
+        ],
+        [
+            {
+                "id": 23493436,
+                "title": "Pride and Prejudice 2019 NEW EDITION. One of Jane Austen's Most Popular Romantic Novels Written in 1813 That Has Sold over 20 Million Copies and Has Been Adapted into Films",
+                "subtitle": "2019 NEW EDITION. One of Jane Austen's Most Popular Romantic Novels Written in 1813 That Has Sold over 20 Million Copies and Has Been Adapted into Films",
+                "image": "https://covers.openlibrary.org/b/id/13306851-M.jpg",
+                "authors": [
+                    {
+                        "id": 13073504,
+                        "name": "Jane Austen"
                     },
                     {
-                        "id": 14221730,
-                        "name": "Greg Rucka"
+                        "id": 23493434,
+                        "name": "A. J. HENRY"
                     }
                 ],
                 "rating": {
-                    "average": 0.7820000052452087
+                    "average": 0.8560000061988831
                 }
             }
         ],
         [
             {
-                "id": 23663868,
-                "title": "Instructions for preparing the antemortem and postmortem inspection summary",
-                "image": "https://covers.openlibrary.org/b/id/11843123-M.jpg",
+                "id": 27067084,
+                "title": "The Fellowship of the Ring",
+                "image": "https://covers.openlibrary.org/b/id/13530646-M.jpg",
                 "authors": [
                     {
-                        "id": 17315684,
-                        "name": "United States. Agricultural Research Service. Meat Inspection Division"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 20831538,
-                "title": "The government we choose",
-                "subtitle": "lean, focused, affordable : Governor Weld and Lieutenant Governor Cellucci's plan for downsizing Massachusetts government",
-                "image": "https://covers.openlibrary.org/b/id/9420340-M.jpg",
-                "authors": [
-                    {
-                        "id": 16327264,
-                        "name": "Massachusetts. Governor (1991-1997 : Weld)"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 16804274,
-                "title": "Old St. Nick Carving",
-                "subtitle": "Classic Santas from Wood",
-                "image": "https://covers.openlibrary.org/b/id/1438873-M.jpg",
-                "authors": [
-                    {
-                        "id": 13045234,
-                        "name": "Jeffrey B. Snyder"
+                        "id": 13038776,
+                        "name": "J.R.R. Tolkien"
                     },
                     {
-                        "id": 16804270,
-                        "name": "David Sabol"
-                    }
-                ],
-                "rating": {
-                    "average": 0.0
-                }
-            }
-        ],
-        [
-            {
-                "id": 23414010,
-                "title": "Adobe Flash animation",
-                "subtitle": "creative storytelling for the Web and TV",
-                "image": "https://covers.openlibrary.org/b/id/11585235-M.jpg",
-                "authors": [
-                    {
-                        "id": 23414004,
-                        "name": "Philip Carrera"
-                    }
-                ],
-                "rating": {
-                    "average": 0.800000011920929
-                }
-            }
-        ],
-        [
-            {
-                "id": 22026472,
-                "title": "1988 CIIPS public opinion survey",
-                "subtitle": "security, arms control and defence : public attitudes in Canada",
-                "image": "https://covers.openlibrary.org/b/id/5308360-M.jpg",
-                "authors": [
-                    {
-                        "id": 14343376,
-                        "name": "Michael Driedger"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 17999208,
-                "title": "Her last death",
-                "subtitle": "a memoir",
-                "image": "https://covers.openlibrary.org/b/id/8014654-M.jpg",
-                "authors": [
-                    {
-                        "id": 17999206,
-                        "name": "Susanna Sonnenberg"
-                    }
-                ],
-                "rating": {
-                    "average": 0.6679999828338623
-                }
-            }
-        ],
-        [
-            {
-                "id": 13971944,
-                "title": "The Magical Child",
-                "image": "https://covers.openlibrary.org/b/id/5179345-M.jpg",
-                "authors": [
-                    {
-                        "id": 13971942,
-                        "name": "Carol Dimarco"
-                    }
-                ],
-                "rating": {
-                    "average": 0.0
-                }
-            }
-        ],
-        [
-            {
-                "id": 19386746,
-                "title": "Braided Dreams",
-                "image": "https://covers.openlibrary.org/b/id/1306819-M.jpg",
-                "authors": [
-                    {
-                        "id": 15382502,
-                        "name": "Richard H Orndorff"
-                    }
-                ],
-                "rating": {
-                    "average": 0.0
-                }
-            }
-        ],
-        [
-            {
-                "id": 15359482,
-                "title": "RNP particles, splicing, and autoimmune diseases",
-                "image": "https://covers.openlibrary.org/b/id/2227064-M.jpg",
-                "authors": [
-                    {
-                        "id": 15359470,
-                        "name": "Johannes Schenkel"
-                    }
-                ],
-                "rating": {
-                    "average": 0.0
-                }
-            }
-        ],
-        [
-            {
-                "id": 23221406,
-                "title": "Physical chemistry for physicians and biologists",
-                "image": "https://covers.openlibrary.org/b/id/6269974-M.jpg",
-                "authors": [
-                    {
-                        "id": 23221404,
-                        "name": "Ernst Cohen"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 19194142,
-                "title": "Nonmetals (Material Matters/Freestyle Express)",
-                "image": "https://covers.openlibrary.org/b/id/1765701-M.jpg",
-                "authors": [
-                    {
-                        "id": 13614990,
-                        "name": "Carol Baldwin"
-                    }
-                ],
-                "rating": {
-                    "average": 0.800000011920929
-                }
-            }
-        ],
-        [
-            {
-                "id": 20581680,
-                "title": "New Poems",
-                "image": "https://covers.openlibrary.org/b/id/10644477-M.jpg",
-                "authors": [
-                    {
-                        "id": 20581654,
-                        "name": "Joshua Krugman"
-                    }
-                ],
-                "rating": {
-                    "average": 0.0
-                }
-            }
-        ],
-        [
-            {
-                "id": 21776614,
-                "title": "The Ten Essentials for Travel in the Outdoors",
-                "image": "https://covers.openlibrary.org/b/id/4772970-M.jpg",
-                "authors": [
-                    {
-                        "id": 17383182,
-                        "name": "Mountaineers"
-                    }
-                ],
-                "rating": {
-                    "average": 0.699999988079071
-                }
-            }
-        ],
-        [
-            {
-                "id": 17749350,
-                "title": "The Army times book of great land battles",
-                "subtitle": "from the Civil War to the Gulf War",
-                "image": "https://covers.openlibrary.org/b/id/1225191-M.jpg",
-                "authors": [
-                    {
-                        "id": 17749342,
-                        "name": "J. D. Morelock"
-                    }
-                ],
-                "rating": {
-                    "average": 0.6800000071525574
-                }
-            }
-        ],
-        [
-            {
-                "id": 13722086,
-                "title": "Desert queen",
-                "subtitle": "the many lives and loves of Daisy Bates",
-                "image": "https://covers.openlibrary.org/b/id/12177832-M.jpg",
-                "authors": [
-                    {
-                        "id": 13702832,
-                        "name": "Susanna De Vries"
-                    }
-                ],
-                "rating": {
-                    "average": 0.7139999866485596
-                }
-            }
-        ],
-        [
-            {
-                "id": 14917020,
-                "title": "Story pictures of transportation and communication",
-                "image": "https://covers.openlibrary.org/b/id/6782947-M.jpg",
-                "authors": [
-                    {
-                        "id": 14917012,
-                        "name": "John Y. Beaty"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 24166482,
-                "title": "Cracking the SAT U.S. & World History Subject Tests",
-                "image": "https://covers.openlibrary.org/b/id/231005-M.jpg",
-                "authors": [
-                    {
-                        "id": 13143374,
-                        "name": "Princeton Review"
-                    }
-                ],
-                "rating": {
-                    "average": 0.6859999895095825
-                }
-            }
-        ],
-        [
-            {
-                "id": 20139218,
-                "title": "Hardware/software interface for the Stereo-matrix display",
-                "image": "https://covers.openlibrary.org/b/id/9907104-M.jpg",
-                "authors": [
-                    {
-                        "id": 20139210,
-                        "name": "Ian MacDonald Cunningham"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 21526756,
-                "title": "The lithographs of Charles Banks Wilson",
-                "image": "https://covers.openlibrary.org/b/id/1523723-M.jpg",
-                "authors": [
-                    {
-                        "id": 15721068,
-                        "name": "David C. Hunt"
-                    }
-                ],
-                "rating": {
-                    "average": 1.0
-                }
-            }
-        ],
-        [
-            {
-                "id": 17499492,
-                "title": "Reinvent your kitchen",
-                "image": "https://covers.openlibrary.org/b/id/7387067-M.jpg",
-                "authors": [
-                    {
-                        "id": 13184782,
-                        "name": "Christine E. Barnes"
-                    }
-                ],
-                "rating": {
-                    "average": 0.4000000059604645
-                }
-            }
-        ],
-        [
-            {
-                "id": 17306888,
-                "title": "Evidence taken before the commission appointed to investigate charges of alleged malfeasance of the officials of the Yukon territory ...",
-                "image": "https://covers.openlibrary.org/b/id/7332393-M.jpg",
-                "authors": [
-                    {
-                        "id": 17306864,
-                        "name": "Canada. Ogilvie Commission of Inquiry."
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 22721690,
-                "title": "Witness the Night",
-                "image": "https://covers.openlibrary.org/b/id/10823544-M.jpg",
-                "authors": [
-                    {
-                        "id": 17003118,
-                        "name": "Kishwar Desai"
-                    }
-                ],
-                "rating": {
-                    "average": 0.6919999718666077
-                }
-            }
-        ],
-        [
-            {
-                "id": 14667162,
-                "title": "Frogs",
-                "image": "https://covers.openlibrary.org/b/id/10555667-M.jpg",
-                "authors": [
-                    {
-                        "id": 13104488,
-                        "name": "Melissa Gish"
-                    }
-                ],
-                "rating": {
-                    "average": 0.800000011920929
-                }
-            }
-        ],
-        [
-            {
-                "id": 21084294,
-                "title": "Six Sigma ",
-                "subtitle": "The Mcgraw-Hill 36 Hour Course",
-                "image": "https://covers.openlibrary.org/b/id/59564-M.jpg",
-                "authors": [
-                    {
-                        "id": 13487756,
-                        "name": "Greg Brue"
-                    },
-                    {
-                        "id": 21084276,
-                        "name": "Greg  Brue"
-                    },
-                    {
-                        "id": 21084282,
-                        "name": "Ron  Howes"
-                    },
-                    {
-                        "id": 21084290,
-                        "name": "Ron Howes"
-                    }
-                ],
-                "rating": {
-                    "average": 0.7099999785423279
-                }
-            }
-        ],
-        [
-            {
-                "id": 17057030,
-                "title": "Clinical Nutrition in the Under 5s",
-                "subtitle": "A Pocket Guide",
-                "image": "https://covers.openlibrary.org/b/id/3000074-M.jpg",
-                "authors": [
-                    {
-                        "id": 17057024,
-                        "name": "J. W. L. Puntis"
-                    }
-                ],
-                "rating": {
-                    "average": 0.0
-                }
-            }
-        ],
-        [
-            {
-                "id": 18444568,
-                "title": "Dash & Lily's book of dares",
-                "image": "https://covers.openlibrary.org/b/id/6649904-M.jpg",
-                "authors": [
-                    {
-                        "id": 13862656,
-                        "name": "Rachel Cohn"
-                    }
-                ],
-                "rating": {
-                    "average": 0.75
-                }
-            }
-        ],
-        [
-            {
-                "id": 23666766,
-                "title": "Attitude",
-                "subtitle": "Life Skills (Attitude Series)",
-                "image": "https://covers.openlibrary.org/b/id/2091715-M.jpg",
-                "authors": [
-                    {
-                        "id": 23666756,
-                        "name": "Living the Good News"
-                    }
-                ],
-                "rating": {
-                    "average": 0.6000000238418579
-                }
-            }
-        ],
-        [
-            {
-                "id": 22279228,
-                "title": "Not in My Bed!",
-                "subtitle": "The Wrong Bed",
-                "image": "https://covers.openlibrary.org/b/id/2409358-M.jpg",
-                "authors": [
-                    {
-                        "id": 13669890,
-                        "name": "Kate Hoffmann"
-                    }
-                ],
-                "rating": {
-                    "average": 0.7139999866485596
-                }
-            }
-        ],
-        [
-            {
-                "id": 18251964,
-                "title": "Punishment Bound (Silver Mink)",
-                "image": "https://covers.openlibrary.org/b/id/2108563-M.jpg",
-                "authors": [
-                    {
-                        "id": 17935634,
-                        "name": "Francine Whittaker"
-                    }
-                ],
-                "rating": {
-                    "average": 0.800000011920929
-                }
-            }
-        ],
-        [
-            {
-                "id": 19639502,
-                "title": "All in! All in! a selection of Dublin children's traditional street-games with rhymes and music",
-                "subtitle": "a selection of Dublin children's traditional street-games with rhymes and music",
-                "image": "https://covers.openlibrary.org/b/id/9614028-M.jpg",
-                "authors": [
-                    {
-                        "id": 19639496,
-                        "name": "Eilís Brady"
-                    }
-                ],
-                "rating": {
-                    "average": 0.8500000238418579
-                }
-            }
-        ],
-        [
-            {
-                "id": 15612238,
-                "title": "Lucy The Lonely Kitten (Kitten Friends, #7)",
-                "image": "https://covers.openlibrary.org/b/id/436558-M.jpg",
-                "authors": [
-                    {
-                        "id": 13141020,
-                        "name": "Jenny Dale"
+                        "id": 27067082,
+                        "name": "Rob Inglis"
                     }
                 ],
                 "rating": {
@@ -707,113 +410,440 @@
         ],
         [
             {
-                "id": 20834436,
-                "title": "Crumple",
-                "image": "https://covers.openlibrary.org/b/id/791302-M.jpg",
+                "id": 20739958,
+                "title": "Pride and Prejudice",
+                "image": "https://covers.openlibrary.org/b/id/12648774-M.jpg",
                 "authors": [
                     {
-                        "id": 14891208,
-                        "name": "Dave Cooper"
+                        "id": 13073504,
+                        "name": "Jane Austen"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8560000061988831
+                }
+            }
+        ],
+        [
+            {
+                "id": 24355534,
+                "title": "Pride and Prejudice",
+                "subtitle": "with Connections",
+                "image": "https://covers.openlibrary.org/b/id/4348088-M.jpg",
+                "authors": [
+                    {
+                        "id": 13073504,
+                        "name": "Jane Austen"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8560000061988831
+                }
+            }
+        ],
+        [
+            {
+                "id": 21889836,
+                "title": "The Kite Runner",
+                "image": "https://covers.openlibrary.org/b/id/9248229-M.jpg",
+                "authors": [
+                    {
+                        "id": 13290436,
+                        "name": "Khaled Hosseini"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8659999966621399
+                }
+            }
+        ],
+        [
+            {
+                "id": 18409862,
+                "title": "Animal Farm With Connections",
+                "image": "https://covers.openlibrary.org/b/id/10524386-M.jpg",
+                "authors": [
+                    {
+                        "id": 13244072,
+                        "name": "George Orwell"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7960000038146973
+                }
+            }
+        ],
+        [
+            {
+                "id": 23663662,
+                "title": "Animal Farm and Related Readings (Glencoe Literature Library)",
+                "image": "https://covers.openlibrary.org/b/id/9999292-M.jpg",
+                "authors": [
+                    {
+                        "id": 13244072,
+                        "name": "George Orwell"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7960000038146973
+                }
+            }
+        ],
+        [
+            {
+                "id": 14090022,
+                "title": "Animal farm a fairy story",
+                "subtitle": "a fairy story",
+                "image": "https://covers.openlibrary.org/b/id/10524476-M.jpg",
+                "authors": [
+                    {
+                        "id": 13244072,
+                        "name": "George Orwell"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7960000038146973
+                }
+            }
+        ],
+        [
+            {
+                "id": 17938894,
+                "title": "Animal Farm/Coles Notes",
+                "image": "https://covers.openlibrary.org/b/id/12862185-M.jpg",
+                "authors": [
+                    {
+                        "id": 13244072,
+                        "name": "George Orwell"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7960000038146973
+                }
+            }
+        ],
+        [
+            {
+                "id": 17938926,
+                "title": "Animal Farm and Related Readings",
+                "image": "https://covers.openlibrary.org/b/id/10524346-M.jpg",
+                "authors": [
+                    {
+                        "id": 13244072,
+                        "name": "George Orwell"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7960000038146973
+                }
+            }
+        ],
+        [
+            {
+                "id": 16961564,
+                "title": "Animal Farm",
+                "image": "https://covers.openlibrary.org/b/id/-1-M.jpg",
+                "authors": [
+                    {
+                        "id": 13244072,
+                        "name": "George Orwell"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7960000038146973
+                }
+            }
+        ],
+        [
+            {
+                "id": 22272124,
+                "title": "The lord of the rings",
+                "image": "https://covers.openlibrary.org/b/id/13201380-M.jpg",
+                "authors": [
+                    {
+                        "id": 13038776,
+                        "name": "J.R.R. Tolkien"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8759999871253967
+                }
+            }
+        ],
+        [
+            {
+                "id": 20182138,
+                "title": "The Fellowship of the Ring",
+                "subtitle": "Being the first part of The Lord of the Rings",
+                "image": "https://covers.openlibrary.org/b/id/8171428-M.jpg",
+                "authors": [
+                    {
+                        "id": 13038776,
+                        "name": "J.R.R. Tolkien"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8759999871253967
+                }
+            }
+        ],
+        [
+            {
+                "id": 16020306,
+                "title": "Gone Girl",
+                "subtitle": "a novel",
+                "image": "https://covers.openlibrary.org/b/id/11567795-M.jpg",
+                "authors": [
+                    {
+                        "id": 16020298,
+                        "name": "Gillian Flynn"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8240000009536743
+                }
+            }
+        ],
+        [
+            {
+                "id": 21765364,
+                "title": "Angels & demons",
+                "image": "https://covers.openlibrary.org/b/id/11408194-M.jpg",
+                "authors": [
+                    {
+                        "id": 13189766,
+                        "name": "Dan Brown"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7860000133514404
+                }
+            }
+        ],
+        [
+            {
+                "id": 23027824,
+                "title": "The girl on the train",
+                "image": "https://covers.openlibrary.org/b/id/10231953-M.jpg",
+                "authors": [
+                    {
+                        "id": 21877842,
+                        "name": "Paula Hawkins"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7900000214576721
+                }
+            }
+        ],
+        [
+            {
+                "id": 24188152,
+                "title": "The girl on the train",
+                "image": "https://covers.openlibrary.org/b/id/11005407-M.jpg",
+                "authors": [
+                    {
+                        "id": 21877842,
+                        "name": "Paula Hawkins"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7900000214576721
+                }
+            }
+        ],
+        [
+            {
+                "id": 19331354,
+                "title": "The illustrated Alchemist",
+                "subtitle": "a fable about following your dream",
+                "image": "https://covers.openlibrary.org/b/id/22871-M.jpg",
+                "authors": [
+                    {
+                        "id": 13100698,
+                        "name": "Paulo Coelho"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7799999713897705
+                }
+            }
+        ],
+        [
+            {
+                "id": 15701868,
+                "title": "The Da Vinci Code",
+                "subtitle": "a novel",
+                "image": "https://covers.openlibrary.org/b/id/10520459-M.jpg",
+                "authors": [
+                    {
+                        "id": 13189766,
+                        "name": "Dan Brown"
                     },
                     {
-                        "id": 15124196,
-                        "name": "David Cooper (undifferentiated)"
+                        "id": 14217666,
+                        "name": "Paul Michael"
+                    },
+                    {
+                        "id": 27081396,
+                        "name": "Dan Brown"
                     }
                 ],
                 "rating": {
-                    "average": 0.722000002861023
+                    "average": 0.7799999713897705
                 }
             }
         ],
         [
             {
-                "id": 16807172,
-                "title": "The 2007-2012 Outlook for Commercial Coin-Operated Laundry Drying Tumblers with More Than 10 Kg (22 Pounds) Load Capacity Excluding Parts, Attachments, and Accessories in the United States",
-                "image": "https://covers.openlibrary.org/b/id/2444718-M.jpg",
+                "id": 19519202,
+                "title": "Thousand Splendid Suns",
+                "image": "https://covers.openlibrary.org/b/id/12581285-M.jpg",
                 "authors": [
                     {
-                        "id": 13033190,
-                        "name": "Philip M. Parker"
+                        "id": 13290436,
+                        "name": "Khaled Hosseini"
                     }
                 ],
                 "rating": {
-                    "average": 0.0
+                    "average": 0.8840000033378601
                 }
             }
         ],
         [
             {
-                "id": 18002106,
-                "title": "Annual report of the Commissioner of Banks for the year ending ... Relating to savings banks and institutions for savings",
-                "subtitle": "Relating to savings banks and institutions for savings",
-                "image": "https://covers.openlibrary.org/b/id/9966173-M.jpg",
+                "id": 17228774,
+                "title": "Mil sols esplèndids",
+                "image": "https://covers.openlibrary.org/b/id/8579787-M.jpg",
                 "authors": [
                     {
-                        "id": 14699484,
-                        "name": "Massachusetts. Division of Banks and Loan Agencies"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 27251568,
-                "title": "Cattle purchases by Agricultural Adjustment Administration from drought areas June 1934 to February 1935",
-                "image": "https://covers.openlibrary.org/b/id/14601835-M.jpg",
-                "authors": [
+                        "id": 13290436,
+                        "name": "Khaled Hosseini"
+                    },
                     {
-                        "id": 27251566,
-                        "name": "Harry Petrie"
-                    }
-                ]
-            }
-        ],
-        [
-            {
-                "id": 24611842,
-                "title": "Process-based strategic planning",
-                "image": "https://covers.openlibrary.org/b/id/9462165-M.jpg",
-                "authors": [
-                    {
-                        "id": 24611832,
-                        "name": "Richard Kühn"
+                        "id": 27067736,
+                        "name": "Beatriu Cajal"
                     }
                 ],
                 "rating": {
-                    "average": 0.6660000085830688
+                    "average": 0.8840000033378601
                 }
             }
         ],
         [
             {
-                "id": 23224304,
-                "title": "Evidence-based management of pancreatic malignancy",
-                "image": "https://covers.openlibrary.org/b/id/10579474-M.jpg",
+                "id": 20387084,
+                "title": "A Thousand Splendid Suns (Readers Circle (Center Point))",
+                "image": "https://covers.openlibrary.org/b/id/2010945-M.jpg",
                 "authors": [
                     {
-                        "id": 23224292,
-                        "name": "Richard K. Orr"
+                        "id": 13290436,
+                        "name": "Khaled Hosseini"
                     }
                 ],
                 "rating": {
-                    "average": 0.0
+                    "average": 0.8840000033378601
                 }
             }
         ],
         [
             {
-                "id": 15169776,
-                "title": "The 826 Quarterly, Vol. 3",
-                "subtitle": "Fall 2004 (826 Quarterly, The)",
-                "image": "https://covers.openlibrary.org/b/id/2125278-M.jpg",
+                "id": 27559358,
+                "title": "Looking for Alaska",
                 "authors": [
                     {
-                        "id": 13278986,
-                        "name": "Students in Conjunction with 826 Valencia"
+                        "id": 13145446,
+                        "name": "John Green - undifferentiated"
                     }
                 ],
                 "rating": {
-                    "average": 0.800000011920929
+                    "average": 0.7919999957084656
+                }
+            }
+        ],
+        [
+            {
+                "id": 18542786,
+                "title": "Looking for Alaska",
+                "image": "https://covers.openlibrary.org/b/id/1818573-M.jpg",
+                "authors": [
+                    {
+                        "id": 13145446,
+                        "name": "John Green - undifferentiated"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7960000038146973
+                }
+            }
+        ],
+        [
+            {
+                "id": 16984526,
+                "title": "Looking for Alaska",
+                "image": "https://covers.openlibrary.org/b/id/13307643-M.jpg",
+                "authors": [
+                    {
+                        "id": 16984520,
+                        "name": "John Green"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7960000038146973
+                }
+            }
+        ],
+        [
+            {
+                "id": 27067750,
+                "title": "Ciutats de paper",
+                "image": "https://covers.openlibrary.org/b/id/13524712-M.jpg",
+                "authors": [
+                    {
+                        "id": 16984520,
+                        "name": "John Green"
+                    },
+                    {
+                        "id": 27067646,
+                        "name": "Mercè Santaularia Campillo"
+                    }
+                ],
+                "rating": {
+                    "average": 0.7400000095367432
+                }
+            }
+        ],
+        [
+            {
+                "id": 20778556,
+                "title": "Two Towers : The Lord of the Rings",
+                "subtitle": "Part Two",
+                "image": "https://covers.openlibrary.org/b/id/13220226-M.jpg",
+                "authors": [
+                    {
+                        "id": 13038776,
+                        "name": "J.R.R. Tolkien"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8939999938011169
+                }
+            }
+        ],
+        [
+            {
+                "id": 15360182,
+                "title": "The Two Towers",
+                "subtitle": "Being the Second Part of The Lord of the Rings",
+                "image": "https://covers.openlibrary.org/b/id/10511021-M.jpg",
+                "authors": [
+                    {
+                        "id": 13038776,
+                        "name": "J.R.R. Tolkien"
+                    }
+                ],
+                "rating": {
+                    "average": 0.8939999938011169
                 }
             }
         ]

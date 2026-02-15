@@ -1,0 +1,337 @@
+# ===================================
+# BookBuddy MERN Stack .gitignore
+# ===================================
+
+# ===================================
+# Environment Variables & Secrets
+# ===================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.example
+config.env
+secrets.json
+
+# ===================================
+# Node.js Dependencies
+# ===================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ===================================
+# Package Manager Files
+# ===================================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.yarn/
+.pnp.*
+
+# ===================================
+# Build & Distribution Files
+# ===================================
+build/
+dist/
+out/
+.next/
+.nuxt/
+.vuepress/dist/
+.serverless/
+
+# Frontend build files
+frontend/build/
+frontend/dist/
+
+# ===================================
+# Runtime & Cache Files
+# ===================================
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ===================================
+# Logs
+# ===================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ===================================
+# Coverage & Testing
+# ===================================
+coverage/
+*.lcov
+.nyc_output/
+.coverage/
+.jest/
+test-results/
+junit.xml
+
+# ===================================
+# IDE & Editor Files
+# ===================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.vim
+.vimrc
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ===================================
+# MongoDB & Database Files
+# ===================================
+# MongoDB playground files (auto-generated)
+playground-*.mongodb.js
+*.mongodb.js
+
+# Database dumps
+*.dump
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+
+# MongoDB data directory (if running locally)
+data/
+mongodb-data/
+
+# ===================================
+# Temporary Files
+# ===================================
+tmp/
+temp/
+.tmp/
+.temp/
+*.tmp
+*.temp
+
+# ===================================
+# OS Generated Files
+# ===================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===================================
+# Security & Certificates
+# ===================================
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+ssl/
+certificates/
+
+# ===================================
+# Deployment & Production
+# ===================================
+.vercel/
+.netlify/
+.firebase/
+.aws/
+.gcp/
+.azure/
+.heroku/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# ===================================
+# Backup Files
+# ===================================
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*~
+
+# ===================================
+# Media & Upload Files
+# ===================================
+# User uploaded files (if storing locally)
+uploads/
+public/uploads/
+static/uploads/
+media/
+images/user-uploads/
+
+# Large media files
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mkv
+*.m4v
+*.3gp
+
+# ===================================
+# Documentation Build
+# ===================================
+docs/_build/
+site/
+_site/
+
+# ===================================
+# Miscellaneous
+# ===================================
+# Dependency directories
+jspm_packages/
+web_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Storybook build outputs
+.out
+.storybook-out
+storybook-static
+
+# Temporary folders
+tmp/
+temp/
+
+# ===================================
+# Project Specific
+# ===================================
+# BookBuddy specific ignores
+
+# Product images (if storing locally)
+backend/uploads/
+frontend/public/product-images/
+
+# Session files
+sessions/
+
+# Email templates compiled
+email-templates-compiled/
+
+# API documentation generated files
+api-docs/
+
+# Test data
+test-data/
+mock-data/
+
+# ===================================
+# End of .gitignore
+# ===================================

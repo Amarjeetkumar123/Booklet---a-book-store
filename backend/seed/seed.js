@@ -54,8 +54,7 @@ const manningProducts = manningBooks.map((book, index) => {
   const subtitle = book.subtitle ? ` - ${book.subtitle}` : "";
   const description = `${title}${subtitle}${authors ? ` by ${authors}` : ""}`;
   const price = Number((Math.random() * 800 + 150).toFixed(0)); // Price in INR
-  const imageUrl = book.image || "";
-  const fallbackUrl = `https://placehold.co/600x800?text=${encodeURIComponent(title)}`;
+  const imageUrl = book.image || ""; // Use only database images
   const randomCategory = bookCategories[index % bookCategories.length];
 
   return {
@@ -65,7 +64,7 @@ const manningProducts = manningBooks.map((book, index) => {
     category: randomCategory,
     quantity: Math.max(10, Math.min(100, 20)),
     shipping: true,
-    imageUrl: imageUrl || fallbackUrl,
+    imageUrl: imageUrl,
   };
 });
 

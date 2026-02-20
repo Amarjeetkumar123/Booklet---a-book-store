@@ -53,7 +53,7 @@ const manningProducts = manningBooks.map((book, index) => {
   const title = book.title || "Untitled";
   const subtitle = book.subtitle ? ` - ${book.subtitle}` : "";
   const description = `${title}${subtitle}${authors ? ` by ${authors}` : ""}`;
-  const price = Number((Math.random() * 30 + 10).toFixed(2));
+  const price = Number((Math.random() * 800 + 150).toFixed(0)); // Price in INR
   const imageUrl = book.image || "";
   const fallbackUrl = `https://placehold.co/600x800?text=${encodeURIComponent(title)}`;
   const randomCategory = bookCategories[index % bookCategories.length];

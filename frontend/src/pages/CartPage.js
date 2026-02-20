@@ -28,10 +28,7 @@ const CartPage = () => {
       cart?.map((item) => {
         total = total + item.price;
       });
-      return total.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-      });
+      return '₹' + total.toLocaleString("en-IN");
     } catch (error) {
       console.log(error);
     }
@@ -166,7 +163,7 @@ const CartPage = () => {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-2 min-w-[70px]">
-                        <p className="text-sm font-bold text-accent-600">{(p.price * (p.qty || 1)).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</p>
+                        <p className="text-sm font-bold text-accent-600">₹{(p.price * (p.qty || 1)).toLocaleString('en-IN')}</p>
                         <button
                           onClick={() => removeCartItem(p._id)}
                           className="p-1 text-red-600 hover:text-white hover:bg-red-600 rounded-full transition-all border border-red-200 hover:border-red-600"
@@ -195,7 +192,7 @@ const CartPage = () => {
                         Subtotal ({cart?.length} items)
                       </span>
                       <span className="font-bold text-primary-900">
-                        {cart.reduce((acc, p) => acc + (p.price * (p.qty || 1)), 0).toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                        ₹{cart.reduce((acc, p) => acc + (p.price * (p.qty || 1)), 0).toLocaleString("en-IN")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-xs border-b border-primary-100 pb-2">
@@ -205,7 +202,7 @@ const CartPage = () => {
                     <div className="bg-accent-50 rounded-lg p-3 border border-accent-200">
                       <div className="flex justify-between items-center text-sm font-bold">
                         <span className="text-primary-900">Total</span>
-                        <span className="text-accent-600">{cart.reduce((acc, p) => acc + (p.price * (p.qty || 1)), 0).toLocaleString("en-US", { style: "currency", currency: "USD" })}</span>
+                        <span className="text-accent-600">₹{cart.reduce((acc, p) => acc + (p.price * (p.qty || 1)), 0).toLocaleString("en-IN")}</span>
                       </div>
                     </div>
                   </div>

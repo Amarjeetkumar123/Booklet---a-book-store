@@ -5,7 +5,39 @@ module.exports = {
     extend: {
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
+        playfair: ["Playfair Display", "serif"],
         sans: ["Poppins", "sans-serif"],
+      },
+      typography: {
+        DEFAULT: {
+          css: {
+            fontFamily: '"Poppins", sans-serif',
+            h1: {
+              fontFamily: '"Poppins", sans-serif',
+              fontWeight: "700",
+            },
+            h2: {
+              fontFamily: '"Poppins", sans-serif',
+              fontWeight: "700",
+            },
+            h3: {
+              fontFamily: '"Poppins", sans-serif',
+              fontWeight: "700",
+            },
+            h4: {
+              fontFamily: '"Poppins", sans-serif',
+              fontWeight: "700",
+            },
+            h5: {
+              fontFamily: '"Poppins", sans-serif',
+              fontWeight: "700",
+            },
+            h6: {
+              fontFamily: '"Poppins", sans-serif',
+              fontWeight: "700",
+            },
+          },
+        },
       },
       colors: {
         primary: {

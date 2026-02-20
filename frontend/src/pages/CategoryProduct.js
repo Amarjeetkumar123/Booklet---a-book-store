@@ -114,10 +114,7 @@ const CategoryProduct = () => {
 
                     <div className="mb-3">
                       <span className="text-lg font-bold text-accent-600">
-                        {p.price.toLocaleString("en-US", {
-                          style: "currency",
-                          currency: "USD",
-                        })}
+                        ₹{p.price.toLocaleString("en-IN")}
                       </span>
                     </div>
                     <div className="flex gap-2">

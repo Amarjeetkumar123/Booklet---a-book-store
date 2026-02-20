@@ -268,7 +268,7 @@ const HomePage = () => {
                     <span className="text-xs text-primary-600">(425)</span>
                   </div>
                   <span className="text-lg font-bold text-accent-600 mb-auto">
-                    {p.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    ₹{p.price.toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
@@ -317,7 +317,7 @@ const HomePage = () => {
                     {p.name}
                   </h3>
                   <span className="text-sm font-bold text-accent-600">
-                    {p.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                    ₹{p.price.toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
@@ -430,7 +430,7 @@ const HomePage = () => {
                     </p>
                     <div className="mb-3">
                       <span className="text-lg font-bold text-accent-600">
-                        {p.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                        ₹{p.price.toLocaleString("en-IN")}
                       </span>
                     </div>
                     <div className="flex gap-2 mt-auto">
@@ -747,7 +747,7 @@ const HomePage = () => {
                   </p>
                   <div className="mb-2">
                     <span className="text-lg font-bold text-accent-600">
-                      {p.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                      ₹{p.price.toLocaleString("en-IN")}
                     </span>
                   </div>
                   <div className="flex gap-1.5">

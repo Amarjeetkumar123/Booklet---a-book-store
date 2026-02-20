@@ -228,10 +228,7 @@ const ProductDetails = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <span className="text-2xl font-bold bg-gradient-to-r from-accent-600 to-accent-700 bg-clip-text text-transparent">
-                        {product?.price?.toLocaleString("en-US", {
-                          style: "currency",
-                          currency: "USD",
-                        })}
+                        ₹{product?.price?.toLocaleString("en-IN")}
                       </span>
                     </div>
 
@@ -561,10 +558,7 @@ const ProductDetails = () => {
                       </h3>
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-xl font-bold text-accent-600">
-                          {p.price.toLocaleString("en-US", {
-                            style: "currency",
-                            currency: "USD",
-                          })}
+                          ₹{p.price.toLocaleString("en-IN")}
                         </span>
                         <div className="flex items-center space-x-1">
                           <FiStar className="h-5 w-5 text-accent-400 fill-current" />

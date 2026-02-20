@@ -518,14 +518,6 @@ const HomePage = () => {
                               <span className="text-primary-400 text-sm font-medium">No image available</span>
                             </div>
                           )}
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
-                            <button
-                              onClick={() => navigate(`/product/${p.slug}`)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity bg-accent-100 text-accent-700 px-4 py-2 rounded-lg hover:bg-accent-200 font-medium border border-accent-200 flex items-center gap-2 text-sm"
-                            >
-                              <FiEye className="w-4 h-4" /> Quick View
-                            </button>
-                          </div>
                         </div>
                         <div className="p-4 flex-grow flex flex-col">
                           <h3 className="text-sm font-semibold text-primary-900 line-clamp-2 mb-2 h-9">
@@ -559,7 +551,7 @@ const HomePage = () => {
                               onClick={() => navigate(`/product/${p.slug}`)}
                               className="flex-1 bg-primary-100 text-primary-800 py-2 px-2 rounded-lg hover:bg-primary-200 transition-all text-xs font-medium hover:shadow-sm whitespace-nowrap"
                             >
-                              Details
+                              View
                             </button>
                             <button
                               onClick={() => {

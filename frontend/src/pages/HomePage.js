@@ -227,7 +227,7 @@ const HomePage = () => {
           <div className="flex gap-6">
             {/* Sidebar Filter - Desktop */}
             <div className={`hidden lg:block flex-shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'}`}>
-              <div className="bg-white rounded-xl shadow-md border border-primary-100 sticky top-20 h-fit overflow-y-auto scrollbar-thin scrollbar-thumb-accent-500 scrollbar-track-transparent"
+              <div className="bg-white rounded-xl shadow-md border border-primary-100 sticky top-20 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-thin scrollbar-thumb-accent-500 scrollbar-track-transparent"
                 style={{
                   scrollbarColor: '#d4a574 transparent',
                   scrollbarWidth: 'thin'
@@ -256,7 +256,7 @@ const HomePage = () => {
                     {/* Reset Button */}
                     <button
                       onClick={handleResetFilters}
-                      className="w-full text-xs text-accent-600 hover:text-accent-700 font-medium py-2 hover:bg-primary-50 rounded-lg transition-colors"
+                      className="w-full bg-accent-100 text-accent-700 px-4 py-2 rounded-lg hover:bg-accent-200 transition-all font-medium shadow-sm border border-accent-200 text-sm"
                     >
                       Reset All Filters
                     </button>
@@ -284,7 +284,12 @@ const HomePage = () => {
                     {/* Category Filter */}
                     <div className="border-t border-primary-100 pt-6">
                       <h4 className="font-semibold text-primary-900 mb-3 text-sm">Category</h4>
-                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                      <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-accent-500 scrollbar-track-transparent"
+                        style={{
+                          scrollbarColor: '#d4a574 transparent',
+                          scrollbarWidth: 'thin'
+                        }}
+                      >
                         <label className="flex items-center gap-3 cursor-pointer">
                           <input
                             type="radio"
@@ -399,7 +404,12 @@ const HomePage = () => {
                   {/* Category Filter */}
                   <div className="mb-6 border-t border-primary-100 pt-6">
                     <h4 className="font-semibold text-primary-900 mb-3 text-sm">Category</h4>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                    <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-accent-500 scrollbar-track-transparent"
+                      style={{
+                        scrollbarColor: '#d4a574 transparent',
+                        scrollbarWidth: 'thin'
+                      }}
+                    >
                       <label className="flex items-center gap-3 cursor-pointer">
                         <input
                           type="radio"

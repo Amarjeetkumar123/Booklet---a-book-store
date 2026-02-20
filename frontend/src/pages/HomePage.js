@@ -5,7 +5,7 @@ import { useWishlist } from "../context/wishlist";
 import axios from "../config/axios";
 import toast from "react-hot-toast";
 import Layout from "./../components/Layout/Layout";
-import { FiChevronRight, FiStar, FiSearch, FiEye, FiHeart, FiX, FiFilter, FiBook } from "react-icons/fi";
+import { FiChevronRight, FiStar, FiSearch, FiEye, FiHeart, FiX, FiFilter, FiBook, FiShoppingCart } from "react-icons/fi";
 import { Prices } from "../components/Price";
 import "../styles/Homepage.css";
 
@@ -256,9 +256,9 @@ const HomePage = () => {
                     {/* Reset Button */}
                     <button
                       onClick={handleResetFilters}
-                      className="w-full bg-accent-100 text-accent-700 px-4 py-2 rounded-lg hover:bg-accent-200 transition-all font-medium shadow-sm border border-accent-200 text-sm"
+                      className="w-full bg-accent-100 text-accent-700 px-3 py-2 rounded-lg hover:bg-accent-200 transition-all font-medium shadow-sm border border-accent-200 text-xs"
                     >
-                      Reset All Filters
+                      Reset Filters
                     </button>
 
                     {/* Price Filter */}
@@ -509,7 +509,7 @@ const HomePage = () => {
 
               {displayProducts?.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     {displayProducts.map((p) => (
                       <div
                         key={p._id}
@@ -556,12 +556,13 @@ const HomePage = () => {
                           </div>
 
                           {/* Action Buttons */}
-                          <div className="flex gap-2 mt-auto">
+                          <div className="grid grid-cols-3 gap-2 mt-auto">
                             <button
                               onClick={() => navigate(`/product/${p.slug}`)}
-                              className="flex-1 bg-primary-100 text-primary-800 py-2 px-2 rounded-lg hover:bg-primary-200 transition-all text-xs font-medium hover:shadow-sm whitespace-nowrap"
+                              className="bg-primary-100 text-primary-800 py-2 px-2 rounded-lg hover:bg-primary-200 transition-all text-xs font-medium hover:shadow-sm flex items-center justify-center gap-1"
                             >
-                              View
+                              <FiEye className="w-4 h-4 flex-shrink-0" />
+                              <span>View</span>
                             </button>
                             <button
                               onClick={() => {
@@ -574,7 +575,7 @@ const HomePage = () => {
                                   toast.success("Added to wishlist");
                                 }
                               }}
-                              className={`flex-1 flex items-center justify-center py-2 px-2 rounded-lg transition-all text-xs font-medium border ${
+                              className={`flex items-center justify-center py-2 px-2 rounded-lg transition-all font-medium border ${
                                 wishlist.find(item => item._id === p._id)
                                   ? "bg-red-100 text-red-700 border-red-300"
                                   : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
@@ -589,9 +590,10 @@ const HomePage = () => {
                                 localStorage.setItem("cart", JSON.stringify([...cart, p]));
                                 toast.success("Item Added to cart");
                               }}
-                              className="flex-1 bg-accent-100 text-accent-700 py-2 px-2 rounded-lg hover:bg-accent-200 transition-all text-xs font-medium border border-accent-200 whitespace-nowrap"
+                              className="bg-accent-100 text-accent-700 py-2 px-2 rounded-lg hover:bg-accent-200 transition-all text-xs font-medium border border-accent-200 flex items-center justify-center gap-1"
                             >
-                              Cart
+                              <FiShoppingCart className="w-4 h-4 flex-shrink-0" />
+                              <span>Cart</span>
                             </button>
                           </div>
                         </div>

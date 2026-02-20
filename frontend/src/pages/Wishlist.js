@@ -4,7 +4,7 @@ import Layout from "../components/Layout/Layout";
 import { useWishlist } from "../context/wishlist";
 import { useCart } from "../context/cart";
 import toast from "react-hot-toast";
-import { FiTrash2, FiShoppingCart, FiArrowLeft } from "react-icons/fi";
+import { FiTrash2, FiShoppingCart, FiArrowLeft, FiEye } from "react-icons/fi";
 
 const WishlistPage = () => {
   const navigate = useNavigate();
@@ -46,50 +46,55 @@ const WishlistPage = () => {
 
   return (
     <Layout title={"Your Wishlist"}>
-      <div className="pt-24 pb-16 bg-primary-50 min-h-screen">
+      <div className="pt-24 pb-16 bg-gradient-to-br from-primary-50 via-white to-accent-50 min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-12">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-accent-600 hover:text-accent-700 font-semibold mb-4 transition-colors"
+              className="inline-flex items-center gap-2 text-accent-600 hover:text-accent-700 font-semibold mb-6 transition-all hover:gap-3 group"
             >
-              <FiArrowLeft /> Back
+              <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Back
             </button>
-            <h1 className="text-3xl md:text-4xl font-bold text-primary-900 mb-2">
-              ❤️ My Wishlist
-            </h1>
-            <p className="text-primary-600">
-              {wishlist.length} {wishlist.length === 1 ? "item" : "items"} in
-              your wishlist
-            </p>
+            <div className="space-y-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-primary-900">
+                <span className="text-red-600">❤️</span> My Wishlist
+              </h1>
+              <p className="text-lg text-primary-600 font-medium">
+                {wishlist.length} {wishlist.length === 1 ? "item" : "items"} saved for later
+              </p>
+            </div>
           </div>
 
           {wishlist.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-              <div className="text-6xl mb-4">📚</div>
-              <h2 className="text-2xl font-bold text-primary-900 mb-2">
+            <div className="bg-white rounded-2xl shadow-lg border border-primary-100 p-16 text-center backdrop-blur-sm">
+              <div className="mb-6 inline-block text-7xl p-6 bg-gradient-to-br from-accent-50 to-primary-50 rounded-full">📚</div>
+              <h2 className="text-3xl font-bold text-primary-900 mb-3">
                 Your wishlist is empty
               </h2>
-              <p className="text-primary-600 mb-6">
-                Add your favorite books to your wishlist and come back later!
+              <p className="text-primary-600 mb-8 text-lg max-w-md mx-auto">
+                Start adding your favorite books to your wishlist and discover amazing reads!
               </p>
               <button
                 onClick={() => navigate("/categories")}
-                className="bg-accent-100 text-accent-700 px-8 py-3 rounded-lg hover:bg-accent-200 transition-all font-semibold border border-accent-200 inline-flex items-center gap-2"
+                className="bg-gradient-to-r from-accent-500 to-accent-600 text-white px-10 py-3 rounded-lg hover:from-accent-600 hover:to-accent-700 transition-all font-semibold shadow-lg hover:shadow-xl inline-flex items-center gap-2 group"
               >
                 Continue Shopping
+                <FiArrowLeft className="rotate-180 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           ) : (
             <>
               {/* Action Buttons */}
-              <div className="mb-6 flex gap-3 justify-end">
+              <div className="mb-8 flex gap-3 justify-between items-center">
+                <div className="text-sm font-medium text-primary-600">
+                  {wishlist.length} item{wishlist.length !== 1 ? "s" : ""} ready to shop
+                </div>
                 <button
                   onClick={moveAllToCart}
-                  className="bg-accent-100 text-accent-700 px-6 py-3 rounded-lg hover:bg-accent-200 transition-all font-semibold border border-accent-200 inline-flex items-center gap-2 shadow-sm"
+                  className="bg-gradient-to-r from-accent-500 to-accent-600 text-white px-8 py-3 rounded-lg hover:from-accent-600 hover:to-accent-700 transition-all font-semibold shadow-lg hover:shadow-xl inline-flex items-center gap-2 group"
                 >
-                  <FiShoppingCart /> Move All to Cart
+                  <FiShoppingCart className="group-hover:scale-110 transition-transform" /> Move All to Cart
                 </button>
               </div>
 
@@ -98,10 +103,10 @@ const WishlistPage = () => {
                 {wishlist.map((product) => (
                   <div
                     key={product._id}
-                    className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-primary-100 hover:border-accent-200"
+                    className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-primary-100 hover:border-accent-300 flex flex-col group hover:scale-105"
                   >
                     {/* Product Image */}
-                    <div className="relative h-48 bg-primary-100 overflow-hidden">
+                    <div className="relative h-56 bg-gradient-to-br from-primary-100 to-primary-50 overflow-hidden">
                       <img
                         src={
                           product.imageUrl ||
@@ -110,70 +115,71 @@ const WishlistPage = () => {
                           )}`
                         }
                         alt={product.name}
-                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-125 transition-transform duration-500"
                       />
-                      <div className="absolute top-3 right-3 bg-accent-100 text-accent-700 px-3 py-1 rounded-full text-sm font-semibold">
+                      <div className="absolute top-4 right-4 bg-gradient-to-r from-accent-500 to-accent-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
                         ₹{product.price}
                       </div>
+                      <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity duration-300"></div>
                     </div>
 
                     {/* Product Info */}
-                    <div className="p-4">
-                      <h3 className="font-bold text-primary-900 text-sm line-clamp-2 mb-1">
+                    <div className="p-3.5 flex flex-col flex-1">
+                      <h3 className="font-bold text-primary-900 text-xs line-clamp-2 mb-1 leading-snug">
                         {product.name}
                       </h3>
-                      <p className="text-xs text-primary-600 line-clamp-1 mb-3">
+                      <p className="text-xs text-primary-600 line-clamp-1 mb-2">
                         {product.description}
                       </p>
 
                       {/* Rating */}
                       {product.rating && (
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="flex text-accent-500">
+                        <div className="flex items-center gap-1.5 mb-3">
+                          <div className="flex text-accent-400 text-sm">
                             {"⭐".repeat(Math.floor(product.rating))}
                           </div>
-                          <span className="text-xs text-primary-500">
+                          <span className="text-xs text-primary-500 font-medium">
                             ({product.ratingCount || 0})
                           </span>
                         </div>
                       )}
 
                       {/* Action Buttons */}
-                      <div className="flex gap-2">
+                      <div className="grid grid-cols-3 gap-1.5 mt-auto pt-3 border-t border-primary-100">
                         <button
                           onClick={() => addToCart(product)}
-                          className="flex-1 bg-accent-100 text-accent-700 px-3 py-2 rounded-lg hover:bg-accent-200 transition-all font-semibold text-sm border border-accent-200"
+                          className="bg-gradient-to-r from-accent-500 to-accent-600 text-white px-1.5 py-2 rounded-lg hover:from-accent-600 hover:to-accent-700 transition-all font-semibold text-xs flex items-center justify-center gap-0.5 whitespace-nowrap h-8 shadow-sm hover:shadow-md group"
                         >
-                          <FiShoppingCart className="inline mr-1" />
-                          Cart
+                          <FiShoppingCart className="w-3.5 h-3.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                          <span className="hidden sm:inline">Cart</span>
                         </button>
                         <button
                           onClick={() => removeFromWishlist(product._id)}
-                          className="px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-all border border-red-200 hover:border-red-300"
+                          className="bg-red-50 text-red-600 px-1.5 py-2 rounded-lg hover:bg-red-100 transition-all font-semibold text-xs border border-red-200 flex items-center justify-center gap-0.5 whitespace-nowrap h-8 group"
                         >
-                          <FiTrash2 />
+                          <FiTrash2 className="w-3.5 h-3.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                          <span className="hidden sm:inline">Remove</span>
+                        </button>
+                        <button
+                          onClick={() => navigate(`/product/${product.slug}`)}
+                          className="bg-primary-100 text-primary-700 px-1.5 py-2 rounded-lg hover:bg-primary-200 transition-all font-semibold text-xs border border-primary-300 flex items-center justify-center gap-0.5 whitespace-nowrap h-8 group"
+                        >
+                          <FiEye className="w-3.5 h-3.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                          <span className="hidden sm:inline">View</span>
                         </button>
                       </div>
-
-                      {/* View Details */}
-                      <button
-                        onClick={() => navigate(`/product/${product.slug}`)}
-                        className="w-full mt-2 text-accent-600 hover:text-accent-700 font-semibold text-sm underline transition-colors"
-                      >
-                        View Details
-                      </button>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Continue Shopping */}
-              <div className="mt-12 text-center">
+              <div className="mt-16 text-center">
                 <button
                   onClick={() => navigate("/categories")}
-                  className="text-accent-600 hover:text-accent-700 font-semibold transition-colors"
+                  className="text-accent-600 hover:text-accent-700 font-semibold text-lg transition-all hover:gap-2 inline-flex items-center gap-1 group"
                 >
-                  ← Continue Shopping
+                  <span className="group-hover:-translate-x-1 transition-transform">←</span> Continue Shopping
                 </button>
               </div>
             </>

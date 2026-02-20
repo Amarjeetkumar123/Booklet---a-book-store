@@ -151,7 +151,12 @@ const CartPage = () => {
                         className="h-16 w-12 object-cover rounded-md shadow border border-primary-100"
                       />
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-primary-900 mb-0.5 line-clamp-1">{p.name}</h3>
+                        <button
+                          onClick={() => p.slug ? navigate(`/product/${p.slug}`) : toast.error('Product details not available')}
+                          className="text-sm font-semibold text-primary-900 mb-0.5 line-clamp-1 hover:text-accent-600 transition-colors text-left w-full"
+                        >
+                          {p.name}
+                        </button>
                         <p className="text-[13px] text-primary-600 mb-0.5 line-clamp-1">{p.description.substring(0, 60)}...</p>
                         <div className="flex items-center gap-1 mb-0.5">
                           <span className="bg-accent-100 text-accent-700 px-2 py-0.5 rounded-full text-[12px] font-semibold border border-accent-200">In Stock</span>

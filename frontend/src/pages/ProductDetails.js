@@ -12,33 +12,42 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useCart();
   const [wishlist, setWishlist] = useWishlist();
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("https://placehold.co/600x800/f5f0e8/826b4d?text=No+Image");
   const [imageZoom, setImageZoom] = useState(false);
 
   // Sample additional images (in a real app, these would come from the product data)
   const productImages = React.useMemo(() => [
-    product.imageUrl || "https://placehold.co/600x800/f5f0e8/826b4d?text=No+Image",
+    product?.imageUrl || "https://placehold.co/600x800/f5f0e8/826b4d?text=No+Image",
     "https://placehold.co/600x800/e8f4fd/3b82f6?text=Back+Cover",
     "https://placehold.co/600x800/f0f9ff/06b6d4?text=Inside+Page",
     "https://placehold.co/600x800/fef3c7/f59e0b?text=Spine"
-  ], [product.imageUrl]);
+  ], [product?.imageUrl]);
 
   //getProduct
   const getProduct = React.useCallback(async () => {
     try {
       setLoading(true);
+      setError(false);
       const { data } = await axios.get(
         `/api/v1/product/get-product/${params.slug}`
       );
-      setProduct(data?.product);
-      setSelectedImage(data?.product?.imageUrl || "https://placehold.co/600x800/f5f0e8/826b4d?text=No+Image");
-      getSimilarProduct(data?.product._id, data?.product.category._id);
+      if (data?.product) {
+        setProduct(data?.product);
+        setSelectedImage(data?.product?.imageUrl || "https://placehold.co/600x800/f5f0e8/826b4d?text=No+Image");
+        getSimilarProduct(data?.product._id, data?.product.category._id);
+      } else {
+        setError(true);
+        setProduct(null);
+      }
     } catch (error) {
       console.log(error);
+      setError(true);
+      setProduct(null);
     } finally {
       setLoading(false);
     }
@@ -102,6 +111,26 @@ const ProductDetails = () => {
                 <div className="h-12 bg-gray-200 rounded"></div>
               </div>
             </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <Layout title="Product Not Found">
+        <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <div className="text-6xl mb-4">📚</div>
+            <h1 className="text-2xl font-bold text-primary-900 mb-2">Product Not Found</h1>
+            <p className="text-primary-600 mb-6">The product you're looking for doesn't exist or the link is invalid.</p>
+            <button
+              onClick={() => navigate('/')}
+              className="bg-accent-100 text-accent-700 px-6 py-3 rounded-lg hover:bg-accent-200 transition-all font-semibold border border-accent-200"
+            >
+              Back to Home
+            </button>
           </div>
         </div>
       </Layout>

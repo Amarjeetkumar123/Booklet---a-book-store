@@ -1,18 +1,23 @@
 import React, { useState } from "react";
 import Layout from "./../../components/Layout/Layout";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import axios from "../../config/axios";
+import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import "../../styles/AuthStyles.css";
+import {
+  FiArrowRight,
+  FiHelpCircle,
+  FiKey,
+  FiLock,
+  FiMail,
+} from "react-icons/fi";
 
-const ForgotPasssword = () => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [answer, setAnswer] = useState("");
 
   const navigate = useNavigate();
 
-  // form function
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -21,65 +26,103 @@ const ForgotPasssword = () => {
         newPassword,
         answer,
       });
-      if (res && res.data.success) {
-        toast.success(res.data && res.data.message);
-
+      if (res?.data?.success) {
+        toast.success(res?.data?.message || "Password reset successful");
         navigate("/login");
       } else {
-        toast.error(res.data.message);
+        toast.error(res?.data?.message || "Unable to reset password");
       }
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong");
     }
   };
+
   return (
-    <Layout title={"Forgot Password - Ecommerce APP"}>
-      <div className="form-container ">
-        <form onSubmit={handleSubmit}>
-          <h4 className="title">RESET PASSWORD</h4>
-
-          <div className="mb-3">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="form-control"
-              id="exampleInputEmail1"
-              placeholder="Enter Your Email "
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <input
-              type="text"
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              className="form-control"
-              id="exampleInputEmail1"
-              placeholder="Enter Your favorite Sport Name "
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="form-control"
-              id="exampleInputPassword1"
-              placeholder="Enter Your Password"
-              required
-            />
+    <Layout title={"Forgot Password - Booklet"}>
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 py-10 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <div className="w-full max-w-xl rounded-3xl border border-primary-200 bg-white shadow-xl p-6 sm:p-8 lg:p-10">
+          <div className="text-center mb-6">
+            <div className="mx-auto h-12 w-12 rounded-xl bg-accent-100 text-accent-700 border border-accent-200 flex items-center justify-center mb-3">
+              <FiKey className="h-5 w-5" />
+            </div>
+            <h1 className="text-2xl font-bold text-primary-900">Reset Password</h1>
+            <p className="mt-1 text-sm text-primary-600">
+              Verify your identity and set a new password.
+            </p>
           </div>
 
-          <button type="submit" className="btn btn-primary">
-            RESET
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-primary-500">
+                Email Address
+              </label>
+              <div className="relative">
+                <FiMail className="h-4 w-4 text-primary-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-primary-200 bg-white pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-primary-500">
+                Security Answer (Favorite sport)
+              </label>
+              <div className="relative">
+                <FiHelpCircle className="h-4 w-4 text-primary-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-primary-200 bg-white pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                  placeholder="Enter your answer"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-primary-500">
+                New Password
+              </label>
+              <div className="relative">
+                <FiLock className="h-4 w-4 text-primary-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-primary-200 bg-white pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                  placeholder="Enter new password"
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full h-11 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
+            >
+              Reset Password
+              <FiArrowRight className="h-4 w-4" />
+            </button>
+          </form>
+
+          <div className="mt-6 pt-5 border-t border-primary-100 text-center text-sm text-primary-600">
+            Remembered your password?{" "}
+            <Link to="/login" className="font-semibold text-accent-700 hover:text-accent-800">
+              Back to login
+            </Link>
+          </div>
+        </div>
       </div>
     </Layout>
   );
 };
 
-export default ForgotPasssword;
+export default ForgotPassword;

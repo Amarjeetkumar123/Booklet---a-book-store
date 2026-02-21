@@ -4,7 +4,15 @@ import axios from "../../config/axios";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/auth";
-import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import {
+  FiArrowRight,
+  FiEye,
+  FiEyeOff,
+  FiLock,
+  FiLogIn,
+  FiMail,
+} from "react-icons/fi";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,7 +22,6 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // form function
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -22,8 +29,8 @@ const Login = () => {
         email,
         password,
       });
-      if (res && res.data.success) {
-        toast.success(res.data && res.data.message);
+      if (res?.data?.success) {
+        toast.success(res?.data?.message || "Login successful");
         setAuth({
           ...auth,
           user: res.data.user,
@@ -32,40 +39,60 @@ const Login = () => {
         localStorage.setItem("auth", JSON.stringify(res.data));
         navigate(location.state || "/");
       } else {
-        toast.error(res.data.message);
+        toast.error(res?.data?.message || "Unable to login");
       }
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong");
     }
   };
+
   return (
-    <Layout title="Login - BookBuddy">
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h2 className="mt-6 text-3xl font-playfair font-bold text-gray-900">
-              Welcome Back
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Sign in to your BookBuddy account
-            </p>
+    <Layout title="Login - Booklet">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 py-10 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 overflow-hidden rounded-3xl border border-primary-200 bg-white shadow-xl">
+          {/* Left branding panel */}
+          <div className="hidden lg:flex flex-col justify-between bg-gradient-to-br from-primary-900 via-primary-800 to-accent-700 p-8 text-white">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+                Booklet
+              </div>
+              <h1 className="mt-5 text-3xl font-bold leading-tight">
+                Welcome back to your reading universe.
+              </h1>
+              <p className="mt-3 text-sm text-white/85">
+                Sign in to continue shopping books, managing orders, and discovering your next favorite title.
+              </p>
+            </div>
+            <div className="space-y-2 text-sm text-white/90">
+              <p>• Curated titles across categories</p>
+              <p>• Fast and secure checkout</p>
+              <p>• Track orders and wishlist in one place</p>
+            </div>
           </div>
 
-          <div className="bg-white py-8 px-6 shadow-xl rounded-lg">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              {/* Email Field */}
+          {/* Form panel */}
+          <div className="p-6 sm:p-8 lg:p-10">
+            <div className="mb-6">
+              <div className="h-11 w-11 rounded-xl bg-accent-100 text-accent-700 border border-accent-200 flex items-center justify-center mb-3">
+                <FiLogIn className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold text-primary-900">Sign In</h2>
+              <p className="text-sm text-primary-600 mt-1">
+                Enter your credentials to access your account.
+              </p>
+            </div>
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-primary-500"
                 >
                   Email Address
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiMail className="h-5 w-5 text-gray-400" />
-                  </div>
+                  <FiMail className="h-4 w-4 text-primary-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     id="email"
                     name="email"
@@ -75,24 +102,21 @@ const Login = () => {
                     autoFocus
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                    placeholder="Enter your email"
+                    className="w-full h-11 rounded-lg border border-primary-200 bg-white pl-10 pr-3 text-sm text-primary-900 placeholder:text-primary-400 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    placeholder="you@example.com"
                   />
                 </div>
               </div>
 
-              {/* Password Field */}
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-primary-500"
                 >
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiLock className="h-5 w-5 text-gray-400" />
-                  </div>
+                  <FiLock className="h-4 w-4 text-primary-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     id="password"
                     name="password"
@@ -101,57 +125,52 @@ const Login = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                    placeholder="Enter your password"
+                    className="w-full h-11 rounded-lg border border-primary-200 bg-white pl-10 pr-10 text-sm text-primary-900 placeholder:text-primary-400 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    placeholder="Enter password"
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    className="absolute inset-y-0 right-0 px-3 text-primary-400 hover:text-primary-600"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
-                      <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <FiEyeOff className="h-4 w-4" />
                     ) : (
-                      <FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <FiEye className="h-4 w-4" />
                     )}
                   </button>
                 </div>
               </div>
 
-              {/* Forgot Password */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-end">
                 <button
                   type="button"
                   onClick={() => navigate("/forgot-password")}
-                  className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                  className="text-sm text-accent-700 hover:text-accent-800 font-medium"
                 >
-                  Forgot your password?
+                  Forgot password?
                 </button>
               </div>
 
-              {/* Submit Button */}
-              <div>
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-                >
-                  Sign In
-                </button>
-              </div>
-
-              {/* Register Link */}
-              <div className="text-center">
-                <p className="text-sm text-gray-600">
-                  Don't have an account?{" "}
-                  <Link
-                    to="/register"
-                    className="font-medium text-indigo-600 hover:text-indigo-500"
-                  >
-                    Sign up here
-                  </Link>
-                </p>
-              </div>
+              <button
+                type="submit"
+                className="w-full h-11 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors"
+              >
+                Continue
+                <FiArrowRight className="h-4 w-4" />
+              </button>
             </form>
+
+            <div className="mt-6 pt-5 border-t border-primary-100 text-sm text-primary-600 text-center">
+              New to Booklet?{" "}
+              <Link
+                to="/register"
+                className="font-semibold text-accent-700 hover:text-accent-800"
+              >
+                Create an account
+              </Link>
+            </div>
           </div>
         </div>
       </div>

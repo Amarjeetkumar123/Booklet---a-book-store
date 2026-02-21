@@ -21,10 +21,39 @@ const initializeGateway = () => {
   return gateway;
 };
 
+const normalizeImageUrls = (imageUrls, imageUrl) => {
+  const parsedImageUrls = Array.isArray(imageUrls)
+    ? imageUrls
+        .map((url) => (typeof url === "string" ? url.trim() : ""))
+        .filter(Boolean)
+    : typeof imageUrls === "string"
+      ? imageUrls
+          .split(/\n|,/)
+          .map((url) => url.trim())
+          .filter(Boolean)
+      : [];
+
+  const singleImageUrl = typeof imageUrl === "string" ? imageUrl.trim() : "";
+
+  if (singleImageUrl) {
+    return Array.from(new Set([singleImageUrl, ...parsedImageUrls]));
+  }
+
+  return Array.from(new Set(parsedImageUrls));
+};
+
 export const createProductController = async (req, res) => {
   try {
-    const { name, description, price, category, quantity, shipping, imageUrl } =
-      req.body;
+    const {
+      name,
+      description,
+      price,
+      category,
+      quantity,
+      shipping,
+      imageUrl,
+      imageUrls,
+    } = req.body;
     //alidation
     switch (true) {
       case !name:
@@ -39,6 +68,8 @@ export const createProductController = async (req, res) => {
         return res.status(500).send({ error: "Quantity is Required" });
     }
 
+    const normalizedImageUrls = normalizeImageUrls(imageUrls, imageUrl);
+
     const products = new productModel({
       name,
       description,
@@ -46,7 +77,8 @@ export const createProductController = async (req, res) => {
       category,
       quantity,
       shipping,
-      imageUrl,
+      imageUrl: normalizedImageUrls[0] || "",
+      imageUrls: normalizedImageUrls,
       slug: slugify(name),
     });
     await products.save();
@@ -129,8 +161,16 @@ export const deleteProductController = async (req, res) => {
 //upate producta
 export const updateProductController = async (req, res) => {
   try {
-    const { name, description, price, category, quantity, shipping, imageUrl } =
-      req.body;
+    const {
+      name,
+      description,
+      price,
+      category,
+      quantity,
+      shipping,
+      imageUrl,
+      imageUrls,
+    } = req.body;
     //alidation
     switch (true) {
       case !name:
@@ -145,6 +185,8 @@ export const updateProductController = async (req, res) => {
         return res.status(500).send({ error: "Quantity is Required" });
     }
 
+    const normalizedImageUrls = normalizeImageUrls(imageUrls, imageUrl);
+
     const products = await productModel.findByIdAndUpdate(
       req.params.pid,
       {
@@ -154,7 +196,8 @@ export const updateProductController = async (req, res) => {
         category,
         quantity,
         shipping,
-        imageUrl,
+        imageUrl: normalizedImageUrls[0] || "",
+        imageUrls: normalizedImageUrls,
         slug: slugify(name),
       },
       { new: true }

@@ -55,15 +55,15 @@ const AdminOrders = () => {
   };
   return (
     <Layout title={"All Orders - Booklet Admin"}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[auto,1fr] gap-5 lg:gap-6 items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:h-[calc(100vh-4rem)]">
+        <div className="grid grid-cols-1 lg:grid-cols-[auto,1fr] gap-5 lg:gap-6 items-start lg:h-full">
           {/* Sidebar */}
           <div>
             <AdminMenu />
           </div>
 
           {/* Main Content */}
-          <div className="min-w-0">
+          <div className="min-w-0 lg:h-full lg:overflow-y-auto lg:pr-1">
             <div className="p-1 sm:p-2">
               <div className="mb-6">
                 <div className="flex justify-between items-center">

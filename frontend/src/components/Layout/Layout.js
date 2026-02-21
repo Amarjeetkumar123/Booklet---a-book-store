@@ -1,7 +1,11 @@
 import Footer from "./Footer";
 import Header from "./Header";
 import { Toaster } from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 const Layout = ({ children }) => {
+  const location = useLocation();
+  const hideFooterOnAdminPages = location.pathname.startsWith("/dashboard/admin");
+
   return (
     <div className="min-h-screen bg-primary-100">
       <Header />
@@ -27,7 +31,7 @@ const Layout = ({ children }) => {
         />
         {children}
       </main>
-      <Footer />
+      {!hideFooterOnAdminPages && <Footer />}
     </div>
   );
 };

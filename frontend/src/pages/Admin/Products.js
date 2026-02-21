@@ -4,6 +4,7 @@ import Layout from "./../../components/Layout/Layout";
 import axios from "../../config/axios";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { FiBox } from "react-icons/fi";
 const Products = () => {
   const [products, setProducts] = useState([]);
 
@@ -23,33 +24,63 @@ const Products = () => {
     getAllProducts();
   }, []);
   return (
-    <Layout>
-      <div className="row dashboard">
-        <div className="col-md-3">
-          <AdminMenu />
-        </div>
-        <div className="col-md-9 ">
-          <h1 className="text-center">All Products List</h1>
-          <div className="d-flex flex-wrap">
-            {products?.map((p) => (
-              <Link
-                key={p._id}
-                to={`/dashboard/admin/product/${p.slug}`}
-                className="product-link"
-              >
-                <div className="card m-2" style={{ width: "18rem" }}>
-                  <img
-                    src={p.imageUrl || "https://placehold.co/300x400?text=No+Image"}
-                    className="card-img-top"
-                    alt={p.name}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{p.name}</h5>
-                    <p className="card-text">{p.description}</p>
-                  </div>
+    <Layout title={"Admin - Products"}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[auto,1fr] gap-5 lg:gap-6 items-start">
+          <div>
+            <AdminMenu />
+          </div>
+
+          <div className="min-w-0">
+            <div className="p-1 sm:p-2">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center border border-primary-200">
+                  <FiBox className="h-4 w-4" />
                 </div>
-              </Link>
-            ))}
+                <div>
+                  <h1 className="text-2xl font-bold text-primary-900">
+                    All Products
+                  </h1>
+                  <p className="text-sm text-primary-600">
+                    Select any product card to edit details.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {products?.map((p) => (
+                  <Link
+                    key={p._id}
+                    to={`/dashboard/admin/product/${p.slug}`}
+                    className="no-underline"
+                  >
+                    <div className="h-full bg-white rounded-xl border border-primary-200 hover:border-accent-300 hover:shadow-md transition-all overflow-hidden">
+                      <img
+                        src={
+                          p.imageUrl || "https://placehold.co/300x400?text=No+Image"
+                        }
+                        className="h-44 w-full object-cover"
+                        alt={p.name}
+                      />
+                      <div className="p-3.5">
+                        <h5 className="text-base font-semibold text-primary-900 mb-1">
+                          {p.name}
+                        </h5>
+                        <p className="text-sm text-primary-600 line-clamp-2">
+                          {p.description}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {products?.length === 0 && (
+                <div className="text-center py-10 text-primary-600 text-sm">
+                  No products found.
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

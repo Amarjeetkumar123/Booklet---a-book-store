@@ -1,112 +1,110 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  FiShield,
   FiGrid,
   FiTag,
   FiPackage,
   FiPlus,
   FiShoppingBag,
   FiUsers,
+  FiChevronLeft,
+  FiChevronRight,
 } from "react-icons/fi";
 
 const AdminMenu = () => {
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("admin-menu-collapsed") === "true";
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("admin-menu-collapsed", String(collapsed));
+    }
+  }, [collapsed]);
+
+  const menuItems = [
+    { to: "/dashboard/admin", label: "Dashboard", icon: FiGrid, end: true },
+    {
+      to: "/dashboard/admin/create-category",
+      label: "Create Category",
+      icon: FiTag,
+    },
+    {
+      to: "/dashboard/admin/create-product",
+      label: "Create Product",
+      icon: FiPlus,
+    },
+    { to: "/dashboard/admin/products", label: "Products", icon: FiPackage },
+    { to: "/dashboard/admin/orders", label: "Orders", icon: FiShoppingBag },
+    { to: "/dashboard/admin/users", label: "Users", icon: FiUsers },
+  ];
+
+  const rowBaseClass = collapsed
+    ? "h-10 w-full justify-center px-2"
+    : "h-10 w-full gap-2.5 px-3";
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="text-center mb-6">
-        <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-          <FiShield className="h-8 w-8 text-purple-600" />
-        </div>
-        <h3 className="text-xl font-semibold text-gray-900">Admin Panel</h3>
-        <p className="text-sm text-gray-600">Manage your store</p>
+    <aside
+      className={`relative lg:sticky lg:top-24 transition-all duration-300 ${
+        collapsed ? "lg:w-[72px]" : "lg:w-64"
+      }`}
+    >
+      <button
+        type="button"
+        onClick={() => setCollapsed((prev) => !prev)}
+        className="hidden lg:inline-flex absolute top-1 right-0 translate-x-1/2 z-20 h-8 w-8 items-center justify-center rounded-full border border-primary-300 bg-white text-primary-600 shadow-sm hover:text-accent-700 hover:border-accent-300"
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
+        {collapsed ? (
+          <FiChevronRight className="h-4 w-4" />
+        ) : (
+          <FiChevronLeft className="h-4 w-4" />
+        )}
+      </button>
+
+      <div className="border-r-2 border-primary-300 lg:pr-3">
+        <nav className="space-y-1.5">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                title={collapsed ? item.label : undefined}
+                className={({ isActive }) =>
+                  `group no-underline flex items-center rounded-lg transition-all ${rowBaseClass} ${
+                    isActive
+                      ? "bg-accent-50 text-accent-700"
+                      : "text-primary-700 hover:bg-primary-50 hover:text-accent-700"
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <span
+                      className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ${
+                        isActive
+                          ? "bg-accent-100 text-accent-700"
+                          : "text-primary-700 group-hover:text-accent-700"
+                      } shrink-0`}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    {!collapsed && (
+                      <span className="text-sm font-medium leading-none">
+                        {item.label}
+                      </span>
+                    )}
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
       </div>
-
-      <nav className="space-y-2">
-        <NavLink
-          to="/dashboard/admin"
-          className={({ isActive }) =>
-            `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive
-                ? "bg-purple-100 text-purple-700 border-r-4 border-purple-600"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            }`
-          }
-        >
-          <FiGrid className="h-5 w-5" />
-          <span className="font-medium">Dashboard</span>
-        </NavLink>
-
-        <NavLink
-          to="/dashboard/admin/create-category"
-          className={({ isActive }) =>
-            `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive
-                ? "bg-purple-100 text-purple-700 border-r-4 border-purple-600"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            }`
-          }
-        >
-          <FiTag className="h-5 w-5" />
-          <span className="font-medium">Create Category</span>
-        </NavLink>
-
-        <NavLink
-          to="/dashboard/admin/create-product"
-          className={({ isActive }) =>
-            `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive
-                ? "bg-purple-100 text-purple-700 border-r-4 border-purple-600"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            }`
-          }
-        >
-          <FiPlus className="h-5 w-5" />
-          <span className="font-medium">Create Product</span>
-        </NavLink>
-
-        <NavLink
-          to="/dashboard/admin/products"
-          className={({ isActive }) =>
-            `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive
-                ? "bg-purple-100 text-purple-700 border-r-4 border-purple-600"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            }`
-          }
-        >
-          <FiPackage className="h-5 w-5" />
-          <span className="font-medium">Products</span>
-        </NavLink>
-
-        <NavLink
-          to="/dashboard/admin/orders"
-          className={({ isActive }) =>
-            `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive
-                ? "bg-purple-100 text-purple-700 border-r-4 border-purple-600"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            }`
-          }
-        >
-          <FiShoppingBag className="h-5 w-5" />
-          <span className="font-medium">Orders</span>
-        </NavLink>
-
-        <NavLink
-          to="/dashboard/admin/users"
-          className={({ isActive }) =>
-            `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive
-                ? "bg-purple-100 text-purple-700 border-r-4 border-purple-600"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            }`
-          }
-        >
-          <FiUsers className="h-5 w-5" />
-          <span className="font-medium">Users</span>
-        </NavLink>
-      </nav>
-    </div>
+    </aside>
   );
 };
 

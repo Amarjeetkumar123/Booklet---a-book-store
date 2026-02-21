@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import axios from "../../config/axios";
 import { Select } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
+import { FiEdit3, FiImage, FiTrash2, FiSave } from "react-icons/fi";
 const { Option } = Select;
 
 const UpdateProduct = () => {
@@ -29,7 +30,6 @@ const UpdateProduct = () => {
       setName(data.product.name);
       setId(data.product._id);
       setDescription(data.product.description);
-      setPrice(data.product.price);
       setPrice(data.product.price);
       setQuantity(data.product.quantity);
       setShipping(data.product.shipping);
@@ -94,9 +94,7 @@ const UpdateProduct = () => {
     try {
       let answer = window.prompt("Are You Sure want to delete this product ? ");
       if (!answer) return;
-      const { data } = await axios.delete(
-        `/api/v1/product/delete-product/${id}`
-      );
+      await axios.delete(`/api/v1/product/delete-product/${id}`);
       toast.success("Product DEleted Succfully");
       navigate("/dashboard/admin/products");
     } catch (error) {
@@ -105,113 +103,138 @@ const UpdateProduct = () => {
     }
   };
   return (
-    <Layout title={"Dashboard - Create Product"}>
-      <div className="container-fluid m-6 p-3 dashboard">
-        <div className="row">
-          <div className="col-md-3">
+    <Layout title={"Admin - Update Product"}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[auto,1fr] gap-5 lg:gap-6 items-start">
+          <div>
             <AdminMenu />
           </div>
-          <div className="col-md-9">
-            <h1>Update Product</h1>
-            <div className="m-1 w-75">
-              <Select
-                bordered={false}
-                placeholder="Select a category"
-                size="large"
-                showSearch
-                className="form-select mb-3"
-                onChange={(value) => {
-                  setCategory(value);
-                }}
-                value={category}
-              >
-                {categories?.map((c) => (
-                  <Option key={c._id} value={c._id}>
-                    {c.name}
-                  </Option>
-                ))}
-              </Select>
-              <div className="mb-3">
-                <input
-                  type="text"
-                  value={imageUrl}
-                  placeholder="Image URL"
-                  className="form-control"
-                  onChange={(e) => setImageUrl(e.target.value)}
-                />
+
+          <div className="min-w-0">
+            <div className="p-1 sm:p-2">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center border border-primary-200">
+                  <FiEdit3 className="h-4 w-4" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-primary-900">
+                    Update Product
+                  </h1>
+                  <p className="text-sm text-primary-600">
+                    Edit product details or remove this product.
+                  </p>
+                </div>
               </div>
-              {imageUrl && (
-                <div className="mb-3 text-center">
-                  <img
-                    src={imageUrl}
-                    alt="product"
-                    height={"200px"}
-                    className="img img-responsive"
+
+              <div className="max-w-3xl space-y-3">
+                <Select
+                  bordered={false}
+                  placeholder="Select a category"
+                  size="middle"
+                  showSearch
+                  className="w-full"
+                  onChange={(value) => {
+                    setCategory(value);
+                  }}
+                  value={category}
+                >
+                  {categories?.map((c) => (
+                    <Option key={c._id} value={c._id}>
+                      {c.name}
+                    </Option>
+                  ))}
+                </Select>
+
+                <div>
+                  <label className="mb-1.5 text-sm font-medium text-primary-700 inline-flex items-center gap-1.5">
+                    <FiImage className="h-4 w-4" />
+                    Image URL
+                  </label>
+                  <input
+                    type="text"
+                    value={imageUrl}
+                    placeholder="Paste image URL"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setImageUrl(e.target.value)}
                   />
                 </div>
-              )}
-              <div className="mb-3">
+
+                {imageUrl && (
+                  <div className="rounded-lg border border-primary-200 p-2 bg-primary-50 max-w-[220px]">
+                    <img
+                      src={imageUrl}
+                      alt="product"
+                      className="h-[180px] w-full object-cover rounded-md"
+                    />
+                  </div>
+                )}
+
                 <input
                   type="text"
                   value={name}
-                  placeholder="write a name"
-                  className="form-control"
+                  placeholder="Product name"
+                  className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
                   onChange={(e) => setName(e.target.value)}
                 />
-              </div>
-              <div className="mb-3">
+
                 <textarea
                   type="text"
                   value={description}
-                  placeholder="write a description"
-                  className="form-control"
+                  placeholder="Product description"
+                  className="w-full min-h-[100px] rounded-lg border border-primary-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
                   onChange={(e) => setDescription(e.target.value)}
                 />
-              </div>
 
-              <div className="mb-3">
-                <input
-                  type="number"
-                  value={price}
-                  placeholder="write a Price"
-                  className="form-control"
-                  onChange={(e) => setPrice(e.target.value)}
-                />
-              </div>
-              <div className="mb-3">
-                <input
-                  type="number"
-                  value={quantity}
-                  placeholder="write a quantity"
-                  className="form-control"
-                  onChange={(e) => setQuantity(e.target.value)}
-                />
-              </div>
-              <div className="mb-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    type="number"
+                    value={price}
+                    placeholder="Price"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
+                  <input
+                    type="number"
+                    value={quantity}
+                    placeholder="Quantity"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setQuantity(e.target.value)}
+                  />
+                </div>
+
                 <Select
                   bordered={false}
-                  placeholder="Select Shipping "
-                  size="large"
+                  placeholder="Select Shipping"
+                  size="middle"
                   showSearch
-                  className="form-select mb-3"
+                  className="w-full"
                   onChange={(value) => {
                     setShipping(value);
                   }}
-                  value={shipping ? "yes" : "No"}
+                  value={
+                    String(shipping) === "1" || shipping === true ? "1" : "0"
+                  }
                 >
                   <Option value="0">No</Option>
                   <Option value="1">Yes</Option>
                 </Select>
-              </div>
-              <div className="mb-3">
-                <button className="btn btn-primary" onClick={handleUpdate}>
-                  UPDATE PRODUCT
-                </button>
-              </div>
-              <div className="mb-3">
-                <button className="btn btn-danger" onClick={handleDelete}>
-                  DELETE PRODUCT
-                </button>
+
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    className="h-10 px-4 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold inline-flex items-center gap-2"
+                    onClick={handleUpdate}
+                  >
+                    <FiSave className="h-4 w-4" />
+                    Update Product
+                  </button>
+                  <button
+                    className="h-10 px-4 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-sm font-semibold inline-flex items-center gap-2"
+                    onClick={handleDelete}
+                  >
+                    <FiTrash2 className="h-4 w-4" />
+                    Delete Product
+                  </button>
+                </div>
               </div>
             </div>
           </div>

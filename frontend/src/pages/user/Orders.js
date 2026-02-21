@@ -1,20 +1,72 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import UserMenu from "../../components/Layout/UserMenu";
 import Layout from "./../../components/Layout/Layout";
 import axios from "../../config/axios";
 import { useAuth } from "../../context/auth";
 import moment from "moment";
 import {
-  FiPackage,
   FiCalendar,
+  FiCheckCircle,
+  FiClock,
   FiCreditCard,
+  FiPackage,
   FiShoppingBag,
+  FiTruck,
+  FiXCircle,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+
+const normalizeStatus = (status = "") => {
+  const value = String(status).trim().toLowerCase();
+  if (value === "deliverd" || value === "delivered") return "delivered";
+  if (value === "cancel" || value === "cancelled") return "cancelled";
+  return value;
+};
+
+const formatStatus = (status = "") => {
+  const value = normalizeStatus(status);
+  if (value === "not process") return "Not Process";
+  if (value === "processing") return "Processing";
+  if (value === "shipped") return "Shipped";
+  if (value === "delivered") return "Delivered";
+  if (value === "cancelled") return "Cancelled";
+  return status || "Unknown";
+};
+
+const getStatusStyle = (status = "") => {
+  const value = normalizeStatus(status);
+  if (value === "not process") return "border-amber-200 bg-amber-50 text-amber-700";
+  if (value === "processing") return "border-blue-200 bg-blue-50 text-blue-700";
+  if (value === "shipped") return "border-indigo-200 bg-indigo-50 text-indigo-700";
+  if (value === "delivered") return "border-green-200 bg-green-50 text-green-700";
+  if (value === "cancelled") return "border-red-200 bg-red-50 text-red-700";
+  return "border-primary-200 bg-primary-100 text-primary-700";
+};
+
+const getStatusIcon = (status = "") => {
+  const value = normalizeStatus(status);
+  if (value === "not process" || value === "processing") return FiClock;
+  if (value === "shipped") return FiTruck;
+  if (value === "delivered") return FiCheckCircle;
+  if (value === "cancelled") return FiXCircle;
+  return FiPackage;
+};
+
+const getOrderAmount = (order) => {
+  return (order?.products || []).reduce((sum, product) => {
+    const price = Number(product?.price) || 0;
+    const qty = Number(product?.qty) || 1;
+    return sum + price * (qty > 0 ? qty : 1);
+  }, 0);
+};
+
+const formatCurrency = (value) => `₹${(Number(value) || 0).toLocaleString("en-IN")}`;
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [auth] = useAuth();
+  const navigate = useNavigate();
 
   const getOrders = async () => {
     try {
@@ -32,154 +84,230 @@ const Orders = () => {
   useEffect(() => {
     if (auth?.token) getOrders();
   }, [auth?.token]);
+
+  const summary = useMemo(() => {
+    const totalOrders = orders.length;
+    const paidOrders = orders.filter((order) => order?.payment?.success).length;
+    const pendingOrders = orders.filter((order) => {
+      const status = normalizeStatus(order?.status);
+      return status === "not process" || status === "processing";
+    }).length;
+    const totalSpent = orders.reduce((sum, order) => {
+      if (!order?.payment?.success) return sum;
+      return sum + getOrderAmount(order);
+    }, 0);
+
+    return {
+      totalOrders,
+      paidOrders,
+      pendingOrders,
+      totalSpent,
+    };
+  }, [orders]);
+
   return (
-    <Layout title={"Your Orders - BookBuddy"}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
+    <Layout title={"Your Orders - Booklet"}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:h-[calc(100vh-4rem)]">
+        <div className="grid grid-cols-1 lg:grid-cols-[auto,1fr] gap-5 lg:gap-6 items-start lg:h-full">
+          <div>
             <UserMenu />
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-md p-8">
-              {/* Header */}
-              <div className="mb-8">
-                <h1 className="text-3xl font-playfair font-bold text-gray-900 mb-2">
-                  My Orders
-                </h1>
-                <p className="text-gray-600">
-                  Track your order history and status
-                </p>
-              </div>
+          <div className="min-w-0 lg:h-full lg:overflow-y-auto lg:pr-1">
+            <div className="relative overflow-hidden p-1 sm:p-2">
+              <div className="absolute -top-14 -right-14 h-32 w-32 rounded-full bg-accent-100/60 blur-3xl" />
+              <div className="absolute -bottom-16 -left-14 h-36 w-36 rounded-full bg-primary-100/70 blur-3xl" />
 
-              {loading ? (
-                <div className="text-center py-16">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                  <p className="mt-4 text-gray-600">Loading your orders...</p>
-                </div>
-              ) : orders?.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="text-gray-400 text-6xl mb-4">📦</div>
-                  <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                    No orders found
-                  </h3>
-                  <p className="text-gray-500 mb-6">
-                    You haven't placed any orders yet. Start shopping to see
-                    your orders here!
+              <div className="bg-white border border-primary-200 rounded-2xl shadow-sm p-4 sm:p-5 relative z-10">
+                <div className="mb-5 rounded-2xl border border-primary-200 bg-gradient-to-r from-primary-50 via-white to-accent-50 p-4 sm:p-5">
+                  <h1 className="text-xl sm:text-2xl font-bold text-primary-900 inline-flex items-center gap-2">
+                    <FiShoppingBag className="h-5 w-5 text-accent-700" />
+                    My Orders
+                  </h1>
+                  <p className="mt-1.5 text-sm text-primary-700">
+                    Track your purchases, payment status, and delivery updates.
                   </p>
-                  <a
-                    href="/"
-                    className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-                  >
-                    Start Shopping
-                  </a>
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  {orders?.map((order, index) => (
-                    <div
-                      key={order._id}
-                      className="bg-gray-50 rounded-lg p-6 border border-gray-200"
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+                  <div className="rounded-xl border border-primary-200 bg-white p-3">
+                    <p className="text-xs text-primary-500 inline-flex items-center gap-1">
+                      <FiShoppingBag className="h-3.5 w-3.5" />
+                      Total Orders
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-primary-900">
+                      {summary.totalOrders}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-green-200 bg-green-50 p-3">
+                    <p className="text-xs text-green-700 inline-flex items-center gap-1">
+                      <FiCheckCircle className="h-3.5 w-3.5" />
+                      Paid Orders
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-green-700">
+                      {summary.paidOrders}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                    <p className="text-xs text-amber-700 inline-flex items-center gap-1">
+                      <FiClock className="h-3.5 w-3.5" />
+                      Pending Orders
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-amber-700">
+                      {summary.pendingOrders}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-accent-200 bg-accent-50/70 p-3">
+                    <p className="text-xs text-accent-700 inline-flex items-center gap-1">
+                      <FiCreditCard className="h-3.5 w-3.5" />
+                      Total Spent
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-accent-700">
+                      {formatCurrency(summary.totalSpent)}
+                    </p>
+                  </div>
+                </div>
+
+                {loading ? (
+                  <div className="rounded-xl border border-primary-200 bg-primary-50 text-center py-14">
+                    <div className="animate-spin rounded-full h-9 w-9 border-b-2 border-accent-500 mx-auto" />
+                    <p className="mt-3 text-sm text-primary-600">Loading your orders...</p>
+                  </div>
+                ) : orders.length === 0 ? (
+                  <div className="rounded-xl border border-primary-200 bg-primary-50/60 text-center py-14 px-4">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary-200 bg-white text-primary-500 mb-3">
+                      <FiPackage className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-primary-900">No orders found</h3>
+                    <p className="mt-1 text-sm text-primary-600">
+                      You have not placed any order yet.
+                    </p>
+                    <button
+                      onClick={() => navigate("/")}
+                      className="mt-5 h-10 px-4 rounded-lg border border-accent-200 bg-accent-50 text-accent-700 hover:bg-accent-100 text-sm font-semibold"
                     >
-                      {/* Order Header */}
-                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 p-4 bg-white rounded-lg shadow-sm">
-                        <div className="text-center">
-                          <span className="text-sm text-gray-500">Order #</span>
-                          <p className="font-semibold text-gray-900">
-                            {index + 1}
-                          </p>
-                        </div>
+                      Start Shopping
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {orders.map((order, index) => {
+                      const StatusIcon = getStatusIcon(order?.status);
+                      return (
+                        <div
+                          key={order._id}
+                          className="rounded-xl border border-primary-200 bg-white shadow-sm overflow-hidden"
+                        >
+                          <div className="bg-primary-50/70 border-b border-primary-100 px-3.5 py-3">
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-2.5">
+                              <div>
+                                <p className="text-[11px] text-primary-500 inline-flex items-center gap-1">
+                                  <FiShoppingBag className="h-3.5 w-3.5" />
+                                  Order
+                                </p>
+                                <p className="mt-1 text-sm font-semibold text-primary-900">
+                                  #{index + 1}
+                                </p>
+                              </div>
 
-                        <div className="text-center">
-                          <span className="text-sm text-gray-500">Status</span>
-                          <span
-                            className={`inline-block mt-1 px-3 py-1 rounded-full text-xs font-medium ${
-                              order?.status === "Not Process"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : order?.status === "Processing"
-                                ? "bg-blue-100 text-blue-800"
-                                : order?.status === "Shipped"
-                                ? "bg-purple-100 text-purple-800"
-                                : order?.status === "Delivered"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {order?.status}
-                          </span>
-                        </div>
+                              <div>
+                                <p className="text-[11px] text-primary-500">Status</p>
+                                <span
+                                  className={`mt-1 inline-flex items-center gap-1 h-6 px-2 rounded-md border text-[11px] font-semibold ${getStatusStyle(
+                                    order?.status
+                                  )}`}
+                                >
+                                  <StatusIcon className="h-3.5 w-3.5" />
+                                  {formatStatus(order?.status)}
+                                </span>
+                              </div>
 
-                        <div className="text-center">
-                          <span className="text-sm text-gray-500">Date</span>
-                          <p className="font-semibold text-gray-900">
-                            {moment(order?.createdAt).format("MMM DD, YYYY")}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {moment(order?.createdAt).fromNow()}
-                          </p>
-                        </div>
+                              <div>
+                                <p className="text-[11px] text-primary-500 inline-flex items-center gap-1">
+                                  <FiCalendar className="h-3.5 w-3.5" />
+                                  Date
+                                </p>
+                                <p className="mt-1 text-sm font-semibold text-primary-900">
+                                  {moment(order?.createdAt).format("DD MMM YYYY")}
+                                </p>
+                                <p className="text-[11px] text-primary-500">
+                                  {moment(order?.createdAt).fromNow()}
+                                </p>
+                              </div>
 
-                        <div className="text-center">
-                          <span className="text-sm text-gray-500">Payment</span>
-                          <span
-                            className={`inline-flex items-center mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              order?.payment?.success
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            <FiCreditCard className="h-3 w-3 mr-1" />
-                            {order?.payment?.success ? "Paid" : "Failed"}
-                          </span>
-                        </div>
+                              <div>
+                                <p className="text-[11px] text-primary-500 inline-flex items-center gap-1">
+                                  <FiCreditCard className="h-3.5 w-3.5" />
+                                  Payment
+                                </p>
+                                <span
+                                  className={`mt-1 inline-flex items-center h-6 px-2 rounded-md border text-[11px] font-semibold ${
+                                    order?.payment?.success
+                                      ? "border-green-200 bg-green-50 text-green-700"
+                                      : "border-red-200 bg-red-50 text-red-700"
+                                  }`}
+                                >
+                                  {order?.payment?.success ? "Paid" : "Failed"}
+                                </span>
+                              </div>
 
-                        <div className="text-center">
-                          <span className="text-sm text-gray-500">Items</span>
-                          <p className="font-semibold text-gray-900 flex items-center justify-center">
-                            <FiShoppingBag className="h-4 w-4 mr-1" />
-                            {order?.products?.length}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Order Products */}
-                      <div className="space-y-4">
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                          <FiPackage className="h-5 w-5 mr-2" />
-                          Order Items:
-                        </h4>
-                        {order?.products?.map((product) => (
-                          <div
-                            key={product._id}
-                            className="flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200"
-                          >
-                            <div className="flex-shrink-0">
-                              <img
-                                src={product.imageUrl || "https://placehold.co/120x160?text=No+Image"}
-                                alt={product.name}
-                                className="w-20 h-20 object-cover rounded-lg"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h5 className="text-lg font-medium text-gray-900 mb-1">
-                                {product.name}
-                              </h5>
-                              <p className="text-sm text-gray-600 mb-2">
-                                {product.description.substring(0, 100)}...
-                              </p>
-                              <p className="text-lg font-semibold text-indigo-600">
-                                ${product.price}
-                              </p>
+                              <div>
+                                <p className="text-[11px] text-primary-500 inline-flex items-center gap-1">
+                                  <FiPackage className="h-3.5 w-3.5" />
+                                  Amount
+                                </p>
+                                <p className="mt-1 text-sm font-semibold text-accent-700">
+                                  {formatCurrency(getOrderAmount(order))}
+                                </p>
+                                <p className="text-[11px] text-primary-500">
+                                  {order?.products?.length || 0} items
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+
+                          <div className="p-3.5">
+                            <h4 className="text-sm font-semibold text-primary-900 mb-2 inline-flex items-center gap-1.5">
+                              <FiPackage className="h-4 w-4 text-accent-700" />
+                              Ordered Items
+                            </h4>
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">
+                              {(order?.products || []).map((product) => (
+                                <div
+                                  key={product._id}
+                                  className="rounded-lg border border-primary-200 bg-primary-50/40 p-2.5 flex items-center gap-3"
+                                >
+                                  <div className="h-14 w-11 rounded-md overflow-hidden border border-primary-200 bg-white shrink-0">
+                                    <img
+                                      src={
+                                        product?.imageUrl ||
+                                        "https://placehold.co/120x160?text=No+Image"
+                                      }
+                                      alt={product?.name}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-semibold text-primary-900 truncate">
+                                      {product?.name}
+                                    </p>
+                                    <p className="text-[11px] text-primary-600 truncate">
+                                      {product?.description || "No description"}
+                                    </p>
+                                    <p className="mt-0.5 text-sm font-semibold text-accent-700">
+                                      {formatCurrency(product?.price)}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

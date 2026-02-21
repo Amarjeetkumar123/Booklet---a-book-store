@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
 import { useCart } from "../../context/cart";
@@ -24,6 +24,7 @@ const Header = () => {
   const [cart] = useCart();
   const [wishlist] = useWishlist();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     setAuth({
@@ -33,6 +34,7 @@ const Header = () => {
     });
     localStorage.removeItem("auth");
     toast.success("Logout Successfully");
+    navigate("/", { replace: true });
   };
 
   const dashboardPath = hasAdminAccess(auth?.user?.role)

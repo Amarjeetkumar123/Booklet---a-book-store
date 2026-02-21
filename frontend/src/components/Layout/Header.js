@@ -5,21 +5,21 @@ import toast from "react-hot-toast";
 import useCategory from "../../hooks/useCategory";
 import { useCart } from "../../context/cart";
 import { useWishlist } from "../../context/wishlist";
-import { getRoleLabel, hasAdminAccess } from "../../utils/roleUtils";
 import { GiSpellBook } from "react-icons/gi";
 import {
+  FiBook,
+  FiChevronDown,
+  FiHeart,
+  FiHome,
+  FiInfo,
+  FiLogOut,
+  FiMail,
+  FiMenu,
   FiShoppingCart,
   FiUser,
-  FiChevronDown,
-  FiMenu,
   FiX,
-  FiLogOut,
-  FiBook,
-  FiHome,
-  FiHeart,
-  FiInfo,
-  FiMail,
 } from "react-icons/fi";
+import { getRoleLabel, hasAdminAccess } from "../../utils/roleUtils";
 
 const Header = () => {
   const [auth, setAuth] = useAuth();
@@ -43,63 +43,67 @@ const Header = () => {
     ? "/dashboard/admin"
     : "/dashboard/user";
 
+  const desktopNavItemClass = ({ isActive }) =>
+    `no-underline h-10 px-3.5 rounded-lg inline-flex items-center gap-2 text-sm font-medium transition-colors ${
+      isActive
+        ? "bg-accent-100 text-accent-700 border border-accent-200"
+        : "text-primary-700 hover:bg-primary-50 hover:text-accent-700"
+    }`;
+
+  const desktopIconLinkClass = ({ isActive }) =>
+    `no-underline relative h-10 min-w-[2.5rem] sm:min-w-0 sm:px-3 rounded-lg inline-flex items-center justify-center sm:justify-start gap-2 text-sm font-medium transition-colors ${
+      isActive
+        ? "bg-accent-100 text-accent-700 border border-accent-200"
+        : "text-primary-700 hover:bg-primary-50 hover:text-accent-700"
+    }`;
+
   return (
-    <nav className="bg-white shadow-lg border-b border-accent-200 fixed top-0 left-0 right-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-primary-200 bg-white/95 backdrop-blur shadow-[0_6px_20px_rgba(85,67,43,0.08)]">
+      <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8">
+        <div className="h-16 flex items-center justify-between gap-3">
           {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center space-x-2 group no-underline flex-shrink-0"
-          >
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-accent-500 to-accent-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur"></div>
-              <GiSpellBook className="text-3xl text-accent-500 relative" />
+          <Link to="/" className="no-underline flex items-center gap-2.5 shrink-0 group">
+            <div className="h-10 w-10 rounded-xl border border-accent-200 bg-accent-50 text-accent-600 flex items-center justify-center group-hover:bg-accent-100 transition-colors">
+              <GiSpellBook className="h-5 w-5" />
             </div>
-            <span className="font-bold text-lg text-primary-900">Booklet</span>
+            <div className="leading-tight">
+              <p className="text-base font-bold text-primary-900 m-0">Booklet</p>
+              <p className="text-[11px] text-primary-500 m-0 hidden sm:block">
+                Read. Learn. Grow.
+              </p>
+            </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center space-x-2">
-            {/* Home Link */}
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `no-underline flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all ${
-                  isActive 
-                    ? "bg-accent-100 text-accent-600 shadow-sm border border-accent-200" 
-                    : "text-primary-700 hover:bg-primary-50 hover:text-accent-600"
-                }`
-              }
-            >
-              <FiHome className="text-lg" />
-              <span>Home</span>
+          {/* Desktop navigation */}
+          <nav className="hidden lg:flex items-center gap-1.5">
+            <NavLink to="/" className={desktopNavItemClass}>
+              <FiHome className="h-4 w-4" />
+              Home
             </NavLink>
 
-            {/* Categories Dropdown */}
             <div className="relative group">
               <button
-                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-primary-700 hover:bg-primary-50 hover:text-accent-600 font-semibold transition-all"
+                type="button"
+                className="h-10 px-3.5 rounded-lg inline-flex items-center gap-2 text-sm font-medium text-primary-700 hover:bg-primary-50 hover:text-accent-700 transition-colors"
               >
-                <FiBook className="text-lg" />
-                <span>Categories</span>
-                <FiChevronDown className="text-sm group-hover:rotate-180 transition-transform" />
+                <FiBook className="h-4 w-4" />
+                Categories
+                <FiChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform" />
               </button>
-              <div
-                className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 hidden group-hover:block z-50 transition-all"
-              >
+
+              <div className="hidden group-hover:block group-focus-within:block absolute left-0 top-full mt-2 w-64 rounded-xl border border-primary-200 bg-white shadow-xl py-2 z-50">
                 <Link
                   to="/categories"
-                  className="no-underline flex items-center gap-2 px-4 py-3 text-primary-700 hover:bg-accent-50 hover:text-accent-600 transition-colors font-medium border-b border-gray-100"
+                  className="no-underline h-9 px-3.5 text-sm font-medium text-primary-800 hover:bg-accent-50 hover:text-accent-700 flex items-center"
                 >
-                  <FiBook className="text-accent-500" />
                   All Categories
                 </Link>
+                <div className="my-1 h-px bg-primary-100" />
                 {categories?.map((c) => (
                   <Link
                     key={c._id}
                     to={`/category/${c.slug}`}
-                    className="no-underline block px-4 py-2.5 text-primary-600 hover:bg-accent-50 hover:text-accent-600 transition-colors text-sm hover:pl-6 border-l-4 border-transparent hover:border-accent-500"
+                    className="no-underline h-9 px-3.5 text-sm text-primary-700 hover:bg-primary-50 hover:text-accent-700 flex items-center"
                   >
                     {c.name}
                   </Link>
@@ -107,86 +111,45 @@ const Header = () => {
               </div>
             </div>
 
-            {/* About Us Link */}
-            <NavLink
-              to="/about"
-              className={({ isActive }) =>
-                `no-underline flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all ${
-                  isActive 
-                    ? "bg-accent-100 text-accent-600 shadow-sm border border-accent-200" 
-                    : "text-primary-700 hover:bg-primary-50 hover:text-accent-600"
-                }`
-              }
-            >
-              <FiInfo className="text-lg" />
-              <span>About Us</span>
+            <NavLink to="/about" className={desktopNavItemClass}>
+              <FiInfo className="h-4 w-4" />
+              About
             </NavLink>
-
-            {/* Contact Link */}
-            <NavLink
-              to="/contact"
-              className={({ isActive }) =>
-                `no-underline flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all ${
-                  isActive 
-                    ? "bg-accent-100 text-accent-600 shadow-sm border border-accent-200" 
-                    : "text-primary-700 hover:bg-primary-50 hover:text-accent-600"
-                }`
-              }
-            >
-              <FiMail className="text-lg" />
-              <span>Contact</span>
+            <NavLink to="/contact" className={desktopNavItemClass}>
+              <FiMail className="h-4 w-4" />
+              Contact
             </NavLink>
-          </div>
+          </nav>
 
-          {/* Right Side: Cart and Auth */}
-          <div className="flex items-center gap-2">
-            {/* Wishlist */}
-            <NavLink
-              to="/wishlist"
-              className={({ isActive }) =>
-                `no-underline relative flex items-center gap-2 px-3 py-2 rounded-lg font-semibold transition-all ${
-                  isActive
-                    ? "bg-accent-100 text-accent-600 border border-accent-200 shadow-sm"
-                    : "text-primary-700 hover:bg-primary-50 hover:text-accent-600"
-                }`
-              }
-            >
-              <FiHeart className="text-lg" />
-              <span className="hidden lg:block text-sm">Wishlist</span>
+          {/* Right actions */}
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <NavLink to="/wishlist" className={desktopIconLinkClass}>
+              <FiHeart className="h-4.5 w-4.5" />
+              <span className="hidden xl:inline">Wishlist</span>
               {wishlist?.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-md">
+                <span className="absolute -top-1.5 -right-1.5 h-5 min-w-[1.25rem] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold inline-flex items-center justify-center">
                   {wishlist.length}
                 </span>
               )}
             </NavLink>
 
-            {/* Cart */}
-            <NavLink
-              to="/cart"
-              className={({ isActive }) =>
-                `no-underline relative flex items-center gap-2 px-3 py-2 rounded-lg font-semibold transition-all ${
-                  isActive
-                    ? "bg-accent-100 text-accent-600 border border-accent-200 shadow-sm"
-                    : "text-primary-700 hover:bg-primary-50 hover:text-accent-600"
-                }`
-              }
-            >
-              <FiShoppingCart className="text-lg" />
-              <span className="hidden lg:block text-sm">Cart</span>
+            <NavLink to="/cart" className={desktopIconLinkClass}>
+              <FiShoppingCart className="h-4.5 w-4.5" />
+              <span className="hidden xl:inline">Cart</span>
               {cart?.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-md">
+                <span className="absolute -top-1.5 -right-1.5 h-5 min-w-[1.25rem] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold inline-flex items-center justify-center">
                   {cart.length}
                 </span>
               )}
             </NavLink>
 
-            {/* Auth - Desktop */}
+            {/* Desktop auth */}
             <div className="hidden md:flex items-center">
               {!auth?.user ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <NavLink
                     to="/login"
-                    className="no-underline bg-accent-100 text-accent-700 px-4 py-2 rounded-lg hover:bg-accent-200 transition-all font-semibold hover:scale-105 transform border border-accent-200 shadow-sm text-sm"
+                    className="no-underline h-10 px-4 rounded-lg border border-accent-200 bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-semibold inline-flex items-center justify-center"
                   >
                     Login
                   </NavLink>
@@ -194,29 +157,40 @@ const Header = () => {
               ) : (
                 <div className="relative group">
                   <button
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-primary-700 hover:bg-primary-50 font-semibold transition-all group-hover:text-accent-600"
+                    type="button"
+                    className="h-10 px-2.5 rounded-lg inline-flex items-center gap-2 text-primary-700 hover:bg-primary-50 hover:text-accent-700 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-accent-400 to-accent-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-r from-accent-400 to-accent-500 text-white text-xs font-bold flex items-center justify-center">
                       {auth?.user?.name?.charAt(0).toUpperCase()}
                     </div>
-                    <span className="hidden lg:block text-xs">{auth?.user?.name?.split(" ")[0]}</span>
-                    <FiChevronDown className="text-xs group-hover:rotate-180 transition-transform hidden lg:block" />
+                    <span className="hidden xl:block text-sm font-medium">
+                      {auth?.user?.name?.split(" ")[0]}
+                    </span>
+                    <FiChevronDown className="hidden xl:block h-4 w-4 group-hover:rotate-180 transition-transform" />
                   </button>
-                  <div
-                    className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 hidden group-hover:block z-50"
-                  >
+
+                  <div className="hidden group-hover:block group-focus-within:block absolute right-0 top-full mt-2 w-52 rounded-xl border border-primary-200 bg-white shadow-xl py-2 z-50">
+                    <div className="px-3.5 py-2 border-b border-primary-100">
+                      <p className="text-sm font-semibold text-primary-900 truncate m-0">
+                        {auth?.user?.name}
+                      </p>
+                      <p className="text-xs text-primary-500 capitalize m-0 mt-0.5">
+                        {getRoleLabel(auth?.user?.role)}
+                      </p>
+                    </div>
                     <Link
                       to={dashboardPath}
-                      className="no-underline flex items-center gap-2 px-4 py-3 text-primary-700 hover:bg-accent-50 hover:text-accent-600 transition-colors font-medium border-b border-gray-100"
+                      className="no-underline h-9 px-3.5 text-sm text-primary-700 hover:bg-primary-50 hover:text-accent-700 flex items-center gap-2"
                     >
-                      <FiUser className="text-accent-500" />
+                      <FiUser className="h-4 w-4" />
                       Dashboard
                     </Link>
                     <button
+                      type="button"
                       onClick={handleLogout}
-                      className="flex items-center gap-2 w-full px-4 py-3 text-primary-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      className="w-full h-9 px-3.5 text-sm text-red-700 hover:bg-red-50 flex items-center gap-2"
                     >
-                      <FiLogOut className="text-red-500" />
+                      <FiLogOut className="h-4 w-4" />
                       Logout
                     </button>
                   </div>
@@ -224,191 +198,185 @@ const Header = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile menu toggle */}
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-primary-700 hover:text-accent-600 transition-colors p-2"
+              type="button"
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              className="lg:hidden h-10 w-10 rounded-lg border border-primary-200 bg-white text-primary-700 hover:text-accent-700 hover:border-accent-300 inline-flex items-center justify-center"
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMobileMenuOpen ? (
-                <FiX className="text-3xl" />
+                <FiX className="h-5 w-5" />
               ) : (
-                <FiMenu className="text-3xl" />
+                <FiMenu className="h-5 w-5" />
               )}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t-2 border-accent-200 bg-gradient-to-b from-white to-primary-50">
-            <div className="px-4 py-6 space-y-3">
-              {/* Home Link */}
+          <div className="lg:hidden border-t border-primary-100 py-3">
+            <div className="space-y-1.5">
               <NavLink
                 to="/"
                 className={({ isActive }) =>
-                  `no-underline flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
-                    isActive ? "bg-accent-100 text-accent-700 border border-accent-200" : "text-primary-700 hover:bg-primary-100"
+                  `no-underline h-10 px-3 rounded-lg inline-flex items-center gap-2 w-full text-sm font-medium ${
+                    isActive
+                      ? "bg-accent-100 text-accent-700"
+                      : "text-primary-700 hover:bg-primary-50"
                   }`
                 }
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <FiHome className="text-lg" />
+                <FiHome className="h-4 w-4" />
                 Home
               </NavLink>
 
-              {/* Categories */}
-              <div>
-                <button
-                  className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-primary-700 hover:bg-primary-100 font-semibold transition-all"
-                  onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
-                >
-                  <span className="flex items-center gap-2">
-                    <FiBook className="text-accent-500 text-lg" />
-                    Categories
-                  </span>
-                  <FiChevronDown
-                    className={`text-sm transition-transform ${
-                      isCategoriesOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                {isCategoriesOpen && (
-                  <div className="mt-2 ml-4 space-y-1 border-l-4 border-accent-300 pl-4">
+              <button
+                type="button"
+                className="h-10 px-3 rounded-lg inline-flex items-center justify-between w-full text-sm font-medium text-primary-700 hover:bg-primary-50"
+                onClick={() => setIsCategoriesOpen((prev) => !prev)}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <FiBook className="h-4 w-4" />
+                  Categories
+                </span>
+                <FiChevronDown
+                  className={`h-4 w-4 transition-transform ${
+                    isCategoriesOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {isCategoriesOpen && (
+                <div className="ml-3 pl-3 border-l-2 border-accent-200 space-y-1 py-1">
+                  <Link
+                    to="/categories"
+                    className="no-underline h-9 px-2 rounded-md text-sm font-medium text-accent-700 hover:bg-accent-50 flex items-center"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsCategoriesOpen(false);
+                    }}
+                  >
+                    All Categories
+                  </Link>
+                  {categories?.map((c) => (
                     <Link
-                      to="/categories"
-                      className="no-underline block px-3 py-2.5 text-accent-600 hover:text-accent-700 font-medium rounded hover:bg-accent-50 transition-all"
+                      key={c._id}
+                      to={`/category/${c.slug}`}
+                      className="no-underline h-9 px-2 rounded-md text-sm text-primary-700 hover:bg-primary-50 flex items-center"
                       onClick={() => {
-                        setIsCategoriesOpen(false);
                         setIsMobileMenuOpen(false);
+                        setIsCategoriesOpen(false);
                       }}
                     >
-                      All Categories
+                      {c.name}
                     </Link>
-                    {categories?.map((c) => (
-                      <Link
-                        key={c._id}
-                        to={`/category/${c.slug}`}
-                        className="no-underline block px-3 py-2 text-primary-600 hover:text-accent-600 transition-colors rounded hover:bg-accent-50"
-                        onClick={() => {
-                          setIsCategoriesOpen(false);
-                          setIsMobileMenuOpen(false);
-                        }}
-                      >
-                        {c.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
 
-              {/* About Us Link */}
               <NavLink
                 to="/about"
                 className={({ isActive }) =>
-                  `no-underline flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
-                    isActive ? "bg-accent-100 text-accent-700 border border-accent-200" : "text-primary-700 hover:bg-primary-100"
+                  `no-underline h-10 px-3 rounded-lg inline-flex items-center gap-2 w-full text-sm font-medium ${
+                    isActive
+                      ? "bg-accent-100 text-accent-700"
+                      : "text-primary-700 hover:bg-primary-50"
                   }`
                 }
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <FiInfo className="text-lg" />
-                About Us
+                <FiInfo className="h-4 w-4" />
+                About
               </NavLink>
 
-              {/* Contact Link */}
               <NavLink
                 to="/contact"
                 className={({ isActive }) =>
-                  `no-underline flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
-                    isActive ? "bg-accent-100 text-accent-700 border border-accent-200" : "text-primary-700 hover:bg-primary-100"
+                  `no-underline h-10 px-3 rounded-lg inline-flex items-center gap-2 w-full text-sm font-medium ${
+                    isActive
+                      ? "bg-accent-100 text-accent-700"
+                      : "text-primary-700 hover:bg-primary-50"
                   }`
                 }
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <FiMail className="text-lg" />
+                <FiMail className="h-4 w-4" />
                 Contact
               </NavLink>
 
-              {/* Quick Actions - Wishlist & Cart */}
-              <div className="flex gap-3 pt-3">
+              <div className="grid grid-cols-2 gap-2 pt-1">
                 <NavLink
                   to="/wishlist"
                   className={({ isActive }) =>
-                    `no-underline flex items-center justify-center gap-2 flex-1 px-4 py-3 rounded-lg font-semibold transition-all ${
+                    `no-underline h-10 px-3 rounded-lg inline-flex items-center justify-center gap-2 text-sm font-medium ${
                       isActive
-                        ? "bg-accent-100 text-accent-700 border border-accent-200"
-                        : "text-primary-700 hover:bg-primary-100"
+                        ? "bg-accent-100 text-accent-700"
+                        : "text-primary-700 hover:bg-primary-50"
                     }`
                   }
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <FiHeart className="text-lg" />
-                  <span>Wishlist</span>
-                  {wishlist?.length > 0 && (
-                    <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                      {wishlist.length}
-                    </span>
-                  )}
+                  <FiHeart className="h-4 w-4" />
+                  Wishlist
                 </NavLink>
                 <NavLink
                   to="/cart"
                   className={({ isActive }) =>
-                    `no-underline flex items-center justify-center gap-2 flex-1 px-4 py-3 rounded-lg font-semibold transition-all ${
+                    `no-underline h-10 px-3 rounded-lg inline-flex items-center justify-center gap-2 text-sm font-medium ${
                       isActive
-                        ? "bg-accent-100 text-accent-700 border border-accent-200"
-                        : "text-primary-700 hover:bg-primary-100"
+                        ? "bg-accent-100 text-accent-700"
+                        : "text-primary-700 hover:bg-primary-50"
                     }`
                   }
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <FiShoppingCart className="text-lg" />
-                  <span>Cart</span>
-                  {cart?.length > 0 && (
-                    <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                      {cart.length}
-                    </span>
-                  )}
+                  <FiShoppingCart className="h-4 w-4" />
+                  Cart
                 </NavLink>
               </div>
 
-              {/* Auth Links */}
               {!auth?.user ? (
-                <div className="space-y-3 pt-4 mt-4 border-t-2 border-primary-200">
+                <div className="pt-2 border-t border-primary-100">
                   <NavLink
                     to="/login"
-                    className="no-underline block bg-accent-100 text-accent-700 px-4 py-3 rounded-lg hover:bg-accent-200 transition-all font-semibold text-center border border-accent-200"
+                    className="no-underline h-10 px-3 rounded-lg bg-accent-50 hover:bg-accent-100 border border-accent-200 text-accent-700 text-sm font-semibold inline-flex items-center justify-center w-full"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Login
                   </NavLink>
                 </div>
               ) : (
-                <div className="space-y-3 pt-4 mt-4 border-t-2 border-primary-200">
-                  <div className="flex items-center gap-3 px-4 py-3 bg-accent-50 rounded-lg border border-accent-200">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-accent-400 to-accent-500 flex items-center justify-center text-white font-bold shadow-sm">
-                      {auth?.user?.name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-primary-900">{auth?.user?.name}</p>
-                      <p className="text-xs text-primary-500 capitalize">{getRoleLabel(auth?.user?.role)}</p>
-                    </div>
+                <div className="pt-2 border-t border-primary-100 space-y-2">
+                  <div className="px-3 py-2.5 rounded-lg border border-accent-200 bg-accent-50">
+                    <p className="text-sm font-semibold text-primary-900 m-0 truncate">
+                      {auth?.user?.name}
+                    </p>
+                    <p className="text-xs text-primary-500 capitalize m-0 mt-0.5">
+                      {getRoleLabel(auth?.user?.role)}
+                    </p>
                   </div>
+
                   <Link
                     to={dashboardPath}
-                    className="no-underline flex items-center gap-2 px-4 py-3 text-primary-700 hover:bg-accent-50 transition-all rounded-lg font-medium border border-transparent hover:border-accent-200"
+                    className="no-underline h-10 px-3 rounded-lg text-sm font-medium text-primary-700 hover:bg-primary-50 inline-flex items-center gap-2 w-full"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <FiUser className="text-accent-500" />
+                    <FiUser className="h-4 w-4" />
                     Dashboard
                   </Link>
+
                   <button
+                    type="button"
                     onClick={() => {
                       handleLogout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="flex items-center gap-2 w-full px-4 py-3 text-red-600 hover:bg-red-50 transition-all rounded-lg font-medium border border-transparent hover:border-red-200"
+                    className="h-10 px-3 rounded-lg text-sm font-medium text-red-700 hover:bg-red-50 inline-flex items-center gap-2 w-full"
                   >
-                    <FiLogOut className="text-red-500" />
+                    <FiLogOut className="h-4 w-4" />
                     Logout
                   </button>
                 </div>
@@ -417,7 +385,7 @@ const Header = () => {
           </div>
         )}
       </div>
-    </nav>
+    </header>
   );
 };
 

@@ -9,8 +9,15 @@ import {
   getAllOrdersController,
   orderStatusController,
   getAllUsersController,
+  createUserByAdminController,
+  updateUserByAdminController,
+  deleteUserByAdminController,
 } from "../controllers/authController.js";
-import { isAdmin, requireSignIn } from "../middlewares/authMiddleware.js";
+import {
+  isAdmin,
+  isSuperAdmin,
+  requireSignIn,
+} from "../middlewares/authMiddleware.js";
 
 //router object
 const router = express.Router();
@@ -56,5 +63,24 @@ router.put(
 
 //all users
 router.get("/all-users", requireSignIn, isAdmin, getAllUsersController);
+
+//create user by admin
+router.post(
+  "/create-user",
+  requireSignIn,
+  isSuperAdmin,
+  createUserByAdminController
+);
+
+//update user by superadmin
+router.put("/user/:uid", requireSignIn, isSuperAdmin, updateUserByAdminController);
+
+//delete user by superadmin
+router.delete(
+  "/user/:uid",
+  requireSignIn,
+  isSuperAdmin,
+  deleteUserByAdminController
+);
 
 export default router;

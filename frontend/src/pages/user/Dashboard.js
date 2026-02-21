@@ -12,6 +12,7 @@ import {
   FiBookOpen,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { getRoleLabel } from "../../utils/roleUtils";
 
 const Dashboard = () => {
   const [auth] = useAuth();
@@ -93,7 +94,7 @@ const Dashboard = () => {
                     <div className="flex justify-between">
                       <span className="text-primary-600">Account Type:</span>
                       <span className="font-medium text-primary-900">
-                        {auth?.user?.role === 1 ? "Admin" : "Customer"}
+                        {getRoleLabel(auth?.user?.role)}
                       </span>
                     </div>
                     <div className="flex justify-between">

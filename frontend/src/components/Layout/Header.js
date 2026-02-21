@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import useCategory from "../../hooks/useCategory";
 import { useCart } from "../../context/cart";
 import { useWishlist } from "../../context/wishlist";
+import { getRoleLabel, hasAdminAccess } from "../../utils/roleUtils";
 import { GiSpellBook } from "react-icons/gi";
 import {
   FiShoppingCart,
@@ -37,6 +38,10 @@ const Header = () => {
     localStorage.removeItem("auth");
     toast.success("Logout Successfully");
   };
+
+  const dashboardPath = hasAdminAccess(auth?.user?.role)
+    ? "/dashboard/admin"
+    : "/dashboard/user";
 
   return (
     <nav className="bg-white shadow-lg border-b border-accent-200 fixed top-0 left-0 right-0 z-50">
@@ -201,9 +206,7 @@ const Header = () => {
                     className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 hidden group-hover:block z-50"
                   >
                     <Link
-                      to={`/dashboard/${
-                        auth?.user?.role === 1 ? "admin" : "user"
-                      }`}
+                      to={dashboardPath}
                       className="no-underline flex items-center gap-2 px-4 py-3 text-primary-700 hover:bg-accent-50 hover:text-accent-600 transition-colors font-medium border-b border-gray-100"
                     >
                       <FiUser className="text-accent-500" />
@@ -387,13 +390,11 @@ const Header = () => {
                     </div>
                     <div>
                       <p className="font-semibold text-primary-900">{auth?.user?.name}</p>
-                      <p className="text-xs text-primary-500 capitalize">{auth?.user?.role === 1 ? "Admin" : "Customer"}</p>
+                      <p className="text-xs text-primary-500 capitalize">{getRoleLabel(auth?.user?.role)}</p>
                     </div>
                   </div>
                   <Link
-                    to={`/dashboard/${
-                      auth?.user?.role === 1 ? "admin" : "user"
-                    }`}
+                    to={dashboardPath}
                     className="no-underline flex items-center gap-2 px-4 py-3 text-primary-700 hover:bg-accent-50 transition-all rounded-lg font-medium border border-transparent hover:border-accent-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

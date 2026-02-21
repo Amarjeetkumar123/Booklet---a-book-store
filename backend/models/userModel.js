@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ROLE } from "../utils/roleUtils.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -30,7 +31,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: Number,
-      default: 0,
+      enum: Object.values(ROLE),
+      default: ROLE.CUSTOMER,
     },
   },
   { timestamps: true }

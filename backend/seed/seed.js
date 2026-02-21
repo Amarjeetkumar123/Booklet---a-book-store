@@ -9,6 +9,7 @@ import categoryModel from "../models/categoryModel.js";
 import productModel from "../models/productModel.js";
 import userModel from "../models/userModel.js";
 import { hashPassword } from "../helpers/authHelper.js";
+import { ROLE } from "../utils/roleUtils.js";
 
 const envResult = dotenv.config({ path: "./backend/.env" });
 if (envResult.error) {
@@ -120,6 +121,21 @@ const seed = async () => {
       );
     }
 
+    const superAdminEmail = "superadmin@booklet.test";
+    const superAdminExists = await userModel.findOne({ email: superAdminEmail });
+    if (!superAdminExists) {
+      const passwordHash = await hashPassword("superadmin@123");
+      await userModel.create({
+        name: "Super Admin",
+        email: superAdminEmail,
+        password: passwordHash,
+        phone: "9999990000",
+        address: "Superadmin Address",
+        answer: "blue",
+        role: ROLE.SUPERADMIN,
+      });
+    }
+
     const adminEmail = "admin@booklet.test";
     const adminExists = await userModel.findOne({ email: adminEmail });
     if (!adminExists) {
@@ -131,7 +147,7 @@ const seed = async () => {
         phone: "9999999999",
         address: "Admin Address",
         answer: "blue",
-        role: 1,
+        role: ROLE.ADMIN,
       });
     }
 
@@ -146,7 +162,7 @@ const seed = async () => {
         phone: "8888888888",
         address: "Sample Address",
         answer: "blue",
-        role: 0,
+        role: ROLE.CUSTOMER,
       });
     }
 

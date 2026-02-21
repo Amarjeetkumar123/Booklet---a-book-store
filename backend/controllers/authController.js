@@ -3,6 +3,7 @@ import orderModel from "../models/orderModel.js";
 
 import { comparePassword, hashPassword } from "./../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
+import { ROLE, normalizeRoleInput } from "../utils/roleUtils.js";
 
 export const registerController = async (req, res) => {
   try {
@@ -45,6 +46,7 @@ export const registerController = async (req, res) => {
       address,
       password: hashedPassword,
       answer,
+      role: ROLE.CUSTOMER,
     }).save();
 
     res.status(201).send({
@@ -57,6 +59,70 @@ export const registerController = async (req, res) => {
     res.status(500).send({
       success: false,
       message: "Errro in Registeration",
+      error,
+    });
+  }
+};
+
+// admin create user with role
+export const createUserByAdminController = async (req, res) => {
+  try {
+    const { name, email, password, phone, address, answer, role } = req.body;
+
+    if (!name) return res.status(400).send({ message: "Name is Required" });
+    if (!email) return res.status(400).send({ message: "Email is Required" });
+    if (!password)
+      return res.status(400).send({ message: "Password is Required" });
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .send({ message: "Password should be at least 6 characters" });
+    }
+    if (!phone) return res.status(400).send({ message: "Phone is Required" });
+    if (!address)
+      return res.status(400).send({ message: "Address is Required" });
+    if (!answer)
+      return res.status(400).send({ message: "Answer is Required" });
+
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      return res.status(409).send({
+        success: false,
+        message: "User already exists with this email",
+      });
+    }
+
+    const normalizedRole = normalizeRoleInput(role, ROLE.CUSTOMER);
+    const hashedPassword = await hashPassword(password);
+
+    const user = await new userModel({
+      name,
+      email,
+      phone,
+      address,
+      password: hashedPassword,
+      answer,
+      role: normalizedRole,
+    }).save();
+
+    return res.status(201).send({
+      success: true,
+      message: "User created successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error while creating user",
       error,
     });
   }
@@ -290,6 +356,106 @@ export const getAllUsersController = async (req, res) => {
     res.status(500).send({
       success: false,
       message: "Error While Getting Users",
+      error,
+    });
+  }
+};
+
+// update user by superadmin
+export const updateUserByAdminController = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const { name, email, phone, address, answer, role, password } = req.body;
+
+    const user = await userModel.findById(uid);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (email && email !== user.email) {
+      const existingUser = await userModel.findOne({ email });
+      if (existingUser) {
+        return res.status(409).send({
+          success: false,
+          message: "Another user already exists with this email",
+        });
+      }
+    }
+
+    if (password && password.length < 6) {
+      return res.status(400).send({
+        success: false,
+        message: "Password should be at least 6 characters",
+      });
+    }
+
+    const hashedPassword = password ? await hashPassword(password) : undefined;
+    const normalizedRole = normalizeRoleInput(role, user.role);
+
+    const updatedUser = await userModel
+      .findByIdAndUpdate(
+        uid,
+        {
+          name: name ?? user.name,
+          email: email ?? user.email,
+          phone: phone ?? user.phone,
+          address: address ?? user.address,
+          answer: answer ?? user.answer,
+          role: normalizedRole,
+          password: hashedPassword || user.password,
+        },
+        { new: true }
+      )
+      .select("-password");
+
+    return res.status(200).send({
+      success: true,
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error while updating user",
+      error,
+    });
+  }
+};
+
+// delete user by superadmin
+export const deleteUserByAdminController = async (req, res) => {
+  try {
+    const { uid } = req.params;
+
+    if (String(req.user._id) === String(uid)) {
+      return res.status(400).send({
+        success: false,
+        message: "You cannot delete your own account",
+      });
+    }
+
+    const user = await userModel.findById(uid);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    await userModel.findByIdAndDelete(uid);
+    return res.status(200).send({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error while deleting user",
       error,
     });
   }

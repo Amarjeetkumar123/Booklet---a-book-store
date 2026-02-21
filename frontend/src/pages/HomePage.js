@@ -126,7 +126,7 @@ const HomePage = () => {
   };
 
   return (
-    <Layout title={"All Products - Best offers "}>
+    <Layout>
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-16 md:py-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent-100 rounded-full opacity-20 -mr-48 -mt-48"></div>

@@ -1,275 +1,242 @@
 import React from "react";
 import Layout from "./../components/Layout/Layout";
-import { FiAward, FiTarget, FiUsers, FiTrendingUp, FiBook, FiHeart, FiGlobe, FiZap } from "react-icons/fi";
+import {
+  FiAward,
+  FiBook,
+  FiCheck,
+  FiGlobe,
+  FiHeart,
+  FiTarget,
+  FiTrendingUp,
+  FiUsers,
+  FiZap,
+} from "react-icons/fi";
+
+const highlights = [
+  { value: "50K+", label: "Books curated for readers" },
+  { value: "100K+", label: "Happy readers served" },
+  { value: "150+", label: "Regions shipped globally" },
+  { value: "4.9/5", label: "Average reader rating" },
+];
+
+const pillars = [
+  {
+    title: "Our Mission",
+    description:
+      "Help every reader discover meaningful books with fair pricing, smooth delivery, and trusted service.",
+    icon: FiTarget,
+  },
+  {
+    title: "Our Vision",
+    description:
+      "Build the most loved book platform where discovery, quality, and community feel effortless.",
+    icon: FiGlobe,
+  },
+  {
+    title: "Our Values",
+    description:
+      "Reader-first decisions, authentic catalog quality, and long-term relationships built with care.",
+    icon: FiHeart,
+  },
+];
+
+const reasons = [
+  {
+    title: "Curated Catalog",
+    text: "A broad range of genres, from bestsellers to hidden gems.",
+    icon: FiBook,
+  },
+  {
+    title: "Fair Pricing",
+    text: "Consistent value with frequent deals and member-only offers.",
+    icon: FiTrendingUp,
+  },
+  {
+    title: "Trusted Experience",
+    text: "Secure checkout, reliable delivery timelines, and clear updates.",
+    icon: FiAward,
+  },
+  {
+    title: "Reader Community",
+    text: "Insights and recommendations shaped by real reading habits.",
+    icon: FiUsers,
+  },
+  {
+    title: "Fast Support",
+    text: "Quick help from a support team that understands readers.",
+    icon: FiZap,
+  },
+  {
+    title: "Quality Promise",
+    text: "Book condition standards and service quality stay consistent.",
+    icon: FiCheck,
+  },
+];
+
+const journey = [
+  {
+    year: "2020",
+    title: "Booklet launched",
+    text: "Started with a small team and a focused mission to simplify online book buying.",
+    icon: FiBook,
+  },
+  {
+    year: "2021",
+    title: "10K readers reached",
+    text: "Expanded our catalog and improved recommendations for faster discovery.",
+    icon: FiTrendingUp,
+  },
+  {
+    year: "2022",
+    title: "Industry recognition",
+    text: "Recognized for service quality and customer satisfaction across core regions.",
+    icon: FiAward,
+  },
+  {
+    year: "2023",
+    title: "100K readers milestone",
+    text: "Scaled operations and strengthened delivery reliability worldwide.",
+    icon: FiUsers,
+  },
+  {
+    year: "2024+",
+    title: "Building what readers need next",
+    text: "Continuing to improve discovery, personalization, and customer support.",
+    icon: FiZap,
+  },
+];
 
 const About = () => {
   return (
     <Layout title={"About Us - Booklet"}>
-      <div className="pt-24 pb-16 bg-white min-h-screen">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h1 className="text-4xl md:text-5xl font-bold text-primary-900 mb-4">
-                  Welcome to Booklet
-                </h1>
-                <p className="text-xl text-primary-700 mb-6">
-                  Your gateway to a world of stories, knowledge, and imagination.
-                </p>
-                <p className="text-lg text-primary-600 leading-relaxed">
-                  Founded in 2020, Booklet has been connecting book lovers with their next favorite read. We believe that books have the power to transform lives, and we're committed to making quality literature accessible to everyone, everywhere.
-                </p>
-              </div>
-              <div className="bg-gradient-to-br from-accent-100 to-orange-100 rounded-2xl p-12 shadow-lg">
-                <div className="text-6xl text-accent-600 mb-4">📚</div>
-                <h3 className="text-2xl font-bold text-primary-900 mb-2">Our Promise</h3>
-                <p className="text-primary-700">
-                  To provide the widest selection of books, competitive prices, and exceptional customer service every single day.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Section */}
-        <div className="bg-primary-900 text-white py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-4xl font-bold text-accent-500 mb-2">50K+</div>
-                <p className="text-accent-100">Books Available</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-accent-500 mb-2">100K+</div>
-                <p className="text-accent-100">Happy Customers</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-accent-500 mb-2">150+</div>
-                <p className="text-accent-100">Countries Shipped</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-accent-500 mb-2">4.9★</div>
-                <p className="text-accent-100">Average Rating</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mission, Vision, Values */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            {/* Mission */}
-            <div className="bg-white rounded-xl shadow-lg p-8 border border-primary-100 hover:shadow-xl transition-all">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-accent-100 p-3 rounded-lg">
-                  <FiTarget className="text-2xl text-accent-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-primary-900">Our Mission</h3>
-              </div>
-              <p className="text-primary-700 leading-relaxed">
-                To inspire and empower readers worldwide by providing access to a diverse collection of books at affordable prices, with exceptional service and convenience.
+      <div className="pt-24 pb-14 min-h-screen bg-gradient-to-b from-primary-50 via-white to-primary-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+            <div className="lg:col-span-7 rounded-2xl border border-primary-200 bg-white shadow-sm p-5 sm:p-7">
+              <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full border border-accent-200 bg-accent-50 text-accent-700 text-xs font-semibold">
+                <FiBook className="h-3.5 w-3.5" />
+                About Booklet
+              </span>
+              <h1 className="mt-4 text-3xl sm:text-4xl font-bold text-primary-900 leading-tight">
+                Built for readers who want great books without the noise
+              </h1>
+              <p className="mt-3 text-base sm:text-lg text-primary-700 leading-relaxed">
+                Booklet connects readers with meaningful titles across genres through a
+                clean shopping experience, transparent pricing, and dependable service.
+              </p>
+              <p className="mt-3 text-sm sm:text-base text-primary-600 leading-relaxed">
+                Since 2020, we have focused on one thing: helping people discover books
+                they actually want to read, with smooth ordering and consistent support.
               </p>
             </div>
 
-            {/* Vision */}
-            <div className="bg-white rounded-xl shadow-lg p-8 border border-primary-100 hover:shadow-xl transition-all">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-accent-100 p-3 rounded-lg">
-                  <FiGlobe className="text-2xl text-accent-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-primary-900">Our Vision</h3>
+            <div className="lg:col-span-5 rounded-2xl border border-accent-200 bg-gradient-to-br from-accent-50 to-primary-50 shadow-sm p-5 sm:p-6">
+              <h2 className="text-xl sm:text-2xl font-semibold text-primary-900">
+                Our Promise
+              </h2>
+              <p className="mt-2 text-sm sm:text-base text-primary-700 leading-relaxed">
+                Curated catalog quality, fair pricing, and dependable support for every
+                order.
+              </p>
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                {highlights.map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-xl border border-primary-200 bg-white p-3.5"
+                  >
+                    <p className="text-lg sm:text-xl font-bold text-accent-700 m-0">
+                      {item.value}
+                    </p>
+                    <p className="mt-1 text-xs sm:text-sm text-primary-600 m-0 leading-snug">
+                      {item.label}
+                    </p>
+                  </div>
+                ))}
               </div>
-              <p className="text-primary-700 leading-relaxed">
-                To be the world's most trusted and beloved online bookstore, where every person can find books that matter to them and connect with a global community of readers.
+            </div>
+          </section>
+
+          <section className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+            {pillars.map((pillar) => {
+              const Icon = pillar.icon;
+              return (
+                <article
+                  key={pillar.title}
+                  className="rounded-2xl border border-primary-200 bg-white shadow-sm p-5"
+                >
+                  <div className="h-11 w-11 rounded-xl bg-accent-100 text-accent-700 inline-flex items-center justify-center">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-3 text-lg font-semibold text-primary-900">{pillar.title}</h3>
+                  <p className="mt-2 text-sm text-primary-600 leading-relaxed">
+                    {pillar.description}
+                  </p>
+                </article>
+              );
+            })}
+          </section>
+
+          <section className="mt-10">
+            <div className="mb-4 sm:mb-5">
+              <h2 className="text-2xl sm:text-3xl font-bold text-primary-900">
+                Why readers choose Booklet
+              </h2>
+              <p className="mt-1.5 text-sm sm:text-base text-primary-600">
+                A modern bookstore experience with reliable fundamentals.
               </p>
             </div>
-
-            {/* Values */}
-            <div className="bg-white rounded-xl shadow-lg p-8 border border-primary-100 hover:shadow-xl transition-all">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-accent-100 p-3 rounded-lg">
-                  <FiHeart className="text-2xl text-accent-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-primary-900">Our Values</h3>
-              </div>
-              <ul className="space-y-2 text-primary-700">
-                <li>✓ Customer First Always</li>
-                <li>✓ Quality & Authenticity</li>
-                <li>✓ Passionate About Books</li>
-                <li>✓ Community & Connection</li>
-              </ul>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {reasons.map((reason) => {
+                const Icon = reason.icon;
+                return (
+                  <article
+                    key={reason.title}
+                    className="rounded-xl border border-primary-200 bg-white p-4 sm:p-5 shadow-sm"
+                  >
+                    <div className="inline-flex items-center gap-2 text-accent-700">
+                      <Icon className="h-4.5 w-4.5" />
+                      <h3 className="text-base font-semibold text-primary-900 m-0">
+                        {reason.title}
+                      </h3>
+                    </div>
+                    <p className="mt-2 text-sm text-primary-600 leading-relaxed m-0">
+                      {reason.text}
+                    </p>
+                  </article>
+                );
+              })}
             </div>
-          </div>
+          </section>
 
-          {/* Why Choose Us */}
-          <div className="mb-16">
-            <h2 className="text-4xl font-bold text-primary-900 mb-12 text-center">Why Choose Booklet?</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-primary-50 rounded-xl p-8 border border-primary-100 hover:border-accent-300 transition-all">
-                <div className="text-4xl mb-3">📖</div>
-                <h4 className="font-bold text-primary-900 mb-2">Vast Selection</h4>
-                <p className="text-primary-600 text-sm">
-                  Over 50,000 titles across all genres and categories from bestsellers to rare finds.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-xl p-8 border border-primary-100 hover:border-accent-300 transition-all">
-                <div className="text-4xl mb-3">💰</div>
-                <h4 className="font-bold text-primary-900 mb-2">Best Prices</h4>
-                <p className="text-primary-600 text-sm">
-                  Competitive pricing with regular discounts and exclusive deals for our members.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-xl p-8 border border-primary-100 hover:border-accent-300 transition-all">
-                <div className="text-4xl mb-3">🚚</div>
-                <h4 className="font-bold text-primary-900 mb-2">Fast Shipping</h4>
-                <p className="text-primary-600 text-sm">
-                  Quick delivery to over 150 countries with real-time tracking on all orders.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-xl p-8 border border-primary-100 hover:border-accent-300 transition-all">
-                <div className="text-4xl mb-3">🤝</div>
-                <h4 className="font-bold text-primary-900 mb-2">Great Support</h4>
-                <p className="text-primary-600 text-sm">
-                  24/7 customer service team ready to help with any questions or concerns.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-xl p-8 border border-primary-100 hover:border-accent-300 transition-all">
-                <div className="text-4xl mb-3">⭐</div>
-                <h4 className="font-bold text-primary-900 mb-2">Reviews & Ratings</h4>
-                <p className="text-primary-600 text-sm">
-                  Authentic customer reviews to help you choose the perfect book every time.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-xl p-8 border border-primary-100 hover:border-accent-300 transition-all">
-                <div className="text-4xl mb-3">🔐</div>
-                <h4 className="font-bold text-primary-900 mb-2">Secure Shopping</h4>
-                <p className="text-primary-600 text-sm">
-                  Your information is protected with industry-leading encryption technology.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-xl p-8 border border-primary-100 hover:border-accent-300 transition-all">
-                <div className="text-4xl mb-3">📱</div>
-                <h4 className="font-bold text-primary-900 mb-2">Easy Returns</h4>
-                <p className="text-primary-600 text-sm">
-                  30-day hassle-free returns policy. We want you to be completely satisfied.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-xl p-8 border border-primary-100 hover:border-accent-300 transition-all">
-                <div className="text-4xl mb-3">🎁</div>
-                <h4 className="font-bold text-primary-900 mb-2">Loyalty Program</h4>
-                <p className="text-primary-600 text-sm">
-                  Earn points on every purchase and redeem them for discounts and exclusive offers.
-                </p>
-              </div>
+          <section className="mt-10 rounded-2xl border border-primary-200 bg-white shadow-sm p-5 sm:p-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-primary-900">Our Journey</h2>
+            <div className="mt-5 space-y-4">
+              {journey.map((step) => {
+                const Icon = step.icon;
+                return (
+                  <article
+                    key={step.title}
+                    className="rounded-xl border border-primary-100 bg-primary-50/60 p-4 sm:p-5 flex gap-3"
+                  >
+                    <div className="h-10 w-10 rounded-lg bg-accent-100 text-accent-700 shrink-0 inline-flex items-center justify-center">
+                      <Icon className="h-4.5 w-4.5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-accent-700 mb-1">
+                        {step.year}
+                      </p>
+                      <h3 className="text-base sm:text-lg font-semibold text-primary-900 m-0">
+                        {step.title}
+                      </h3>
+                      <p className="mt-1.5 text-sm text-primary-600 leading-relaxed m-0">
+                        {step.text}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-          </div>
-
-          {/* Team Section */}
-          <div className="bg-gradient-to-br from-accent-50 to-primary-50 rounded-2xl p-12 mb-16">
-            <h2 className="text-3xl font-bold text-primary-900 mb-6">Meet Our Team</h2>
-            <p className="text-primary-700 mb-8 text-lg">
-              Our diverse team of book enthusiasts, technology experts, and customer service professionals are dedicated to making your experience exceptional.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                <div className="text-5xl mb-3">👨‍💼</div>
-                <h4 className="font-bold text-primary-900">John Smith</h4>
-                <p className="text-sm text-primary-600">CEO & Founder</p>
-              </div>
-              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                <div className="text-5xl mb-3">👩‍💼</div>
-                <h4 className="font-bold text-primary-900">Sarah Johnson</h4>
-                <p className="text-sm text-primary-600">Head of Operations</p>
-              </div>
-              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                <div className="text-5xl mb-3">👨‍💻</div>
-                <h4 className="font-bold text-primary-900">Mike Chen</h4>
-                <p className="text-sm text-primary-600">CTO & Tech Lead</p>
-              </div>
-              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                <div className="text-5xl mb-3">👩‍💻</div>
-                <h4 className="font-bold text-primary-900">Emma Davis</h4>
-                <p className="text-sm text-primary-600">Customer Care Director</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Milestones */}
-          <div>
-            <h2 className="text-3xl font-bold text-primary-900 mb-8 text-center">Our Journey</h2>
-            <div className="space-y-6">
-              <div className="flex gap-4 items-start">
-                <div className="bg-accent-100 rounded-full p-3 flex-shrink-0">
-                  <FiBook className="text-xl text-accent-600" />
-                </div>
-                <div className="bg-white rounded-xl p-6 flex-grow border border-primary-100">
-                  <h4 className="font-bold text-primary-900 mb-1">2020 - Founded Booklet</h4>
-                  <p className="text-primary-600">Started with a small team and a big dream to revolutionize online book shopping.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-start">
-                <div className="bg-accent-100 rounded-full p-3 flex-shrink-0">
-                  <FiTrendingUp className="text-xl text-accent-600" />
-                </div>
-                <div className="bg-white rounded-xl p-6 flex-grow border border-primary-100">
-                  <h4 className="font-bold text-primary-900 mb-1">2021 - Reached 10K Customers</h4>
-                  <p className="text-primary-600">Expanded our catalog and launched in 5 new countries.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-start">
-                <div className="bg-accent-100 rounded-full p-3 flex-shrink-0">
-                  <FiAward className="text-xl text-accent-600" />
-                </div>
-                <div className="bg-white rounded-xl p-6 flex-grow border border-primary-100">
-                  <h4 className="font-bold text-primary-900 mb-1">2022 - Won Best Online Bookstore Award</h4>
-                  <p className="text-primary-600">Recognized for excellence in service and selection by industry leaders.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-start">
-                <div className="bg-accent-100 rounded-full p-3 flex-shrink-0">
-                  <FiUsers className="text-xl text-accent-600" />
-                </div>
-                <div className="bg-white rounded-xl p-6 flex-grow border border-primary-100">
-                  <h4 className="font-bold text-primary-900 mb-1">2023 - Reached 100K Customers</h4>
-                  <p className="text-primary-600">Launched mobile app and expanded to 150+ countries worldwide.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-start">
-                <div className="bg-accent-100 rounded-full p-3 flex-shrink-0">
-                  <FiZap className="text-xl text-accent-600" />
-                </div>
-                <div className="bg-white rounded-xl p-6 flex-grow border border-primary-100">
-                  <h4 className="font-bold text-primary-900 mb-1">2024 - Today & Beyond</h4>
-                  <p className="text-primary-600">Continuing to innovate and serve readers around the world with new features and services.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="bg-gradient-to-br from-accent-500 to-accent-600 text-white py-12 mt-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Join Our Growing Community</h2>
-            <p className="text-lg text-accent-100 mb-8">
-              Discover thousands of books and connect with book lovers from around the world.
-            </p>
-            <button className="bg-white text-accent-600 px-8 py-3 rounded-lg hover:bg-accent-50 transition-all font-semibold shadow-lg">
-              Start Exploring
-            </button>
-          </div>
+          </section>
         </div>
       </div>
     </Layout>

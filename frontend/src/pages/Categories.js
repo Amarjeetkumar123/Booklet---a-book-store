@@ -1,12 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useCategory from "../hooks/useCategory";
 import Layout from "../components/Layout/Layout";
-import { FiBook, FiArrowRight, FiAward, FiCode, FiBriefcase, FiTrendingUp, FiSearch, FiUser } from "react-icons/fi";
+import {
+  FiArrowRight,
+  FiAward,
+  FiBook,
+  FiBriefcase,
+  FiCode,
+  FiGrid,
+  FiSearch,
+  FiTrendingUp,
+  FiUser,
+  FiX,
+} from "react-icons/fi";
 
 const Categories = () => {
   const categories = useCategory();
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
 
   // Scroll to top when page loads
   useEffect(() => {
@@ -27,69 +39,119 @@ const Categories = () => {
     return iconMap[categoryName] || <FiBook className="w-6 h-6" />;
   };
 
+  const filteredCategories = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return categories;
+    return categories.filter((c) => c?.name?.toLowerCase().includes(query));
+  }, [categories, search]);
+
   return (
     <Layout title={"All Categories - Booklet"}>
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-16 border-b border-primary-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="inline-block mb-4">
-              <span className="bg-accent-100 text-accent-700 px-4 py-2 rounded-full text-sm font-semibold border border-accent-200">
-                📚 All Categories
-              </span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-primary-900 mb-4">
-              Browse Our Collection
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-accent-50 border-b border-primary-100">
+        <div className="absolute -top-16 -left-20 h-72 w-72 rounded-full bg-primary-100/70 blur-3xl" />
+        <div className="absolute -bottom-20 -right-16 h-72 w-72 rounded-full bg-accent-100/70 blur-3xl" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative z-10">
+          <div className="max-w-3xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-accent-200 bg-accent-50 px-3 py-1.5 text-xs font-semibold text-accent-700">
+              <FiGrid className="h-3.5 w-3.5" />
+              Browse Categories
+            </span>
+
+            <h1 className="mt-4 text-3xl md:text-5xl font-bold tracking-tight text-primary-900">
+              Explore books by
+              <span className="block text-accent-600">genre & interest</span>
             </h1>
-            <p className="text-lg text-primary-600 max-w-2xl mx-auto">
-              Explore books across different genres and find your next favorite read
+
+            <p className="mt-3 text-base md:text-lg text-primary-700">
+              Discover curated sections and jump straight to the stories you love.
             </p>
+
+            <div className="mt-6 rounded-xl border border-primary-200 bg-white p-2 shadow-sm flex items-center gap-2 max-w-xl">
+              <div className="relative flex-1">
+                <FiSearch className="h-4 w-4 text-primary-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search categories..."
+                  className="w-full h-10 rounded-lg border border-transparent bg-transparent pl-10 pr-3 text-sm text-primary-900 focus:outline-none"
+                />
+              </div>
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="h-9 px-3 rounded-lg border border-primary-200 bg-primary-50 hover:bg-primary-100 text-primary-700 text-sm font-medium inline-flex items-center gap-1"
+                >
+                  <FiX className="h-3.5 w-3.5" />
+                  Clear
+                </button>
+              )}
+            </div>
+
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white px-3 py-1.5 text-xs text-primary-700">
+              <span className="font-semibold text-primary-900">{filteredCategories.length}</span>
+              {search ? "matching categories" : "total categories"}
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Main Content */}
-      <div className="min-h-screen bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          {/* Categories Grid */}
+      <section className="min-h-screen bg-primary-50/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
           {categories.length === 0 ? (
-            <div className="text-center py-20">
-              <FiBook className="mx-auto w-20 h-20 text-primary-200 mb-4" />
-              <h3 className="text-2xl font-bold text-primary-900 mb-2">
-                No categories found
-              </h3>
+            <div className="text-center py-20 bg-white rounded-2xl border border-primary-200 shadow-sm">
+              <FiBook className="mx-auto w-16 h-16 text-primary-300 mb-4" />
+              <h3 className="text-2xl font-bold text-primary-900 mb-2">No categories found</h3>
               <p className="text-primary-600 mb-6">
                 Categories will appear here once they are added.
               </p>
               <button
                 onClick={() => navigate("/")}
-                className="bg-accent-100 text-accent-700 px-6 py-3 rounded-lg hover:bg-accent-200 transition-all font-medium border border-accent-200"
+                className="h-11 px-6 rounded-lg border border-accent-200 bg-accent-50 hover:bg-accent-100 text-accent-700 font-semibold"
               >
                 Back to Home
               </button>
             </div>
+          ) : filteredCategories.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-2xl border border-primary-200 shadow-sm">
+              <FiSearch className="mx-auto w-14 h-14 text-primary-300 mb-4" />
+              <h3 className="text-xl font-bold text-primary-900 mb-2">No matching categories</h3>
+              <p className="text-primary-600 mb-6">
+                Try a different keyword or clear your search.
+              </p>
+              <button
+                onClick={() => setSearch("")}
+                className="h-11 px-6 rounded-lg border border-primary-200 bg-primary-100 hover:bg-primary-200 text-primary-800 font-semibold"
+              >
+                Clear Search
+              </button>
+            </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {categories.map((c) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+              {filteredCategories.map((c) => (
                 <Link
                   key={c._id}
                   to={`/category/${c.slug}`}
-                  className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-primary-100 hover:border-accent-200"
+                  className="group relative overflow-hidden rounded-2xl border border-primary-200 bg-white p-5 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                 >
-                  <div className="p-6 text-center h-full flex flex-col items-center justify-center">
-                    {/* Icon */}
-                    <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:bg-accent-200 transition-all shadow-sm border border-accent-200">
-                      <span className="text-accent-700">{getCategoryIcon(c.name)}</span>
+                  <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-accent-100/60 blur-xl group-hover:bg-accent-200/70 transition-colors" />
+
+                  <div className="relative z-10 flex h-full flex-col">
+                    <div className="h-12 w-12 rounded-xl border border-accent-200 bg-accent-50 text-accent-700 inline-flex items-center justify-center group-hover:scale-105 transition-transform">
+                      {getCategoryIcon(c.name)}
                     </div>
-                    
-                    {/* Name */}
-                    <h3 className="text-lg font-semibold text-primary-900 mb-2 group-hover:text-accent-600 transition-colors line-clamp-2">
+
+                    <h3 className="mt-4 text-base md:text-lg font-semibold text-primary-900 line-clamp-2 group-hover:text-accent-700 transition-colors">
                       {c.name}
                     </h3>
-                    
-                    {/* Arrow */}
-                    <div className="flex items-center justify-center text-accent-600 group-hover:text-accent-700 transition-colors mt-auto">
-                      <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+
+                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-accent-700">
+                      View books
+                      <FiArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </Link>
@@ -97,36 +159,36 @@ const Categories = () => {
             </div>
           )}
         </div>
+      </section>
 
-        {/* CTA Section */}
-        <div className="bg-gradient-to-br from-accent-50 via-white to-primary-50 py-16 border-t border-primary-100">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-2xl border-2 border-accent-200 p-12 text-center shadow-sm">
-              <h2 className="text-3xl font-bold text-primary-900 mb-4">
-                Can't find what you're looking for?
-              </h2>
-              <p className="text-primary-600 mb-8 text-lg max-w-2xl mx-auto">
-                Browse all our products or use the search feature to discover specific books
-              </p>
-              <div className="flex gap-4 justify-center flex-wrap">
-                <button
-                  onClick={() => navigate("/")}
-                  className="inline-flex items-center gap-2 bg-accent-100 text-accent-700 px-8 py-3 rounded-lg hover:bg-accent-200 transition-all font-medium border border-accent-200"
-                >
-                  <span>Browse All Books</span>
-                  <FiArrowRight className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => navigate("/")}
-                  className="inline-flex items-center gap-2 border-2 border-accent-300 text-accent-600 px-8 py-3 rounded-lg hover:bg-accent-50 transition-all font-medium"
-                >
-                  <span>Back to Home</span>
-                </button>
-              </div>
+      {/* Bottom CTA */}
+      <section className="bg-gradient-to-br from-accent-50 via-white to-primary-50 py-12 md:py-16 border-t border-primary-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl border border-primary-200 p-7 md:p-10 text-center shadow-sm">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-3">
+              Looking for something specific?
+            </h2>
+            <p className="text-primary-600 mb-7 text-base md:text-lg max-w-2xl mx-auto">
+              Go back to the home page and use filters to find your perfect read.
+            </p>
+            <div className="flex gap-3 justify-center flex-wrap">
+              <button
+                onClick={() => navigate("/")}
+                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-accent-500 hover:bg-accent-600 text-white font-semibold"
+              >
+                Browse All Books
+                <FiArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg border border-primary-200 bg-white hover:bg-primary-50 text-primary-700 font-semibold"
+              >
+                Back to Top
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </Layout>
   );
 };

@@ -2,12 +2,10 @@ import React, { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
-import useCategory from "../../hooks/useCategory";
 import { useCart } from "../../context/cart";
 import { useWishlist } from "../../context/wishlist";
 import { GiSpellBook } from "react-icons/gi";
 import {
-  FiBook,
   FiChevronDown,
   FiHeart,
   FiHome,
@@ -25,8 +23,6 @@ const Header = () => {
   const [auth, setAuth] = useAuth();
   const [cart] = useCart();
   const [wishlist] = useWishlist();
-  const categories = useCategory();
-  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -80,36 +76,6 @@ const Header = () => {
               <FiHome className="h-4 w-4" />
               Home
             </NavLink>
-
-            <div className="relative group">
-              <button
-                type="button"
-                className="h-10 px-3.5 rounded-lg inline-flex items-center gap-2 text-sm font-medium text-primary-700 hover:bg-primary-50 hover:text-accent-700 transition-colors"
-              >
-                <FiBook className="h-4 w-4" />
-                Categories
-                <FiChevronDown className="h-4 w-4 group-hover:rotate-180 transition-transform" />
-              </button>
-
-              <div className="hidden group-hover:block group-focus-within:block absolute left-0 top-full mt-2 w-64 rounded-xl border border-primary-200 bg-white shadow-xl py-2 z-50">
-                <Link
-                  to="/categories"
-                  className="no-underline h-9 px-3.5 text-sm font-medium text-primary-800 hover:bg-accent-50 hover:text-accent-700 flex items-center"
-                >
-                  All Categories
-                </Link>
-                <div className="my-1 h-px bg-primary-100" />
-                {categories?.map((c) => (
-                  <Link
-                    key={c._id}
-                    to={`/category/${c.slug}`}
-                    className="no-underline h-9 px-3.5 text-sm text-primary-700 hover:bg-primary-50 hover:text-accent-700 flex items-center"
-                  >
-                    {c.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
 
             <NavLink to="/about" className={desktopNavItemClass}>
               <FiInfo className="h-4 w-4" />
@@ -232,50 +198,6 @@ const Header = () => {
                 <FiHome className="h-4 w-4" />
                 Home
               </NavLink>
-
-              <button
-                type="button"
-                className="h-10 px-3 rounded-lg inline-flex items-center justify-between w-full text-sm font-medium text-primary-700 hover:bg-primary-50"
-                onClick={() => setIsCategoriesOpen((prev) => !prev)}
-              >
-                <span className="inline-flex items-center gap-2">
-                  <FiBook className="h-4 w-4" />
-                  Categories
-                </span>
-                <FiChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    isCategoriesOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {isCategoriesOpen && (
-                <div className="ml-3 pl-3 border-l-2 border-accent-200 space-y-1 py-1">
-                  <Link
-                    to="/categories"
-                    className="no-underline h-9 px-2 rounded-md text-sm font-medium text-accent-700 hover:bg-accent-50 flex items-center"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setIsCategoriesOpen(false);
-                    }}
-                  >
-                    All Categories
-                  </Link>
-                  {categories?.map((c) => (
-                    <Link
-                      key={c._id}
-                      to={`/category/${c.slug}`}
-                      className="no-underline h-9 px-2 rounded-md text-sm text-primary-700 hover:bg-primary-50 flex items-center"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setIsCategoriesOpen(false);
-                      }}
-                    >
-                      {c.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
 
               <NavLink
                 to="/about"

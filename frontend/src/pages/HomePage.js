@@ -485,23 +485,55 @@ const HomePage = () => {
                 </button>
               </div>
 
-              <div className="flex flex-wrap gap-2 pt-1">
-                <button
-                  onClick={() => navigate("/categories")}
-                  className="h-10 px-4 rounded-lg bg-accent-100 text-accent-700 hover:bg-accent-200 border border-accent-200 text-sm font-semibold inline-flex items-center gap-2"
-                >
-                  Explore Collection
-                  <FiChevronRight className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    handleResetFilters();
-                    window.scrollTo({ top: 460, behavior: "smooth" });
-                  }}
-                  className="h-10 px-4 rounded-lg border border-primary-200 bg-white hover:bg-primary-50 text-primary-700 text-sm font-semibold"
-                >
-                  Quick Filters
-                </button>
+              <div className="pt-2 max-w-2xl">
+                <div className="rounded-2xl border border-primary-200 bg-white/95 shadow-sm p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-primary-900">
+                        Explore Collections
+                      </p>
+                      <p className="text-xs text-primary-600 mt-0.5">
+                        Jump into curated categories and trending picks.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => navigate("/categories")}
+                        className="h-10 px-4 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm"
+                      >
+                        <FiBook className="h-4 w-4" />
+                        Explore
+                        <FiChevronRight className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleResetFilters();
+                          window.scrollTo({ top: 460, behavior: "smooth" });
+                        }}
+                        className="h-10 px-4 rounded-lg border border-primary-200 bg-white hover:bg-primary-50 text-primary-700 text-sm font-semibold inline-flex items-center gap-2"
+                      >
+                        <FiSliders className="h-4 w-4" />
+                        Quick Filters
+                      </button>
+                    </div>
+                  </div>
+
+                  {categories?.length > 0 && (
+                    <div className="mt-3.5 flex flex-wrap gap-1.5">
+                      {categories.slice(0, 5).map((cat) => (
+                        <button
+                          key={cat._id}
+                          type="button"
+                          onClick={() => navigate(`/category/${cat.slug}`)}
+                          className="h-7 px-2.5 rounded-full border border-accent-200 bg-accent-50 hover:bg-accent-100 text-accent-700 text-xs font-medium"
+                        >
+                          {cat.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
             </div>

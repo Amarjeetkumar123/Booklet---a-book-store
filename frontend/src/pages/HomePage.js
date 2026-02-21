@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import Layout from "./../components/Layout/Layout";
 import {
   FiBook,
+  FiChevronDown,
   FiChevronRight,
   FiEye,
   FiFilter,
@@ -22,6 +23,13 @@ import { Prices } from "../components/Price";
 import "../styles/Homepage.css";
 
 const DEFAULT_PRICE = [0, 999999];
+const SORT_OPTIONS = [
+  { value: "newest", label: "Sort: Newest" },
+  { value: "price-low", label: "Price: Low to High" },
+  { value: "price-high", label: "Price: High to Low" },
+  { value: "name-asc", label: "Name: A to Z" },
+  { value: "name-desc", label: "Name: Z to A" },
+];
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -44,8 +52,10 @@ const HomePage = () => {
   const [selectedPrice, setSelectedPrice] = useState(DEFAULT_PRICE);
   const [selectedRating, setSelectedRating] = useState(0);
   const [sortBy, setSortBy] = useState("newest");
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
 
   const observerTarget = useRef(null);
+  const sortMenuRef = useRef(null);
 
   const getProductCategoryId = (product) => {
     if (typeof product?.category === "string") return product.category;
@@ -234,6 +244,28 @@ const HomePage = () => {
       )?.name || ""
     );
   }, [selectedPrice]);
+
+  const selectedSortLabel = useMemo(() => {
+    return SORT_OPTIONS.find((option) => option.value === sortBy)?.label || "Sort: Newest";
+  }, [sortBy]);
+
+  useEffect(() => {
+    if (!sortMenuOpen) return;
+
+    const handleOutsideClick = (event) => {
+      if (sortMenuRef.current && !sortMenuRef.current.contains(event.target)) {
+        setSortMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [sortMenuOpen]);
 
   const FilterPanel = ({ mobile = false }) => (
     <div className={`space-y-3.5 ${mobile ? "p-5" : "p-4"}`}>
@@ -485,22 +517,23 @@ const HomePage = () => {
                 </button>
               </div>
 
-              <div className="pt-2 max-w-2xl">
-                <div className="rounded-2xl border border-primary-200 bg-white/95 shadow-sm p-3 sm:p-4">
+              <div className="pt-1.5 sm:pt-2 max-w-2xl">
+                <div className="rounded-2xl border border-primary-200/90 bg-white/95 shadow-sm p-3.5 sm:p-4">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-primary-900">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-primary-900 inline-flex items-center gap-1.5">
+                        <FiTrendingUp className="h-4 w-4 text-accent-700" />
                         Explore Collections
                       </p>
-                      <p className="text-xs text-primary-600 mt-0.5">
+                      <p className="text-xs text-primary-600 mt-0.5 pr-2">
                         Jump into curated categories and trending picks.
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
                       <button
                         onClick={() => navigate("/categories")}
-                        className="h-10 px-4 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold inline-flex items-center gap-2 shadow-sm"
+                        className="h-10 px-4 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold inline-flex items-center justify-center gap-2 shadow-sm"
                       >
                         <FiBook className="h-4 w-4" />
                         Explore
@@ -511,7 +544,7 @@ const HomePage = () => {
                           handleResetFilters();
                           window.scrollTo({ top: 460, behavior: "smooth" });
                         }}
-                        className="h-10 px-4 rounded-lg border border-primary-200 bg-white hover:bg-primary-50 text-primary-700 text-sm font-semibold inline-flex items-center gap-2"
+                        className="hidden md:inline-flex h-10 px-4 rounded-lg border border-primary-200 bg-white hover:bg-primary-50 text-primary-700 text-sm font-semibold items-center justify-center gap-2"
                       >
                         <FiSliders className="h-4 w-4" />
                         Quick Filters
@@ -519,14 +552,18 @@ const HomePage = () => {
                     </div>
                   </div>
 
+                  <p className="md:hidden mt-2 text-[11px] text-primary-500">
+                    Use the floating filter button to refine results.
+                  </p>
+
                   {categories?.length > 0 && (
-                    <div className="mt-3.5 flex flex-wrap gap-1.5">
+                    <div className="mt-3.5 -mx-1 px-1 flex gap-2 overflow-x-auto snap-x snap-mandatory sm:flex-wrap sm:overflow-visible pb-0.5">
                       {categories.slice(0, 5).map((cat) => (
                         <button
                           key={cat._id}
                           type="button"
                           onClick={() => navigate(`/category/${cat.slug}`)}
-                          className="h-7 px-2.5 rounded-full border border-accent-200 bg-accent-50 hover:bg-accent-100 text-accent-700 text-xs font-medium"
+                          className="h-7 px-2.5 shrink-0 snap-start rounded-full border border-accent-200 bg-accent-50 hover:bg-accent-100 text-accent-700 text-xs font-medium"
                         >
                           {cat.name}
                         </button>
@@ -566,7 +603,7 @@ const HomePage = () => {
       </section>
 
       {/* Main Content */}
-      <section className="bg-primary-50 py-8 md:py-10 min-h-screen">
+      <section className="bg-primary-50 pt-8 pb-24 md:pt-10 md:pb-10 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-5">
             {/* Desktop sidebar */}
@@ -641,25 +678,52 @@ const HomePage = () => {
                   </p>
 
                   <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSidebarOpen(true)}
-                      className="lg:hidden h-10 px-3 rounded-lg border border-primary-200 bg-white text-primary-700 text-sm font-medium inline-flex items-center gap-2"
-                    >
-                      <FiFilter className="h-4 w-4" />
-                      Filters {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ""}
-                    </button>
+                    <div ref={sortMenuRef} className="relative sm:hidden">
+                      <button
+                        type="button"
+                        onClick={() => setSortMenuOpen((prev) => !prev)}
+                        className="h-10 min-w-[10.5rem] rounded-lg border border-primary-200 bg-white px-3 text-sm text-primary-800 inline-flex items-center justify-between gap-2"
+                      >
+                        <span>{selectedSortLabel}</span>
+                        <FiChevronDown
+                          className={`h-4 w-4 text-primary-500 transition-transform ${
+                            sortMenuOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                      {sortMenuOpen && (
+                        <div className="absolute right-0 top-full mt-1.5 w-52 rounded-xl border border-primary-200 bg-white shadow-lg py-1.5 z-30">
+                          {SORT_OPTIONS.map((option) => (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => {
+                                setSortBy(option.value);
+                                setSortMenuOpen(false);
+                              }}
+                              className={`w-full h-9 px-3 text-left text-sm ${
+                                sortBy === option.value
+                                  ? "bg-accent-50 text-accent-700 font-semibold"
+                                  : "text-primary-700 hover:bg-primary-50"
+                              }`}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="h-10 rounded-lg border border-primary-200 bg-white px-3 text-sm text-primary-800 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      className="hidden sm:block h-10 rounded-lg border border-primary-200 bg-white px-3 text-sm text-primary-800 focus:outline-none focus:ring-2 focus:ring-accent-300"
                     >
-                      <option value="newest">Sort: Newest</option>
-                      <option value="price-low">Price: Low to High</option>
-                      <option value="price-high">Price: High to Low</option>
-                      <option value="name-asc">Name: A to Z</option>
-                      <option value="name-desc">Name: Z to A</option>
+                      {SORT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -804,6 +868,23 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Mobile floating filter button */}
+      {!sidebarOpen && (
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="lg:hidden fixed bottom-6 right-4 z-[55] h-12 pl-3.5 pr-4 rounded-full bg-accent-500 hover:bg-accent-600 active:scale-[0.98] text-white shadow-[0_12px_32px_-12px_rgba(249,115,22,0.72)] inline-flex items-center gap-2 border border-accent-400 transition-all"
+        >
+          <FiFilter className="h-4.5 w-4.5" />
+          <span className="text-sm font-semibold">Refine</span>
+          {activeFiltersCount > 0 && (
+            <span className="h-5 min-w-[1.25rem] px-1 rounded-full bg-white text-accent-700 text-[11px] font-bold inline-flex items-center justify-center">
+              {activeFiltersCount}
+            </span>
+          )}
+        </button>
+      )}
+
       {/* Mobile filter drawer */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-[60] lg:hidden">
@@ -811,7 +892,10 @@ const HomePage = () => {
             className="absolute inset-0 bg-black/45"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 w-[86%] max-w-sm bg-white shadow-2xl overflow-y-auto">
+          <div className="absolute inset-x-0 bottom-0 max-h-[86vh] rounded-t-3xl border-t border-primary-200 bg-white shadow-2xl overflow-hidden">
+            <div className="pt-2 pb-1 flex justify-center">
+              <span className="h-1 w-10 rounded-full bg-primary-200" />
+            </div>
             <div className="h-16 px-5 border-b border-primary-100 flex items-center justify-between">
               <div className="py-0.5">
                 <h3 className="text-sm font-semibold text-primary-900">Refine Results</h3>
@@ -827,7 +911,9 @@ const HomePage = () => {
                 <FiX className="h-4 w-4" />
               </button>
             </div>
-            <FilterPanel mobile />
+            <div className="max-h-[calc(86vh-4.75rem)] overflow-y-auto">
+              <FilterPanel mobile />
+            </div>
           </div>
         </div>
       )}

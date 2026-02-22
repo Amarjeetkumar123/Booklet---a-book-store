@@ -267,7 +267,7 @@ const HomePage = () => {
     };
   }, [sortMenuOpen]);
 
-  const FilterPanel = ({ mobile = false }) => (
+  const renderFilterPanel = (mobile = false) => (
     <div className={`space-y-3.5 ${mobile ? "p-5" : "p-4"}`}>
       {activeFiltersCount > 0 && (
         <div className="rounded-xl border border-accent-200 bg-accent-50/70 p-3">
@@ -544,7 +544,7 @@ const HomePage = () => {
                           handleResetFilters();
                           window.scrollTo({ top: 460, behavior: "smooth" });
                         }}
-                        className="hidden md:inline-flex h-10 px-4 rounded-lg border border-primary-200 bg-white hover:bg-primary-50 text-primary-700 text-sm font-semibold items-center justify-center gap-2"
+                        className="hidden md:inline-flex h-10 px-2 rounded-lg border border-primary-200 bg-white hover:bg-primary-50 text-primary-700 text-sm font-semibold items-center justify-center gap-2"
                       >
                         <FiSliders className="h-4 w-4" />
                         Quick Filters
@@ -663,7 +663,7 @@ const HomePage = () => {
                   </div>
                 ) : (
                   <div className="flex-1 overflow-y-auto scrollbar-thin">
-                    <FilterPanel />
+                    {renderFilterPanel()}
                   </div>
                 )}
               </div>
@@ -912,7 +912,7 @@ const HomePage = () => {
               </button>
             </div>
             <div className="max-h-[calc(86vh-4.75rem)] overflow-y-auto">
-              <FilterPanel mobile />
+              {renderFilterPanel(true)}
             </div>
           </div>
         </div>

@@ -21,10 +21,44 @@ connectDB();
 //rest object
 const app = express();
 
+const parseAllowedOrigins = () => {
+  const fromEnv = String(process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  const baseOrigins = [
+    process.env.FRONTEND_URL,
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+  ].filter(Boolean);
+
+  return Array.from(new Set([...baseOrigins, ...fromEnv]));
+};
+
+const allowedOrigins = parseAllowedOrigins();
+const ngrokOriginPatterns = [
+  /^https:\/\/[a-z0-9-]+\.ngrok-free\.app$/i,
+  /^https:\/\/[a-z0-9-]+\.ngrok-free\.dev$/i,
+  /^https:\/\/[a-z0-9-]+\.ngrok\.io$/i,
+];
+
+const isAllowedOrigin = (origin = "") => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  return ngrokOriginPatterns.some((pattern) => pattern.test(origin));
+};
+
 //middelwares
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
   })
 );

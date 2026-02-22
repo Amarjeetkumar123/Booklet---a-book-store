@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:8080",
+  // Use same-origin/proxy by default so ngrok frontend URLs can reach backend via CRA proxy.
+  baseURL: process.env.REACT_APP_API_URL || "",
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

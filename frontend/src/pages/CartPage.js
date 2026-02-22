@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import Layout from "./../components/Layout/Layout";
 import { useCart } from "../context/cart";
 import { useAuth } from "../context/auth";
+import { useLocationContext } from "../context/location";
 import { useNavigate } from "react-router-dom";
 import {
+  FiAlertTriangle,
   FiArrowRight,
   FiCheckCircle,
   FiCreditCard,
@@ -19,6 +21,7 @@ import {
 } from "react-icons/fi";
 import axios from "../config/axios";
 import toast from "react-hot-toast";
+import { isProductAvailableInLocation } from "../utils/locationUtils";
 
 const RAZORPAY_SCRIPT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 let razorpayScriptPromise;
@@ -127,6 +130,14 @@ const normalizedPrice = (item) => {
 const CartPage = () => {
   const [auth] = useAuth();
   const [cart, setCart] = useCart();
+  const {
+    selectedLocation,
+    selectedLocationLabel,
+    customerLocation,
+    selectedAreaDistanceKm,
+    selectedServiceArea,
+    isSelectedAreaInRange,
+  } = useLocationContext();
   const [loading, setLoading] = useState(false);
   const [checkoutReady, setCheckoutReady] = useState(false);
   const [selectedPaymentOption, setSelectedPaymentOption] = useState("all");
@@ -164,6 +175,22 @@ const CartPage = () => {
 
   const shipping = 0;
   const total = subtotal + shipping;
+  const unavailableItems = useMemo(
+    () =>
+      cartItems.filter(
+        (item) => !isProductAvailableInLocation(item, selectedLocation)
+      ),
+    [cartItems, selectedLocation]
+  );
+  const hasUnavailableItems = unavailableItems.length > 0;
+  const hasDistanceRangeConflict =
+    selectedAreaDistanceKm !== null && !isSelectedAreaInRange;
+
+  const paymentLocationMeta = {
+    latitude: customerLocation?.latitude ?? null,
+    longitude: customerLocation?.longitude ?? null,
+    pincode: customerLocation?.pincode || "",
+  };
 
   const persistCart = (nextCart) => {
     setCart(nextCart);
@@ -225,6 +252,21 @@ const CartPage = () => {
       return;
     }
 
+    if (!selectedLocation) {
+      toast.error("Please select your delivery location first");
+      return;
+    }
+
+    if (hasUnavailableItems) {
+      toast.error("Remove unavailable books for current location to continue");
+      return;
+    }
+
+    if (hasDistanceRangeConflict) {
+      toast.error("Selected delivery area is outside service radius");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -236,7 +278,11 @@ const CartPage = () => {
       const paymentCart = getPaymentCartPayload();
       const { data: orderData } = await axios.post(
         "/api/v1/payment/razorpay/create-order",
-        { cart: paymentCart }
+        {
+          cart: paymentCart,
+          selectedLocation,
+          customerLocation: paymentLocationMeta,
+        }
       );
 
       if (!orderData?.success || !orderData?.order?.id) {
@@ -267,6 +313,8 @@ const CartPage = () => {
               "/api/v1/payment/razorpay/verify-payment",
               {
                 cart: paymentCart,
+                selectedLocation,
+                customerLocation: paymentLocationMeta,
                 ...response,
               }
             );
@@ -326,6 +374,9 @@ const CartPage = () => {
     !checkoutReady ||
     !auth?.token ||
     !auth?.user?.address ||
+    !selectedLocation ||
+    hasDistanceRangeConflict ||
+    hasUnavailableItems ||
     !cartItems.length;
 
   return (
@@ -351,6 +402,11 @@ const CartPage = () => {
                 ? "Login to place your order securely."
                 : `${auth?.user?.name}, choose payment method and place your order.`}
             </p>
+            {selectedLocationLabel && (
+              <p className="mt-1 text-xs text-primary-500">
+                Delivering to: <span className="font-semibold text-primary-700">{selectedLocationLabel}</span>
+              </p>
+            )}
           </div>
 
           {cartItems.length === 0 ? (
@@ -411,9 +467,15 @@ const CartPage = () => {
                         </p>
 
                         <div className="mt-3 flex flex-wrap items-center gap-2.5">
-                          <div className="inline-flex items-center rounded-full border border-accent-200 bg-accent-50 px-2.5 py-1 text-[11px] font-semibold text-accent-700">
-                            In Stock
-                          </div>
+                          {isProductAvailableInLocation(product, selectedLocation) ? (
+                            <div className="inline-flex items-center rounded-full border border-accent-200 bg-accent-50 px-2.5 py-1 text-[11px] font-semibold text-accent-700">
+                              Available in your area
+                            </div>
+                          ) : (
+                            <div className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700">
+                              Not deliverable to selected area
+                            </div>
+                          )}
                           <p className="text-xs text-primary-500">Unit: {formatCurrency(product.price)}</p>
 
                           <div className="inline-flex items-center rounded-lg border border-primary-200 bg-white">
@@ -531,6 +593,27 @@ const CartPage = () => {
                       <FiCheckCircle className="h-4 w-4" />
                       100% Secure checkout with Razorpay
                     </div>
+                    {hasUnavailableItems && (
+                      <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 inline-flex items-center gap-1.5">
+                        <FiAlertTriangle className="h-4 w-4" />
+                        {unavailableItems.length} item{unavailableItems.length === 1 ? "" : "s"} unavailable for {selectedLocationLabel}
+                      </div>
+                    )}
+                    {hasDistanceRangeConflict && (
+                      <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 inline-flex items-start gap-1.5">
+                        <FiAlertTriangle className="h-4 w-4 mt-0.5" />
+                        <span>
+                          You are {selectedAreaDistanceKm?.toFixed(1)} km away from{" "}
+                          {selectedLocationLabel}. Service radius is{" "}
+                          {selectedServiceArea?.radiusKm || 0} km.
+                        </span>
+                      </div>
+                    )}
+                    {!selectedLocation && (
+                      <p className="text-[11px] text-red-600">
+                        Select delivery location from header to continue.
+                      </p>
+                    )}
                     {!checkoutReady && (
                       <p className="text-[11px] text-primary-600">
                         Loading secure payment SDK...
@@ -605,7 +688,7 @@ const CartPage = () => {
             <div className="max-w-7xl mx-auto flex items-center gap-3">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] text-primary-500">
-                  {itemCount} item{itemCount === 1 ? "" : "s"}
+                  {itemCount} item{itemCount === 1 ? "" : "s"}{selectedLocationLabel ? ` • ${selectedLocationLabel}` : ""}
                 </p>
                 <p className="text-base font-bold text-accent-700">{formatCurrency(total)}</p>
               </div>

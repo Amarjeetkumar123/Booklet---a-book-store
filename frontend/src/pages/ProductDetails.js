@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Layout from "./../components/Layout/Layout";
-import axios from "axios";
+import axios from "../config/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/cart";
 import { useWishlist } from "../context/wishlist";
+import { useLocationContext } from "../context/location";
 import toast from "react-hot-toast";
 import { FiShoppingCart, FiTag, FiPackage, FiArrowLeft, FiHeart, FiMinus, FiPlus, FiStar, FiTruck, FiShield, FiRefreshCw, FiFacebook, FiTwitter, FiInstagram, FiLinkedin } from "react-icons/fi";
+import { isProductAvailableInLocation } from "../utils/locationUtils";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -13,9 +15,11 @@ const ProductDetails = () => {
   const [cart, setCart] = useCart();
   const [wishlist, setWishlist] = useWishlist();
   const [product, setProduct] = useState(null);
+  const { selectedLocation, selectedLocationLabel } = useLocationContext();
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [isDeliverable, setIsDeliverable] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("https://placehold.co/600x800/f5f0e8/826b4d?text=No+Image");
   const [imageZoom, setImageZoom] = useState(false);
@@ -28,16 +32,37 @@ const ProductDetails = () => {
     "https://placehold.co/600x800/fef3c7/f59e0b?text=Spine"
   ], [product?.imageUrl]);
 
+  //get similar product
+  const getSimilarProduct = React.useCallback(
+    async (pid, cid) => {
+      try {
+        const { data } = await axios.get(
+          `/api/v1/product/related-product/${pid}/${cid}?location=${encodeURIComponent(
+            selectedLocation || ""
+          )}`
+        );
+        setRelatedProducts(data?.products);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [selectedLocation]
+  );
+
   //getProduct
   const getProduct = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(false);
       const { data } = await axios.get(
-        `/api/v1/product/get-product/${params.slug}`
+        `/api/v1/product/get-product/${params.slug}?location=${encodeURIComponent(
+          selectedLocation || ""
+        )}`
       );
       if (data?.product) {
         setProduct(data?.product);
+        const deliverable = data?.isDeliverable ?? isProductAvailableInLocation(data?.product, selectedLocation);
+        setIsDeliverable(Boolean(deliverable));
         setSelectedImage(data?.product?.imageUrl || "https://placehold.co/600x800/f5f0e8/826b4d?text=No+Image");
         getSimilarProduct(data?.product._id, data?.product.category._id);
       } else {
@@ -51,26 +76,19 @@ const ProductDetails = () => {
     } finally {
       setLoading(false);
     }
-  }, [params?.slug]);
+  }, [getSimilarProduct, params?.slug, selectedLocation]);
 
   //initial details
   useEffect(() => {
     if (params?.slug) getProduct();
   }, [params?.slug, getProduct]);
 
-  //get similar product
-  const getSimilarProduct = async (pid, cid) => {
-    try {
-      const { data } = await axios.get(
-        `/api/v1/product/related-product/${pid}/${cid}`
-      );
-      setRelatedProducts(data?.products);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const handleAddToCart = () => {
+    if (!isDeliverable) {
+      toast.error(`This book is not available in ${selectedLocationLabel}`);
+      return;
+    }
+
     const cartItem = { ...product, quantity };
     const existingItemIndex = cart.findIndex(item => item._id === product._id);
 
@@ -298,11 +316,25 @@ const ProductDetails = () => {
 
                   <button
                     onClick={handleAddToCart}
-                    className="w-full bg-gradient-to-r from-accent-500 to-accent-600 text-white py-3 px-6 rounded-lg hover:from-accent-600 hover:to-accent-700 focus:outline-none focus:ring-4 focus:ring-accent-500/30 transition-all duration-300 font-semibold text-sm flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                    disabled={!isDeliverable}
+                    className={`w-full py-3 px-6 rounded-lg focus:outline-none transition-all duration-300 font-semibold text-sm flex items-center justify-center gap-2 shadow-lg ${
+                      isDeliverable
+                        ? "bg-gradient-to-r from-accent-500 to-accent-600 text-white hover:from-accent-600 hover:to-accent-700 focus:ring-4 focus:ring-accent-500/30 hover:shadow-xl"
+                        : "bg-primary-200 text-primary-600 cursor-not-allowed"
+                    }`}
                   >
                     <FiShoppingCart className="h-4 w-4" />
-                    <span>Add to Cart - ${((product?.price || 0) * quantity).toFixed(2)}</span>
+                    <span>
+                      {isDeliverable
+                        ? `Add to Cart - ₹${((product?.price || 0) * quantity).toFixed(2)}`
+                        : `Unavailable in ${selectedLocationLabel}`}
+                    </span>
                   </button>
+                  {!isDeliverable && (
+                    <p className="text-xs text-red-600 mt-1.5">
+                      Select another delivery location from header to buy this book.
+                    </p>
+                  )}
                 </div>
 
                 {/* Key Features */}

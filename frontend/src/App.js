@@ -27,6 +27,7 @@ import AdminOrders from "./pages/Admin/AdminOrders";
 import CartPage from "./pages/CartPage";
 import WishlistPage from "./pages/Wishlist";
 import ScrollToTop from "./components/ScrollToTop";
+import ServiceLocations from "./pages/Admin/ServiceLocations";
 
 function App() {
   return (
@@ -54,6 +55,10 @@ function App() {
           <Route path="admin/create-product" element={<CreateProduct />} />
           <Route path="admin/product/:slug" element={<UpdateProduct />} />
           <Route path="admin/products" element={<Products />} />
+          <Route
+            path="admin/service-locations"
+            element={<ServiceLocations />}
+          />
           <Route path="admin/users" element={<Users />} />
           <Route path="admin/orders" element={<AdminOrders />} />
         </Route>

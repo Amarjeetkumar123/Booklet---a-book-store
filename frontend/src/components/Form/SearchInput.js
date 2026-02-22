@@ -1,18 +1,22 @@
 import React from "react";
 import { useSearch } from "../../context/search";
-import axios from "axios";
+import axios from "../../config/axios";
 import { useNavigate } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
+import { useLocationContext } from "../../context/location";
 
 const SearchInput = () => {
   const [values, setValues] = useSearch();
+  const { selectedLocation } = useLocationContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const { data } = await axios.get(
-        `/api/v1/product/search/${values.keyword}`
+        `/api/v1/product/search/${values.keyword}?location=${encodeURIComponent(
+          selectedLocation || ""
+        )}`
       );
       setValues({ ...values, results: data });
       navigate("/search");

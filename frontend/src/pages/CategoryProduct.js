@@ -4,25 +4,31 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../config/axios";
 import { useCart } from "../context/cart";
 import { useWishlist } from "../context/wishlist";
+import { useLocationContext } from "../context/location";
 import toast from "react-hot-toast";
-import { FiArrowLeft, FiShoppingCart, FiStar, FiHeart } from "react-icons/fi";
+import { FiArrowLeft, FiShoppingCart, FiStar, FiHeart, FiMapPin } from "react-icons/fi";
+import { isProductAvailableInLocation } from "../utils/locationUtils";
 const CategoryProduct = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [cart, setCart] = useCart();
   const [wishlist, setWishlist] = useWishlist();
+  const { selectedLocation, selectedLocationLabel } = useLocationContext();
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     if (params?.slug) getPrductsByCat();
-  }, [params?.slug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params?.slug, selectedLocation]);
 
   const getPrductsByCat = async () => {
     try {
       const { data } = await axios.get(
-        `/api/v1/product/product-category/${params.slug}`
+        `/api/v1/product/product-category/${params.slug}?location=${encodeURIComponent(
+          selectedLocation || ""
+        )}`
       );
       setProducts(data?.products);
       setCategory(data?.category);
@@ -54,6 +60,12 @@ const CategoryProduct = () => {
               <p className="text-lg text-primary-600">
                 <span className="font-semibold text-accent-600">{products?.length}</span> {products?.length === 1 ? "book" : "books"} available
               </p>
+              {selectedLocationLabel && (
+                <p className="mt-2 text-sm text-primary-700 inline-flex items-center gap-1.5">
+                  <FiMapPin className="h-4 w-4 text-accent-700" />
+                  Showing stock for {selectedLocationLabel}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -146,6 +158,10 @@ const CategoryProduct = () => {
                       </button>
                       <button
                         onClick={() => {
+                          if (!isProductAvailableInLocation(p, selectedLocation)) {
+                            toast.error(`Not available in ${selectedLocationLabel}`);
+                            return;
+                          }
                           setCart([...cart, p]);
                           localStorage.setItem(
                             "cart",

@@ -3,13 +3,16 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout/Layout";
 import { useWishlist } from "../context/wishlist";
 import { useCart } from "../context/cart";
+import { useLocationContext } from "../context/location";
 import toast from "react-hot-toast";
 import { FiTrash2, FiShoppingCart, FiArrowLeft, FiEye } from "react-icons/fi";
+import { isProductAvailableInLocation } from "../utils/locationUtils";
 
 const WishlistPage = () => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useWishlist();
   const [cart, setCart] = useCart();
+  const { selectedLocation, selectedLocationLabel } = useLocationContext();
 
   const removeFromWishlist = (productId) => {
     const updatedWishlist = wishlist.filter((item) => item._id !== productId);
@@ -18,6 +21,11 @@ const WishlistPage = () => {
   };
 
   const addToCart = (product) => {
+    if (!isProductAvailableInLocation(product, selectedLocation)) {
+      toast.error(`Not available in ${selectedLocationLabel}`);
+      return;
+    }
+
     const existingItem = cart.find((item) => item._id === product._id);
     if (existingItem) {
       toast.error("Product already in cart");
@@ -34,14 +42,34 @@ const WishlistPage = () => {
       return;
     }
     const newCart = [...cart];
+    const remainingWishlist = [];
+    let movedCount = 0;
+
     wishlist.forEach((product) => {
+      const isAvailable = isProductAvailableInLocation(product, selectedLocation);
+      if (!isAvailable) {
+        remainingWishlist.push(product);
+        return;
+      }
+
       if (!cart.find((item) => item._id === product._id)) {
         newCart.push(product);
+        movedCount += 1;
       }
     });
+
     setCart(newCart);
-    setWishlist([]);
-    toast.success("All items moved to cart");
+    setWishlist(remainingWishlist);
+
+    if (movedCount > 0 && remainingWishlist.length > 0) {
+      toast.success(`${movedCount} item(s) moved. Some items are unavailable in ${selectedLocationLabel}.`);
+      return;
+    }
+    if (movedCount > 0) {
+      toast.success("All available items moved to cart");
+      return;
+    }
+    toast.error(`No wishlist items are deliverable to ${selectedLocationLabel}`);
   };
 
   return (

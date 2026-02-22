@@ -5,15 +5,29 @@ import toast from "react-hot-toast";
 import Layout from "./../components/Layout/Layout";
 import { useSearch } from "../context/search";
 import { useCart } from "../context/cart";
+import { useLocationContext } from "../context/location";
+import { isProductAvailableInLocation } from "../utils/locationUtils";
 
 const Search = () => {
   const [values] = useSearch();
   const [cart, setCart] = useCart();
+  const { selectedLocation, selectedLocationLabel } = useLocationContext();
   const navigate = useNavigate();
 
-  const results = values?.results || [];
+  const results = React.useMemo(
+    () =>
+      (values?.results || []).filter((product) =>
+        isProductAvailableInLocation(product, selectedLocation)
+      ),
+    [selectedLocation, values?.results]
+  );
 
   const addToCart = (product) => {
+    if (!isProductAvailableInLocation(product, selectedLocation)) {
+      toast.error(`Not available in ${selectedLocationLabel}`);
+      return;
+    }
+
     const alreadyInCart = cart?.some((item) => item._id === product?._id);
     if (alreadyInCart) {
       toast("Already in cart");
@@ -37,6 +51,11 @@ const Search = () => {
             <p className="text-sm text-primary-600 m-0">
               {results.length < 1 ? "No products found" : `Found ${results.length} product${results.length === 1 ? "" : "s"}`}
             </p>
+            {selectedLocationLabel && (
+              <p className="mt-1 text-xs text-primary-500">
+                Results for {selectedLocationLabel}
+              </p>
+            )}
           </div>
 
           {results.length < 1 ? (

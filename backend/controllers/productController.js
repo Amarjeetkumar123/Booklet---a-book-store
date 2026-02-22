@@ -1,7 +1,14 @@
 import productModel from "../models/productModel.js";
 import categoryModel from "../models/categoryModel.js";
+import serviceAreaModel from "../models/serviceAreaModel.js";
 
 import slugify from "slugify";
+import {
+  getLocationFilter,
+  isLocationSupportedByProduct,
+  normalizeLocationKey,
+  sanitizeServiceLocations,
+} from "../utils/locationUtils.js";
 
 const normalizeImageUrls = (imageUrls, imageUrl) => {
   const parsedImageUrls = Array.isArray(imageUrls)
@@ -24,6 +31,16 @@ const normalizeImageUrls = (imageUrls, imageUrl) => {
   return Array.from(new Set(parsedImageUrls));
 };
 
+const getRequestedLocation = (req) =>
+  normalizeLocationKey(req?.query?.location || req?.body?.location || "");
+
+const getActiveServiceAreaKeySet = async () => {
+  const serviceAreas = await serviceAreaModel
+    .find({ isActive: true })
+    .select("key");
+  return new Set(serviceAreas.map((area) => normalizeLocationKey(area.key)));
+};
+
 export const createProductController = async (req, res) => {
   try {
     const {
@@ -35,6 +52,7 @@ export const createProductController = async (req, res) => {
       shipping,
       imageUrl,
       imageUrls,
+      serviceLocations,
     } = req.body;
     //alidation
     switch (true) {
@@ -51,6 +69,20 @@ export const createProductController = async (req, res) => {
     }
 
     const normalizedImageUrls = normalizeImageUrls(imageUrls, imageUrl);
+    const activeServiceAreaKeys = await getActiveServiceAreaKeySet();
+    const requestedServiceLocations =
+      typeof serviceLocations === "undefined" ? ["all"] : serviceLocations;
+    const normalizedServiceLocations = sanitizeServiceLocations(
+      requestedServiceLocations,
+      activeServiceAreaKeys,
+      { fallbackToAll: false }
+    );
+    if (!normalizedServiceLocations.length) {
+      return res.status(400).send({
+        success: false,
+        message: "Please select valid service locations",
+      });
+    }
 
     const products = new productModel({
       name,
@@ -61,6 +93,7 @@ export const createProductController = async (req, res) => {
       shipping,
       imageUrl: normalizedImageUrls[0] || "",
       imageUrls: normalizedImageUrls,
+      serviceLocations: normalizedServiceLocations,
       slug: slugify(name),
     });
     await products.save();
@@ -82,14 +115,17 @@ export const createProductController = async (req, res) => {
 //get all products
 export const getProductController = async (req, res) => {
   try {
+    const selectedLocation = getRequestedLocation(req);
+    const locationFilter = getLocationFilter(selectedLocation);
     const products = await productModel
-      .find({})
+      .find(locationFilter)
       .populate("category")
       .sort({ createdAt: -1 });
     res.status(200).send({
       success: true,
       counTotal: products.length,
       message: "ALlProducts ",
+      selectedLocation: selectedLocation || "all",
       products,
     });
   } catch (error) {
@@ -104,12 +140,20 @@ export const getProductController = async (req, res) => {
 // get single product
 export const getSingleProductController = async (req, res) => {
   try {
+    const selectedLocation = getRequestedLocation(req);
     const product = await productModel
       .findOne({ slug: req.params.slug })
       .populate("category");
+    const isDeliverable = isLocationSupportedByProduct(
+      product?.serviceLocations || [],
+      selectedLocation
+    );
+
     res.status(200).send({
       success: true,
       message: "Single Product Fetched",
+      selectedLocation: selectedLocation || "all",
+      isDeliverable,
       product,
     });
   } catch (error) {
@@ -152,6 +196,7 @@ export const updateProductController = async (req, res) => {
       shipping,
       imageUrl,
       imageUrls,
+      serviceLocations,
     } = req.body;
     //alidation
     switch (true) {
@@ -168,6 +213,20 @@ export const updateProductController = async (req, res) => {
     }
 
     const normalizedImageUrls = normalizeImageUrls(imageUrls, imageUrl);
+    const activeServiceAreaKeys = await getActiveServiceAreaKeySet();
+    const requestedServiceLocations =
+      typeof serviceLocations === "undefined" ? ["all"] : serviceLocations;
+    const normalizedServiceLocations = sanitizeServiceLocations(
+      requestedServiceLocations,
+      activeServiceAreaKeys,
+      { fallbackToAll: false }
+    );
+    if (!normalizedServiceLocations.length) {
+      return res.status(400).send({
+        success: false,
+        message: "Please select valid service locations",
+      });
+    }
 
     const products = await productModel.findByIdAndUpdate(
       req.params.pid,
@@ -180,6 +239,7 @@ export const updateProductController = async (req, res) => {
         shipping,
         imageUrl: normalizedImageUrls[0] || "",
         imageUrls: normalizedImageUrls,
+        serviceLocations: normalizedServiceLocations,
         slug: slugify(name),
       },
       { new: true }
@@ -203,13 +263,15 @@ export const updateProductController = async (req, res) => {
 // filters
 export const productFiltersController = async (req, res) => {
   try {
-    const { checked, radio } = req.body;
-    let args = {};
+    const { checked = [], radio = [] } = req.body;
+    const selectedLocation = getRequestedLocation(req);
+    let args = { ...getLocationFilter(selectedLocation) };
     if (checked.length > 0) args.category = checked;
     if (radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
     const products = await productModel.find(args);
     res.status(200).send({
       success: true,
+      selectedLocation: selectedLocation || "all",
       products,
     });
   } catch (error) {
@@ -225,9 +287,13 @@ export const productFiltersController = async (req, res) => {
 // product count
 export const productCountController = async (req, res) => {
   try {
-    const total = await productModel.find({}).estimatedDocumentCount();
+    const selectedLocation = getRequestedLocation(req);
+    const total = await productModel.countDocuments(
+      getLocationFilter(selectedLocation)
+    );
     res.status(200).send({
       success: true,
+      selectedLocation: selectedLocation || "all",
       total,
     });
   } catch (error) {
@@ -245,13 +311,15 @@ export const productListController = async (req, res) => {
   try {
     const perPage = 6;
     const page = req.params.page ? req.params.page : 1;
+    const selectedLocation = getRequestedLocation(req);
     const products = await productModel
-      .find({})
+      .find(getLocationFilter(selectedLocation))
       .skip((page - 1) * perPage)
       .limit(perPage)
       .sort({ createdAt: -1 });
     res.status(200).send({
       success: true,
+      selectedLocation: selectedLocation || "all",
       products,
     });
   } catch (error) {
@@ -268,13 +336,20 @@ export const productListController = async (req, res) => {
 export const searchProductController = async (req, res) => {
   try {
     const { keyword } = req.params;
-    const resutls = await productModel
-      .find({
-        $or: [
-          { name: { $regex: keyword, $options: "i" } },
-          { description: { $regex: keyword, $options: "i" } },
-        ],
-      });
+    const selectedLocation = getRequestedLocation(req);
+    const locationFilter = getLocationFilter(selectedLocation);
+    const searchFilter = {
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    };
+
+    const query = Object.keys(locationFilter).length
+      ? { $and: [searchFilter, locationFilter] }
+      : searchFilter;
+
+    const resutls = await productModel.find(query);
     res.json(resutls);
   } catch (error) {
     console.log(error);
@@ -290,10 +365,13 @@ export const searchProductController = async (req, res) => {
 export const realtedProductController = async (req, res) => {
   try {
     const { pid, cid } = req.params;
+    const selectedLocation = getRequestedLocation(req);
+    const locationFilter = getLocationFilter(selectedLocation);
     const products = await productModel
       .find({
         category: cid,
         _id: { $ne: pid },
+        ...locationFilter,
       })
       .limit(3)
       .populate("category");
@@ -315,10 +393,17 @@ export const realtedProductController = async (req, res) => {
 export const productCategoryController = async (req, res) => {
   try {
     const category = await categoryModel.findOne({ slug: req.params.slug });
-    const products = await productModel.find({ category }).populate("category");
+    const selectedLocation = getRequestedLocation(req);
+    const products = await productModel
+      .find({
+        category,
+        ...getLocationFilter(selectedLocation),
+      })
+      .populate("category");
     res.status(200).send({
       success: true,
       category,
+      selectedLocation: selectedLocation || "all",
       products,
     });
   } catch (error) {

@@ -38,6 +38,11 @@ const productSchema = new mongoose.Schema(
     shipping: {
       type: Boolean,
     },
+    serviceLocations: {
+      type: [String],
+      default: ["all"],
+      index: true,
+    },
   },
   { timestamps: true }
 );

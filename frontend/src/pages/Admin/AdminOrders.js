@@ -10,6 +10,7 @@ import {
   FiChevronDown,
   FiChevronUp,
   FiClock,
+  FiMapPin,
   FiPackage,
   FiRefreshCw,
   FiShoppingBag,
@@ -205,8 +206,15 @@ const AdminOrders = () => {
     return "border-primary-200 bg-primary-100 text-primary-700";
   };
 
-  const formatCurrency = (value) =>
-    `₹${(Number(value) || 0).toLocaleString("en-IN")}`;
+const formatCurrency = (value) =>
+  `₹${(Number(value) || 0).toLocaleString("en-IN")}`;
+
+const getDeliveryLocation = (order) =>
+  order?.deliveryLocationLabel ||
+  order?.payment?.deliveryLocationLabel ||
+  order?.deliveryLocation ||
+  order?.payment?.deliveryLocation ||
+  "";
 
   const orderStats = useMemo(() => {
     const totalOrders = orders.length;
@@ -517,6 +525,16 @@ const AdminOrders = () => {
                             </p>
                             <p className="hidden text-sm font-semibold text-accent-700">
                               {formatCurrency(getOrderTotal(o))}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-[11px] text-primary-500 leading-none inline-flex items-center gap-1">
+                              <FiMapPin className="h-3.5 w-3.5" />
+                              Delivery
+                            </p>
+                            <p className="mt-1 text-xs sm:text-sm font-semibold text-primary-900 line-clamp-2">
+                              {getDeliveryLocation(o) || "Not captured"}
                             </p>
                           </div>
                         </div>

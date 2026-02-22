@@ -9,6 +9,7 @@ import {
   FiCheckCircle,
   FiClock,
   FiCreditCard,
+  FiMapPin,
   FiPackage,
   FiShoppingBag,
   FiTruck,
@@ -103,6 +104,13 @@ const getItemQtyForProduct = (order, productId) => {
 };
 
 const formatCurrency = (value) => `₹${(Number(value) || 0).toLocaleString("en-IN")}`;
+
+const getDeliveryLocation = (order) =>
+  order?.deliveryLocationLabel ||
+  order?.payment?.deliveryLocationLabel ||
+  order?.deliveryLocation ||
+  order?.payment?.deliveryLocation ||
+  "";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -241,7 +249,7 @@ const Orders = () => {
                           className="rounded-xl border border-primary-200 bg-white shadow-sm overflow-hidden"
                         >
                           <div className="bg-primary-50/70 border-b border-primary-100 px-3.5 py-3">
-                            <div className="grid grid-cols-1 md:grid-cols-5 gap-2.5">
+                            <div className="grid grid-cols-1 md:grid-cols-6 gap-2.5">
                               <div>
                                 <p className="text-[11px] text-primary-500 inline-flex items-center gap-1">
                                   <FiShoppingBag className="h-3.5 w-3.5" />
@@ -303,6 +311,16 @@ const Orders = () => {
                                 </p>
                                 <p className="text-[11px] text-primary-500">
                                   {getOrderItemsCount(order)} items
+                                </p>
+                              </div>
+
+                              <div>
+                                <p className="text-[11px] text-primary-500 inline-flex items-center gap-1">
+                                  <FiMapPin className="h-3.5 w-3.5" />
+                                  Delivery
+                                </p>
+                                <p className="mt-1 text-xs font-semibold text-primary-900 line-clamp-2">
+                                  {getDeliveryLocation(order) || "Location not captured"}
                                 </p>
                               </div>
                             </div>

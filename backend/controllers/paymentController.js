@@ -1,5 +1,20 @@
 import orderModel from "../models/orderModel.js";
 import crypto from "crypto";
+import productModel from "../models/productModel.js";
+import serviceAreaModel from "../models/serviceAreaModel.js";
+import {
+  isLocationSupportedByProduct,
+  normalizeLocationKey,
+  normalizePincode,
+  isWithinServiceRadius,
+  toNumberOrNull,
+} from "../utils/locationUtils.js";
+
+const createHttpError = (message, statusCode = 400) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+};
 
 const getItemQuantity = (item) => {
   const parsed = Number(item?.qty);
@@ -11,14 +26,6 @@ const getItemPrice = (item) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 };
 
-const calculateCartTotal = (cart = []) =>
-  cart.reduce((total, item) => total + getItemPrice(item) * getItemQuantity(item), 0);
-
-const getCartProductIds = (cart = []) =>
-  cart
-    .map((item) => item?._id)
-    .filter(Boolean);
-
 const normalizeCartItems = (cart = []) =>
   cart
     .map((item) => ({
@@ -28,6 +35,144 @@ const normalizeCartItems = (cart = []) =>
       price: getItemPrice(item),
     }))
     .filter((item) => item.productId);
+
+const parseCustomerLocation = (customerLocation = {}) => ({
+  pincode: normalizePincode(customerLocation?.pincode || ""),
+  latitude: toNumberOrNull(customerLocation?.latitude),
+  longitude: toNumberOrNull(customerLocation?.longitude),
+});
+
+const validateCartForLocation = async (
+  cart = [],
+  selectedLocation = "",
+  customerLocation = {}
+) => {
+  if (!Array.isArray(cart) || cart.length === 0) {
+    throw createHttpError("Cart is empty");
+  }
+
+  const locationKey = normalizeLocationKey(selectedLocation);
+  if (!locationKey || locationKey === "all") {
+    throw createHttpError("Please select a valid delivery location");
+  }
+
+  const serviceArea = await serviceAreaModel
+    .findOne({ key: locationKey, isActive: true })
+    .select("key label pincode latitude longitude radiusKm");
+
+  if (!serviceArea) {
+    throw createHttpError("Selected location is not serviceable right now");
+  }
+
+  const parsedCustomerLocation = parseCustomerLocation(customerLocation);
+  let distanceKm = null;
+
+  if (
+    parsedCustomerLocation.latitude !== null &&
+    parsedCustomerLocation.longitude !== null
+  ) {
+    const rangeStatus = isWithinServiceRadius({
+      customerLatitude: parsedCustomerLocation.latitude,
+      customerLongitude: parsedCustomerLocation.longitude,
+      areaLatitude: serviceArea.latitude,
+      areaLongitude: serviceArea.longitude,
+      radiusKm: serviceArea.radiusKm,
+    });
+
+    distanceKm = rangeStatus.distanceKm;
+    if (!rangeStatus.inRange) {
+      throw createHttpError(
+        `Delivery is outside range for ${serviceArea.label}. Supported radius is ${serviceArea.radiusKm} km.`
+      );
+    }
+  } else if (
+    parsedCustomerLocation.pincode &&
+    normalizePincode(serviceArea.pincode) !== parsedCustomerLocation.pincode
+  ) {
+    throw createHttpError(
+      `Selected location does not match your current pincode ${parsedCustomerLocation.pincode}`
+    );
+  }
+
+  const normalizedCartItems = normalizeCartItems(cart);
+  if (!normalizedCartItems.length) {
+    throw createHttpError("Invalid products in cart");
+  }
+
+  const mergedQtyMap = new Map();
+  normalizedCartItems.forEach((item) => {
+    const existingQty = mergedQtyMap.get(item.productId) || 0;
+    mergedQtyMap.set(item.productId, existingQty + item.qty);
+  });
+
+  const productIds = Array.from(mergedQtyMap.keys());
+  const products = await productModel
+    .find({ _id: { $in: productIds } })
+    .select("_id name price quantity serviceLocations");
+
+  const productMap = new Map(products.map((product) => [String(product._id), product]));
+
+  const missingProductIds = productIds.filter((id) => !productMap.has(id));
+  if (missingProductIds.length) {
+    throw createHttpError("Some products are no longer available");
+  }
+
+  const unavailableInLocation = [];
+  const outOfStockProducts = [];
+  const orderItems = [];
+  let totalAmount = 0;
+
+  mergedQtyMap.forEach((requestedQty, productId) => {
+    const product = productMap.get(productId);
+    if (!product) return;
+
+    if (!isLocationSupportedByProduct(product.serviceLocations, locationKey)) {
+      unavailableInLocation.push(product.name || "Product");
+      return;
+    }
+
+    const stockQty = Number(product.quantity);
+    if (Number.isFinite(stockQty) && stockQty >= 0 && requestedQty > stockQty) {
+      outOfStockProducts.push(product.name || "Product");
+      return;
+    }
+
+    const price = Number(product.price) || 0;
+    totalAmount += price * requestedQty;
+    orderItems.push({
+      productId: String(product._id),
+      name: product.name || "",
+      qty: requestedQty,
+      price,
+    });
+  });
+
+  if (unavailableInLocation.length) {
+    throw createHttpError(
+      `These books are not available in your location: ${unavailableInLocation.join(", ")}`
+    );
+  }
+
+  if (outOfStockProducts.length) {
+    throw createHttpError(
+      `These books are out of stock for requested quantity: ${outOfStockProducts.join(", ")}`
+    );
+  }
+
+  if (!orderItems.length) {
+    throw createHttpError("No valid items available for checkout");
+  }
+
+  return {
+    locationKey,
+    locationLabel: serviceArea.label,
+    locationPincode: normalizePincode(serviceArea.pincode),
+    distanceKm,
+    totalAmount,
+    productIds: orderItems.map((item) => item.productId),
+    orderItems,
+  };
+};
 
 const createRazorpayAuthHeader = () =>
   `Basic ${Buffer.from(
@@ -59,7 +204,7 @@ const createRazorpayOrder = async (payload) => {
 // razorpay payment order creation
 export const createRazorpayOrderController = async (req, res) => {
   try {
-    const { cart } = req.body;
+    const { cart, selectedLocation, customerLocation } = req.body;
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       return res.status(500).send({
@@ -68,15 +213,12 @@ export const createRazorpayOrderController = async (req, res) => {
       });
     }
 
-    if (!Array.isArray(cart) || cart.length === 0) {
-      return res.status(400).send({
-        success: false,
-        message: "Cart is empty",
-      });
-    }
-
-    const total = calculateCartTotal(cart);
-    const amount = Math.round(total * 100);
+    const validatedCart = await validateCartForLocation(
+      cart,
+      selectedLocation,
+      customerLocation
+    );
+    const amount = Math.round(validatedCart.totalAmount * 100);
 
     if (!amount || amount < 100) {
       return res.status(400).send({
@@ -92,7 +234,9 @@ export const createRazorpayOrderController = async (req, res) => {
       receipt,
       notes: {
         buyerId: String(req.user?._id || ""),
-        items: String(cart.length),
+        items: String(validatedCart.orderItems.length),
+        deliveryLocation: validatedCart.locationKey,
+        deliveryPincode: validatedCart.locationPincode,
       },
     });
 
@@ -103,7 +247,8 @@ export const createRazorpayOrderController = async (req, res) => {
     });
   } catch (error) {
     console.log("Razorpay create order error:", error);
-    return res.status(500).send({
+    const statusCode = Number(error?.statusCode) || 500;
+    return res.status(statusCode).send({
       success: false,
       message: error.message || "Unable to create payment order",
     });
@@ -113,15 +258,15 @@ export const createRazorpayOrderController = async (req, res) => {
 // razorpay payment verification + order save
 export const verifyRazorpayPaymentController = async (req, res) => {
   try {
-    const { cart, razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+    const {
+      cart,
+      selectedLocation,
+      customerLocation,
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    } =
       req.body;
-
-    if (!Array.isArray(cart) || cart.length === 0) {
-      return res.status(400).send({
-        success: false,
-        message: "Cart is empty",
-      });
-    }
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).send({
@@ -159,29 +304,33 @@ export const verifyRazorpayPaymentController = async (req, res) => {
       });
     }
 
-    const totalAmount = calculateCartTotal(cart);
-    const productIds = getCartProductIds(cart);
-
-    if (!productIds.length) {
-      return res.status(400).send({
-        success: false,
-        message: "Invalid products in cart",
-      });
-    }
+    const validatedCart = await validateCartForLocation(
+      cart,
+      selectedLocation,
+      customerLocation
+    );
 
     const order = await new orderModel({
-      products: productIds,
+      products: validatedCart.productIds,
       payment: {
         success: true,
         provider: "razorpay",
         orderId: razorpay_order_id,
         paymentId: razorpay_payment_id,
         signature: razorpay_signature,
-        amount: totalAmount,
+        amount: validatedCart.totalAmount,
         currency: "INR",
-        items: normalizeCartItems(cart),
+        items: validatedCart.orderItems,
+        deliveryLocation: validatedCart.locationKey,
+        deliveryLocationLabel: validatedCart.locationLabel,
+        deliveryPincode: validatedCart.locationPincode,
+        deliveryDistanceKm: validatedCart.distanceKm,
       },
       buyer: req.user._id,
+      deliveryLocation: validatedCart.locationKey,
+      deliveryLocationLabel: validatedCart.locationLabel,
+      deliveryPincode: validatedCart.locationPincode,
+      deliveryDistanceKm: validatedCart.distanceKm,
     }).save();
 
     return res.status(200).send({
@@ -191,7 +340,8 @@ export const verifyRazorpayPaymentController = async (req, res) => {
     });
   } catch (error) {
     console.log("Razorpay verify payment error:", error);
-    return res.status(500).send({
+    const statusCode = Number(error?.statusCode) || 500;
+    return res.status(statusCode).send({
       success: false,
       message: error.message || "Unable to verify payment",
     });

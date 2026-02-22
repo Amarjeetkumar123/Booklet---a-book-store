@@ -10,6 +10,7 @@ import {
   FiHash,
   FiImage,
   FiLink,
+  FiMapPin,
   FiSave,
   FiTag,
   FiTrash2,
@@ -25,6 +26,7 @@ const UpdateProduct = () => {
   const fileInputRef = useRef(null);
 
   const [categories, setCategories] = useState([]);
+  const [serviceAreas, setServiceAreas] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -38,6 +40,7 @@ const UpdateProduct = () => {
   const [imageUrlInput, setImageUrlInput] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
+  const [selectedServiceLocations, setSelectedServiceLocations] = useState(["all"]);
 
   const activeImageUrls = useMemo(
     () =>
@@ -86,6 +89,15 @@ const UpdateProduct = () => {
           ? [product.imageUrl]
           : [];
 
+      const normalizedLocations = Array.isArray(product.serviceLocations)
+        ? product.serviceLocations
+            .map((item) => String(item || "").trim().toLowerCase())
+            .filter(Boolean)
+        : [];
+      setSelectedServiceLocations(
+        normalizedLocations.length ? normalizedLocations : ["all"]
+      );
+
       setImageUrls(normalized);
       setUploadedImages([]);
       setImageInputMode("url");
@@ -108,6 +120,16 @@ const UpdateProduct = () => {
     }
   };
 
+  const getServiceAreas = async () => {
+    try {
+      const { data } = await axios.get("/api/v1/location/service-areas");
+      setServiceAreas(Array.isArray(data?.serviceAreas) ? data.serviceAreas : []);
+    } catch (error) {
+      console.log(error);
+      toast.error("Unable to load service areas");
+    }
+  };
+
   useEffect(() => {
     getSingleProduct();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,6 +137,7 @@ const UpdateProduct = () => {
 
   useEffect(() => {
     getAllCategory();
+    getServiceAreas();
   }, []);
 
   const addImageUrl = () => {
@@ -223,6 +246,7 @@ const UpdateProduct = () => {
         shipping: shipping === "1",
         imageUrl: finalImageUrls[0] || "",
         imageUrls: finalImageUrls,
+        serviceLocations: selectedServiceLocations,
       };
 
       const { data } = await axios.put(`/api/v1/product/update-product/${id}`, productData);
@@ -236,6 +260,24 @@ const UpdateProduct = () => {
       console.log(error);
       toast.error("Something went wrong while updating");
     }
+  };
+
+  const toggleServiceLocation = (locationId) => {
+    if (!locationId) return;
+
+    if (locationId === "all") {
+      setSelectedServiceLocations(["all"]);
+      return;
+    }
+
+    setSelectedServiceLocations((prev) => {
+      const withoutAll = prev.filter((id) => id !== "all");
+      if (withoutAll.includes(locationId)) {
+        const next = withoutAll.filter((id) => id !== locationId);
+        return next.length ? next : ["all"];
+      }
+      return [...withoutAll, locationId];
+    });
   };
 
   const handleDelete = async () => {
@@ -314,6 +356,50 @@ const UpdateProduct = () => {
                     <option value="0">No</option>
                     <option value="1">Yes</option>
                   </select>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-3">
+                <label className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary-500 inline-flex items-center gap-1.5">
+                  <FiMapPin className="h-3.5 w-3.5" />
+                  Service Locations
+                </label>
+                <p className="text-xs text-primary-600 mb-2.5">
+                  Choose where this book can be delivered.
+                </p>
+                {serviceAreas.length === 0 && (
+                  <p className="text-xs text-red-600 mb-2.5">
+                    No active service location found. Add one from Service
+                    Locations page.
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleServiceLocation("all")}
+                    className={`h-8 px-3 rounded-full border text-xs font-semibold ${
+                      selectedServiceLocations.includes("all")
+                        ? "border-accent-300 bg-accent-100 text-accent-700"
+                        : "border-primary-200 bg-white text-primary-700 hover:bg-primary-50"
+                    }`}
+                  >
+                    All Serviceable Areas
+                  </button>
+                  {serviceAreas.map((area) => (
+                    <button
+                      key={area.id}
+                      type="button"
+                      onClick={() => toggleServiceLocation(area.id)}
+                      className={`h-8 px-3 rounded-full border text-xs font-semibold ${
+                        selectedServiceLocations.includes(area.id)
+                          ? "border-accent-300 bg-accent-100 text-accent-700"
+                          : "border-primary-200 bg-white text-primary-700 hover:bg-primary-50"
+                      }`}
+                    >
+                      {area.label}
+                      {area.pincode ? ` (${area.pincode})` : ""}
+                    </button>
+                  ))}
                 </div>
               </div>
 

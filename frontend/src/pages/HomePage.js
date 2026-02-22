@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/cart";
 import { useWishlist } from "../context/wishlist";
+import { useLocationContext } from "../context/location";
 import axios from "../config/axios";
 import toast from "react-hot-toast";
 import Layout from "./../components/Layout/Layout";
@@ -12,6 +13,7 @@ import {
   FiEye,
   FiFilter,
   FiHeart,
+  FiMapPin,
   FiSearch,
   FiShoppingCart,
   FiSliders,
@@ -20,6 +22,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { Prices } from "../components/Price";
+import { isProductAvailableInLocation } from "../utils/locationUtils";
 import "../styles/Homepage.css";
 
 const DEFAULT_PRICE = [0, 999999];
@@ -35,6 +38,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useCart();
   const [wishlist, setWishlist] = useWishlist();
+  const { selectedLocation, selectedLocationLabel } = useLocationContext();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -102,9 +106,12 @@ const HomePage = () => {
     }
   };
 
-  const getAllProducts = async () => {
+  const getAllProducts = async (locationKey = "") => {
     try {
-      const { data } = await axios.get(`/api/v1/product/get-product`);
+      const query = locationKey
+        ? `?location=${encodeURIComponent(locationKey)}`
+        : "";
+      const { data } = await axios.get(`/api/v1/product/get-product${query}`);
       const allProducts = data?.products || [];
       setProducts(allProducts);
       setFilteredProducts(allProducts);
@@ -117,9 +124,13 @@ const HomePage = () => {
 
   useEffect(() => {
     getAllCategory();
-    getAllProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    getAllProducts(selectedLocation);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLocation]);
 
   useEffect(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -216,6 +227,11 @@ const HomePage = () => {
   };
 
   const addToCart = (product) => {
+    if (!isProductAvailableInLocation(product, selectedLocation)) {
+      toast.error(`Not available in ${selectedLocationLabel}`);
+      return;
+    }
+
     setCart([...cart, product]);
     localStorage.setItem("cart", JSON.stringify([...cart, product]));
     toast.success("Item added to cart");
@@ -477,6 +493,13 @@ const HomePage = () => {
                 <FiTrendingUp className="h-3.5 w-3.5" />
                 Fresh arrivals every week
               </div>
+
+              {selectedLocationLabel && (
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white px-3 py-1.5 text-xs font-semibold text-primary-700">
+                  <FiMapPin className="h-3.5 w-3.5 text-accent-700" />
+                  Delivering to {selectedLocationLabel}
+                </div>
+              )}
 
               <h1 className="text-3xl md:text-4xl xl:text-5xl font-bold text-primary-900 leading-tight">
                 Discover stories that

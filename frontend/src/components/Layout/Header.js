@@ -4,6 +4,7 @@ import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
 import { useCart } from "../../context/cart";
 import { useWishlist } from "../../context/wishlist";
+import { useLocationContext } from "../../context/location";
 import {
   FiChevronDown,
   FiHeart,
@@ -11,7 +12,9 @@ import {
   FiInfo,
   FiLogOut,
   FiMail,
+  FiMapPin,
   FiMenu,
+  FiNavigation,
   FiShoppingCart,
   FiUser,
   FiX,
@@ -22,6 +25,17 @@ const Header = () => {
   const [auth, setAuth] = useAuth();
   const [cart] = useCart();
   const [wishlist] = useWishlist();
+  const {
+    serviceAreas,
+    selectedLocation,
+    selectedLocationLabel,
+    selectedLocationPincode,
+    setSelectedLocation,
+    detectCurrentLocation,
+    detectingCurrentLocation,
+    locationDetectionError,
+    loading: locationLoading,
+  } = useLocationContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -39,6 +53,21 @@ const Header = () => {
   const dashboardPath = hasAdminAccess(auth?.user?.role)
     ? "/dashboard/admin"
     : "/dashboard/user";
+
+  const handleDetectLocation = async () => {
+    const response = await detectCurrentLocation({ autoSelect: true });
+    if (response?.success && response?.matchedArea) {
+      toast.success(`Location detected: ${response.matchedArea.label}`);
+      return;
+    }
+
+    if (response?.success) {
+      toast.error("You are outside our current delivery range");
+      return;
+    }
+
+    toast.error("Unable to detect current location");
+  };
 
   const desktopNavItemClass = ({ isActive }) =>
     `no-underline h-10 px-3.5 rounded-lg inline-flex items-center gap-2 text-sm font-medium transition-colors ${
@@ -74,6 +103,35 @@ const Header = () => {
               </p>
             </div>
           </Link>
+
+          <div className="hidden lg:flex items-center gap-2 min-w-[320px]">
+            <label className="flex-1 h-10 rounded-lg border border-primary-200 bg-white px-2.5 inline-flex items-center gap-2 text-sm text-primary-700">
+              <FiMapPin className="h-4 w-4 text-accent-700 shrink-0" />
+              <select
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                disabled={locationLoading || serviceAreas.length === 0}
+                className="w-full bg-transparent text-sm text-primary-900 focus:outline-none"
+              >
+                {!selectedLocation && <option value="">Select delivery location</option>}
+                {serviceAreas.map((area) => (
+                  <option key={area.id} value={area.id}>
+                    {area.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={handleDetectLocation}
+              disabled={detectingCurrentLocation}
+              className="h-10 px-3 rounded-lg border border-accent-200 bg-accent-50 text-accent-700 hover:bg-accent-100 text-xs font-semibold inline-flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+              title="Use current location"
+            >
+              <FiNavigation className="h-3.5 w-3.5" />
+              {detectingCurrentLocation ? "Detecting..." : "Detect"}
+            </button>
+          </div>
 
           {/* Desktop navigation */}
           <nav className="hidden lg:flex items-center gap-1.5">
@@ -189,6 +247,44 @@ const Header = () => {
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-primary-100 py-3">
             <div className="space-y-1.5">
+              <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-2.5 mb-1">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 inline-flex items-center gap-1.5 mb-1.5">
+                  <FiMapPin className="h-3.5 w-3.5 text-accent-700" />
+                  Delivery Location
+                </p>
+                <select
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  disabled={locationLoading || serviceAreas.length === 0}
+                  className="w-full h-9 rounded-lg border border-primary-200 bg-white px-2.5 text-sm text-primary-900 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                >
+                  {!selectedLocation && <option value="">Select delivery location</option>}
+                  {serviceAreas.map((area) => (
+                    <option key={area.id} value={area.id}>
+                      {area.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDetectLocation}
+                    disabled={detectingCurrentLocation}
+                    className="h-7 px-2.5 rounded-md border border-accent-200 bg-accent-50 text-accent-700 text-[11px] font-semibold inline-flex items-center gap-1 disabled:opacity-60"
+                  >
+                    <FiNavigation className="h-3 w-3" />
+                    {detectingCurrentLocation ? "Detecting..." : "Use Current"}
+                  </button>
+                  <p className="text-[11px] text-primary-600 truncate m-0">
+                    {selectedLocationLabel}
+                    {selectedLocationPincode ? ` • ${selectedLocationPincode}` : ""}
+                  </p>
+                </div>
+                {locationDetectionError && (
+                  <p className="mt-1 text-[11px] text-red-600">{locationDetectionError}</p>
+                )}
+              </div>
+
               <NavLink
                 to="/"
                 className={({ isActive }) =>

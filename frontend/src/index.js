@@ -8,19 +8,22 @@ import { AuthProvider } from "./context/auth";
 import { SearchProvider } from "./context/search";
 import { CartProvider } from "./context/cart";
 import { WishlistProvider } from "./context/wishlist";
+import { LocationProvider } from "./context/location";
 import "antd/dist/reset.css";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <AuthProvider>
     <SearchProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </WishlistProvider>
-      </CartProvider>
+      <LocationProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </WishlistProvider>
+        </CartProvider>
+      </LocationProvider>
     </SearchProvider>
   </AuthProvider>
 );

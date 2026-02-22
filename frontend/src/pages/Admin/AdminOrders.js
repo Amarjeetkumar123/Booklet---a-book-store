@@ -115,6 +115,60 @@ const normalizeStatusKey = (status = "") => {
 };
 
 const isNewOrder = (order) => normalizeStatusKey(order?.status) === "not process";
+const getPaymentItems = (order) =>
+  Array.isArray(order?.payment?.items) ? order.payment.items : [];
+
+const getSafeQty = (value) => {
+  const qty = Number(value);
+  return Number.isFinite(qty) && qty > 0 ? qty : 1;
+};
+
+const getOrderItemsCount = (order) => {
+  const paymentItems = getPaymentItems(order);
+  if (paymentItems.length > 0) {
+    return paymentItems.reduce((sum, item) => sum + getSafeQty(item?.qty), 0);
+  }
+
+  return (order?.products || []).reduce((sum, product) => {
+    const quantity = Number(product?.quantity) || Number(product?.qty) || 1;
+    return sum + quantity;
+  }, 0);
+};
+
+const getOrderTotal = (order) => {
+  const paymentAmount = Number(order?.payment?.amount);
+  if (Number.isFinite(paymentAmount) && paymentAmount > 0) {
+    return paymentAmount;
+  }
+
+  const paymentItems = getPaymentItems(order);
+  if (paymentItems.length > 0) {
+    return paymentItems.reduce((sum, item) => {
+      const price = Number(item?.price) || 0;
+      return sum + price * getSafeQty(item?.qty);
+    }, 0);
+  }
+
+  return (order?.products || []).reduce((sum, product) => {
+    const quantity = Number(product?.quantity) || Number(product?.qty) || 1;
+    const price = Number(product?.price) || 0;
+    return sum + price * quantity;
+  }, 0);
+};
+
+const getItemQtyForProduct = (order, productId) => {
+  const paymentItems = getPaymentItems(order);
+  if (paymentItems.length === 0) {
+    return 1;
+  }
+
+  const matchedItem = paymentItems.find((item) => {
+    const itemProductId = item?.productId || item?._id || item?.product;
+    return String(itemProductId || "") === String(productId || "");
+  });
+
+  return getSafeQty(matchedItem?.qty);
+};
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -123,19 +177,6 @@ const AdminOrders = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [expandedOrderIds, setExpandedOrderIds] = useState(new Set());
   const [auth] = useAuth();
-
-  const getOrderItemsCount = (order) =>
-    (order?.products || []).reduce((sum, product) => {
-      const quantity = Number(product?.quantity) || 1;
-      return sum + quantity;
-    }, 0);
-
-  const getOrderTotal = (order) =>
-    (order?.products || []).reduce((sum, product) => {
-      const quantity = Number(product?.quantity) || 1;
-      const price = Number(product?.price) || 0;
-      return sum + price * quantity;
-    }, 0);
 
   const formatStatus = (status = "") => {
     const normalized = normalizeStatusKey(status);
@@ -567,7 +608,7 @@ const AdminOrders = () => {
                                   <div className="mt-0.5 flex items-center justify-between gap-2">
                                     <span className="text-[11px] text-primary-600 inline-flex items-center gap-1">
                                       <FiPackage className="h-3.5 w-3.5" /> Qty{" "}
-                                      {Number(p?.quantity) || 1}
+                                      {getItemQtyForProduct(o, p?._id)}
                                     </span>
                                     <span className="text-xs sm:text-sm font-semibold text-accent-700">
                                       {formatCurrency(p?.price)}

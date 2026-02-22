@@ -1,6 +1,5 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { GiSpellBook } from "react-icons/gi";
 import {
   FiArrowUp,
   FiChevronRight,
@@ -82,8 +81,12 @@ const Footer = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7 sm:gap-8">
             <div>
               <Link to="/" className="inline-flex items-center gap-2 no-underline text-primary-900">
-                <span className="h-10 w-10 rounded-xl bg-accent-100 border border-accent-200 text-accent-700 inline-flex items-center justify-center">
-                  <GiSpellBook className="h-5.5 w-5.5" />
+                <span className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-white border border-accent-200 p-0.5 inline-flex items-center justify-center overflow-hidden">
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                    alt="Booklet logo"
+                    className="h-full w-full object-contain scale-110"
+                  />
                 </span>
                 <span>
                   <span className="block text-lg font-bold">Booklet</span>

@@ -52,12 +52,54 @@ const getStatusIcon = (status = "") => {
   return FiPackage;
 };
 
+const getPaymentItems = (order) =>
+  Array.isArray(order?.payment?.items) ? order.payment.items : [];
+
+const getOrderItemsCount = (order) => {
+  const paymentItems = getPaymentItems(order);
+  if (paymentItems.length > 0) {
+    return paymentItems.reduce((sum, item) => {
+      const qty = Number(item?.qty);
+      return sum + (Number.isFinite(qty) && qty > 0 ? qty : 1);
+    }, 0);
+  }
+  return (order?.products || []).length;
+};
+
 const getOrderAmount = (order) => {
+  const paymentAmount = Number(order?.payment?.amount);
+  if (Number.isFinite(paymentAmount) && paymentAmount > 0) {
+    return paymentAmount;
+  }
+
+  const paymentItems = getPaymentItems(order);
+  if (paymentItems.length > 0) {
+    return paymentItems.reduce((sum, item) => {
+      const price = Number(item?.price) || 0;
+      const qty = Number(item?.qty);
+      const safeQty = Number.isFinite(qty) && qty > 0 ? qty : 1;
+      return sum + price * safeQty;
+    }, 0);
+  }
+
   return (order?.products || []).reduce((sum, product) => {
     const price = Number(product?.price) || 0;
-    const qty = Number(product?.qty) || 1;
+    const qty = Number(product?.qty) || Number(product?.quantity) || 1;
     return sum + price * (qty > 0 ? qty : 1);
   }, 0);
+};
+
+const getItemQtyForProduct = (order, productId) => {
+  const paymentItems = getPaymentItems(order);
+  if (paymentItems.length === 0) return 1;
+
+  const matchedItem = paymentItems.find((item) => {
+    const itemProductId = item?.productId || item?._id || item?.product;
+    return String(itemProductId || "") === String(productId || "");
+  });
+
+  const qty = Number(matchedItem?.qty);
+  return Number.isFinite(qty) && qty > 0 ? qty : 1;
 };
 
 const formatCurrency = (value) => `₹${(Number(value) || 0).toLocaleString("en-IN")}`;
@@ -260,7 +302,7 @@ const Orders = () => {
                                   {formatCurrency(getOrderAmount(order))}
                                 </p>
                                 <p className="text-[11px] text-primary-500">
-                                  {order?.products?.length || 0} items
+                                  {getOrderItemsCount(order)} items
                                 </p>
                               </div>
                             </div>
@@ -294,9 +336,14 @@ const Orders = () => {
                                     <p className="text-[11px] text-primary-600 truncate">
                                       {product?.description || "No description"}
                                     </p>
-                                    <p className="mt-0.5 text-sm font-semibold text-accent-700">
-                                      {formatCurrency(product?.price)}
-                                    </p>
+                                    <div className="mt-0.5 flex items-center justify-between gap-2">
+                                      <span className="text-[11px] text-primary-600">
+                                        Qty {getItemQtyForProduct(order, product?._id)}
+                                      </span>
+                                      <p className="text-sm font-semibold text-accent-700">
+                                        {formatCurrency(product?.price)}
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
                               ))}

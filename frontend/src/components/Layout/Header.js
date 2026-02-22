@@ -4,7 +4,6 @@ import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
 import { useCart } from "../../context/cart";
 import { useWishlist } from "../../context/wishlist";
-import { GiSpellBook } from "react-icons/gi";
 import {
   FiChevronDown,
   FiHeart,
@@ -61,8 +60,12 @@ const Header = () => {
         <div className="h-16 flex items-center justify-between gap-3">
           {/* Logo */}
           <Link to="/" className="no-underline flex items-center gap-2.5 shrink-0 group">
-            <div className="h-10 w-10 rounded-xl border border-accent-200 bg-accent-50 text-accent-600 flex items-center justify-center group-hover:bg-accent-100 transition-colors">
-              <GiSpellBook className="h-5 w-5" />
+            <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl border border-accent-200 bg-white p-0.5 flex items-center justify-center overflow-hidden group-hover:bg-accent-50 transition-colors">
+              <img
+                src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                alt="Booklet logo"
+                className="h-full w-full object-contain scale-110"
+              />
             </div>
             <div className="leading-tight">
               <p className="text-base font-bold text-primary-900 m-0">Booklet</p>

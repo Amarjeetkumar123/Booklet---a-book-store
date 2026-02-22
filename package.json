@@ -1,7 +1,7 @@
 {
-  "name": "booksstore-app",
+  "name": "booklet",
   "version": "1.0.0",
-  "description": "book store website",
+  "description": "Online Bookstore",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -12,8 +12,8 @@
     "seed": "node backend/seed/seed.js"
   },
   "keywords": [],
-  "author": " Shivateja ",
-  "license": "MIT",
+  "author": "booklet",
+  "license": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "braintree": "^3.23.0",

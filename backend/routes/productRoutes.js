@@ -17,19 +17,9 @@ import { isAdmin, requireSignIn } from "../middlewares/authMiddleware.js";
 const router = express.Router();
 
 //routes
-router.post(
-  "/create-product",
-  requireSignIn,
-  isAdmin,
-  createProductController
-);
+router.post("/create-product", requireSignIn, isAdmin, createProductController);
 //routes
-router.put(
-  "/update-product/:pid",
-  requireSignIn,
-  isAdmin,
-  updateProductController
-);
+router.put("/update-product/:pid", requireSignIn, isAdmin, updateProductController);
 
 //get products
 router.get("/get-product", getProductController);

@@ -43,17 +43,7 @@ const getActiveServiceAreaKeySet = async () => {
 
 export const createProductController = async (req, res) => {
   try {
-    const {
-      name,
-      description,
-      price,
-      category,
-      quantity,
-      shipping,
-      imageUrl,
-      imageUrls,
-      serviceLocations,
-    } = req.body;
+    const { name, description, price, category, quantity, shipping, imageUrl, imageUrls, serviceLocations } = req.body;
     //alidation
     switch (true) {
       case !name:

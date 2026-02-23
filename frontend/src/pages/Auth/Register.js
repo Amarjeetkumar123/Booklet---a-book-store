@@ -3,6 +3,7 @@ import Layout from "./../../components/Layout/Layout";
 import axios from "../../config/axios.js";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { getApiErrorMessage } from "../../utils/errorUtils";
 import {
   FiArrowRight,
   FiCheckCircle,
@@ -42,7 +43,7 @@ const Register = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      toast.error(getApiErrorMessage(error, "Unable to create account"));
     }
   };
 

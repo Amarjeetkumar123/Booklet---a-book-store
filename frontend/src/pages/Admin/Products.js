@@ -4,6 +4,7 @@ import Layout from "./../../components/Layout/Layout";
 import axios from "../../config/axios";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { getApiErrorMessage } from "../../utils/errorUtils";
 import {
   FiArrowUpRight,
   FiBox,
@@ -33,7 +34,7 @@ const Products = () => {
       setProducts(data?.products || []);
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong while loading products");
+      toast.error(getApiErrorMessage(error, "Unable to load products"));
     } finally {
       setLoading(false);
     }

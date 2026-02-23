@@ -4,6 +4,7 @@ import AdminMenu from "./../../components/Layout/AdminMenu";
 import toast from "react-hot-toast";
 import axios from "../../config/axios";
 import { useNavigate } from "react-router-dom";
+import { getApiErrorMessage } from "../../utils/errorUtils";
 import {
   FiBox,
   FiFileText,
@@ -50,7 +51,7 @@ const CreateProduct = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong in getting catgeory");
+      toast.error(getApiErrorMessage(error, "Unable to load categories"));
     }
   };
 
@@ -69,6 +70,35 @@ const CreateProduct = () => {
     getServiceAreas();
   }, []);
 
+
+  // Helper to upload images and get URLs
+  const uploadImagesAndGetUrls = async () => {
+    if (!uploadedImages.length) return [];
+    const formData = new FormData();
+    uploadedImages.forEach((img) => {
+      // Convert dataUrl to Blob
+      const arr = img.dataUrl.split(','), mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) u8arr[n] = bstr.charCodeAt(n);
+      const file = new File([u8arr], img.name, { type: mime });
+      formData.append('images', file);
+    });
+    try {
+      const { data } = await axios.post('/api/v1/uploads/images-upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (Array.isArray(data?.images)) {
+        return data.images.map((img) => img.url).filter(Boolean);
+      }
+      return [];
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Image upload failed'));
+      return [];
+    }
+  };
+
   //create product function
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -76,14 +106,25 @@ const CreateProduct = () => {
       toast.error("Please select a category");
       return;
     }
+    let finalImageUrls = imageUrls;
+    if (imageInputMode === 'upload' && uploadedImages.length) {
+      toast.loading('Uploading images...');
+      const uploadedUrls = await uploadImagesAndGetUrls();
+      toast.dismiss();
+      if (!uploadedUrls.length) {
+        toast.error('No images uploaded');
+        return;
+      }
+      finalImageUrls = [...imageUrls, ...uploadedUrls];
+    }
     try {
       const productData = {
         name,
         description,
         price,
         quantity,
-        imageUrl: activeImageUrls[0] || "",
-        imageUrls: activeImageUrls,
+        imageUrl: (finalImageUrls[0] || ""),
+        imageUrls: finalImageUrls,
         category,
         shipping: shipping === "1",
         serviceLocations: selectedServiceLocations,
@@ -100,7 +141,7 @@ const CreateProduct = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("something went wrong");
+      toast.error(getApiErrorMessage(error, "Unable to create product"));
     }
   };
 

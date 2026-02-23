@@ -1,6 +1,9 @@
 import express from "express";
-import colors from "colors";
 import dotenv from "dotenv";
+//configure env
+dotenv.config({ path: "./backend/.env" });
+console.log("Environment variables loaded");
+
 import morgan from "morgan";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoute.js";
@@ -8,11 +11,9 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
+import uploadFilesRoutes from "./routes/uploadFileRoute.js";
 import cors from "cors";
-
-//configure env
-dotenv.config({ path: "./backend/.env" });
-console.log("Environment variables loaded");
+import errorHandler from "./middlewares/errorMiddleware.js";
 
 //databse config
 console.log("Connecting to database...");
@@ -37,6 +38,10 @@ const parseAllowedOrigins = () => {
 };
 
 const allowedOrigins = parseAllowedOrigins();
+const localOriginPatterns = [
+  /^https?:\/\/localhost:\d+$/i,
+  /^https?:\/\/127\.0\.0\.1:\d+$/i,
+];
 const ngrokOriginPatterns = [
   /^https:\/\/[a-z0-9-]+\.ngrok-free\.app$/i,
   /^https:\/\/[a-z0-9-]+\.ngrok-free\.dev$/i,
@@ -46,6 +51,7 @@ const ngrokOriginPatterns = [
 const isAllowedOrigin = (origin = "") => {
   if (!origin) return true;
   if (allowedOrigins.includes(origin)) return true;
+  if (localOriginPatterns.some((pattern) => pattern.test(origin))) return true;
   return ngrokOriginPatterns.some((pattern) => pattern.test(origin));
 };
 
@@ -62,7 +68,8 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 app.use(morgan("dev"));
 
 //routes
@@ -71,6 +78,9 @@ app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/location", locationRoutes);
+app.use("/api/v1/uploads", uploadFilesRoutes);
+// Centralized error handler (should be last middleware)
+app.use(errorHandler);
 
 //rest api
 app.get("/", (req, res) => {

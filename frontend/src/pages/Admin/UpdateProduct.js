@@ -4,6 +4,7 @@ import AdminMenu from "./../../components/Layout/AdminMenu";
 import toast from "react-hot-toast";
 import axios from "../../config/axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { getApiErrorMessage } from "../../utils/errorUtils";
 import {
   FiEdit3,
   FiFileText,
@@ -116,7 +117,7 @@ const UpdateProduct = () => {
       if (data?.success) setCategories(data?.category || []);
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong while loading categories");
+      toast.error(getApiErrorMessage(error, "Unable to load categories"));
     }
   };
 
@@ -258,7 +259,7 @@ const UpdateProduct = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong while updating");
+      toast.error(getApiErrorMessage(error, "Unable to update product"));
     }
   };
 
@@ -290,7 +291,7 @@ const UpdateProduct = () => {
       navigate("/dashboard/admin/products");
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong while deleting");
+      toast.error(getApiErrorMessage(error, "Unable to delete product"));
     }
   };
 

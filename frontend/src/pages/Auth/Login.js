@@ -4,6 +4,7 @@ import axios from "../../config/axios";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/auth";
+import { getApiErrorMessage } from "../../utils/errorUtils";
 import {
   FiArrowRight,
   FiEye,
@@ -43,7 +44,7 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      toast.error(getApiErrorMessage(error, "Unable to login"));
     }
   };
 

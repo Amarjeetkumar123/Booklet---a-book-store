@@ -4,6 +4,7 @@ import Layout from "./../../components/Layout/Layout";
 import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
 import axios from "../../config/axios";
+import { getApiErrorMessage } from "../../utils/errorUtils";
 import {
   FiInfo,
   FiLock,
@@ -64,7 +65,7 @@ const Profile = () => {
       toast.success("Profile Updated Successfully");
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      toast.error(getApiErrorMessage(error, "Unable to update profile"));
     }
   };
 

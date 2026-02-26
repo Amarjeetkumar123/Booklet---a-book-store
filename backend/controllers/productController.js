@@ -13,6 +13,7 @@ import {
   deleteImage,
   getCloudinaryPublicIdFromUrl,
 } from "../utils/cloudinaryUtils.js";
+import { deleteReviewsByProductId } from "../services/reviewService.js";
 
 const normalizeImageUrls = (imageUrls, imageUrl) => {
   const parsedImageUrls = Array.isArray(imageUrls)
@@ -212,6 +213,7 @@ export const deleteProductController = async (req, res) => {
 
     const imageUrls = collectProductImageUrls(existingProduct);
     await productModel.findByIdAndDelete(req.params.pid);
+    await deleteReviewsByProductId(req.params.pid);
     const failedImageDeletions = await deleteCloudinaryImagesSafely(imageUrls);
 
     res.status(200).send({

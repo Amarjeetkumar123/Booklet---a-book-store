@@ -8,14 +8,30 @@ import {
 //Protected Routes token base
 export const requireSignIn = async (req, res, next) => {
   try {
+    const authHeader = req.headers.authorization || "";
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : authHeader;
+
+    if (!token) {
+      return res.status(401).send({
+        success: false,
+        message: "Authorization token is required",
+      });
+    }
+
     const decode = JWT.verify(
-      req.headers.authorization,
+      token,
       process.env.JWT_SECRET
     );
     req.user = decode;
-    next();
+    return next();
   } catch (error) {
     console.log(error);
+    return res.status(401).send({
+      success: false,
+      message: "Invalid or expired token",
+    });
   }
 };
 

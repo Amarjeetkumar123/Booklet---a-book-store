@@ -12,6 +12,7 @@ import productRoutes from "./routes/productRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 import uploadFilesRoutes from "./routes/uploadFileRoute.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 import cors from "cors";
 import errorHandler from "./middlewares/errorMiddleware.js";
 
@@ -76,6 +77,7 @@ app.use(morgan("dev"));
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/review", reviewRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/location", locationRoutes);
 app.use("/api/v1/uploads", uploadFilesRoutes);

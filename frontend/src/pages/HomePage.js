@@ -78,9 +78,13 @@ const HomePage = () => {
   };
 
   const getProductRating = (product) => {
-    if (typeof product?.rating === "number") return product.rating;
-    const seed = Number(product?.price || 0);
-    return Number((3 + ((seed % 21) / 10)).toFixed(1)); // 3.0 - 5.0
+    const rating = Number(product?.rating || 0);
+    return Number.isFinite(rating) ? rating : 0;
+  };
+
+  const getProductReviewCount = (product) => {
+    const count = Number(product?.numReviews || 0);
+    return Number.isFinite(count) ? count : 0;
   };
 
   const activeFiltersCount = useMemo(() => {
@@ -966,6 +970,7 @@ const HomePage = () => {
                   <div className={`catalog-grid ${isFiltering ? "fx-grid-filtering" : ""}`}>
                     {displayProducts.map((p, index) => {
                       const rating = getProductRating(p);
+                      const reviewCount = getProductReviewCount(p);
                       return (
                         <div
                           key={p._id}
@@ -1002,7 +1007,11 @@ const HomePage = () => {
                                     }`}
                                 />
                               ))}
-                              <span className="text-xs text-primary-600 ml-1">({rating})</span>
+                              <span className="text-xs text-primary-600 ml-1">
+                                {reviewCount > 0
+                                  ? `${rating.toFixed(1)} (${reviewCount})`
+                                  : "New"}
+                              </span>
                             </div>
 
                             <div className="mb-3">

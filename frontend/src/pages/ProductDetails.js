@@ -6,13 +6,19 @@ import { useCart } from "../context/cart";
 import { useWishlist } from "../context/wishlist";
 import { useLocationContext } from "../context/location";
 import { useConfirm } from "../context/confirm";
+import { useAuth } from "../context/auth";
 import toast from "react-hot-toast";
 import { FiShoppingCart, FiTag, FiPackage, FiArrowLeft, FiHeart, FiMinus, FiPlus, FiStar, FiTruck, FiShield, FiRefreshCw, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { isProductAvailableInLocation } from "../utils/locationUtils";
+import useProductReviews from "../features/reviews/useProductReviews";
+import ReviewSummary from "../features/reviews/ReviewSummary";
+import ReviewForm from "../features/reviews/ReviewForm";
+import ReviewList from "../features/reviews/ReviewList";
 
 const ProductDetails = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const [auth] = useAuth();
   const [cart, setCart] = useCart();
   const [wishlist, setWishlist] = useWishlist();
   const confirm = useConfirm();
@@ -24,6 +30,9 @@ const ProductDetails = () => {
   const [isDeliverable, setIsDeliverable] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
   const fallbackImage = "https://placehold.co/600x800/f5f0e8/826b4d?text=No+Image";
 
   const productImages = React.useMemo(() => {
@@ -92,6 +101,7 @@ const ProductDetails = () => {
 
   useEffect(() => {
     setActiveImageIndex(0);
+    setShowReviewForm(false);
   }, [product?._id]);
 
   useEffect(() => {
@@ -179,6 +189,90 @@ const ProductDetails = () => {
     toast.success("Item added to cart");
   };
 
+  const {
+    reviews,
+    averageRating,
+    totalReviews,
+    ratingDistribution,
+    myReview,
+    loading: reviewLoading,
+    submitting: reviewSubmitting,
+    loadReviews,
+    submitReview,
+  } = useProductReviews({
+    productId: product?._id || "",
+    userId: auth?.user?._id || "",
+  });
+
+  useEffect(() => {
+    if (!product?._id) return;
+
+    loadReviews().catch((loadError) => {
+      console.log(loadError);
+      toast.error(loadError.message || "Unable to load reviews");
+    });
+  }, [product?._id, loadReviews]);
+
+  useEffect(() => {
+    if (myReview) {
+      setReviewRating(Number(myReview?.rating || 0));
+      setReviewComment(myReview?.comment || "");
+      return;
+    }
+
+    setReviewRating(0);
+    setReviewComment("");
+  }, [myReview, product?._id]);
+
+  const displayAverageRating =
+    totalReviews > 0 ? averageRating : Number(product?.rating || 0);
+  const displayReviewCount =
+    totalReviews > 0 ? totalReviews : Number(product?.numReviews || 0);
+
+  const handleReviewButtonClick = () => {
+    if (!auth?.token) {
+      toast.error("Please login to write a review");
+      navigate("/login", { state: `/product/${params.slug}` });
+      return;
+    }
+
+    setShowReviewForm((previous) => !previous);
+  };
+
+  const handleSubmitReview = async (event) => {
+    event.preventDefault();
+
+    if (!auth?.token) {
+      toast.error("Please login to write a review");
+      navigate("/login", { state: `/product/${params.slug}` });
+      return;
+    }
+
+    if (!reviewRating || reviewRating < 1 || reviewRating > 5) {
+      toast.error("Please select a rating between 1 and 5");
+      return;
+    }
+
+    const trimmedComment = reviewComment.trim();
+    if (!trimmedComment) {
+      toast.error("Please write a review comment");
+      return;
+    }
+
+    try {
+      const data = await submitReview({
+        rating: reviewRating,
+        comment: trimmedComment,
+      });
+      toast.success(data?.message || "Review submitted successfully");
+      await getProduct();
+      setShowReviewForm(false);
+    } catch (submitError) {
+      console.log(submitError);
+      toast.error(submitError.message || "Unable to submit review");
+    }
+  };
+
   const isWishlisted = wishlist.some((item) => item._id === product?._id);
   const totalPrice = (product?.price || 0) * quantity;
   const productSpecs = [
@@ -188,35 +282,6 @@ const ProductDetails = () => {
     { label: "Publisher", value: "Booklet Publishing" },
     { label: "Pages", value: "320" },
     { label: "Weight", value: "0.5 lbs" },
-  ];
-
-  const ratingDistribution = [
-    { stars: 5, count: 95, percent: 75 },
-    { stars: 4, count: 25, percent: 20 },
-    { stars: 3, count: 4, percent: 3 },
-    { stars: 2, count: 1, percent: 1 },
-    { stars: 1, count: 1, percent: 1 },
-  ];
-
-  const featuredReviews = [
-    {
-      initials: "JD",
-      name: "John Doe",
-      date: "2 days ago",
-      rating: 5,
-      comment:
-        "Excellent book with clear writing and practical examples. Delivery was quick and the book quality is great.",
-      helpfulCount: 12,
-    },
-    {
-      initials: "SM",
-      name: "Sarah Miller",
-      date: "1 week ago",
-      rating: 4,
-      comment:
-        "Great read overall. Useful insights, easy flow, and it arrived in perfect condition.",
-      helpfulCount: 8,
-    },
   ];
 
   if (loading) {
@@ -381,8 +446,12 @@ const ProductDetails = () => {
                 </span>
                 <div className="flex items-center gap-1 text-sm font-semibold text-primary-700">
                   <FiStar className="h-4 w-4 fill-current text-accent-500" />
-                  <span>4.8</span>
-                  <span className="text-primary-500">(127 reviews)</span>
+                  <span>
+                    {displayReviewCount > 0 ? displayAverageRating.toFixed(1) : "New"}
+                  </span>
+                  <span className="text-primary-500">
+                    ({displayReviewCount} review{displayReviewCount === 1 ? "" : "s"})
+                  </span>
                 </div>
               </div>
 
@@ -510,80 +579,34 @@ const ProductDetails = () => {
                     <FiStar className="mr-2 h-5 w-5 text-accent-500" />
                     Customer Reviews
                   </h2>
-                  <button className="rounded-full bg-primary-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-800">
-                    Write a Review
+                  <button
+                    onClick={handleReviewButtonClick}
+                    className="rounded-full bg-primary-900 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-800"
+                  >
+                    {myReview ? "Edit Your Review" : "Write a Review"}
                   </button>
                 </div>
 
-                <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <div>
-                    <p className="text-5xl font-bold text-accent-600">4.8</p>
-                    <div className="mt-2 flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <FiStar key={i} className="h-4 w-4 fill-current text-accent-400" />
-                      ))}
-                    </div>
-                    <p className="mt-2 text-sm text-primary-600">Based on 127 verified reviews</p>
-                  </div>
+                {showReviewForm && (
+                  <ReviewForm
+                    rating={reviewRating}
+                    comment={reviewComment}
+                    submitting={reviewSubmitting}
+                    hasExistingReview={Boolean(myReview)}
+                    onRatingChange={setReviewRating}
+                    onCommentChange={(event) => setReviewComment(event.target.value)}
+                    onCancel={() => setShowReviewForm(false)}
+                    onSubmit={handleSubmitReview}
+                  />
+                )}
 
-                  <div className="space-y-2">
-                    {ratingDistribution.map((rating) => (
-                      <div key={rating.stars} className="flex items-center gap-3">
-                        <span className="w-8 text-sm text-primary-600">{rating.stars}★</span>
-                        <div className="h-2 flex-1 rounded-full bg-primary-100">
-                          <div
-                            className="h-2 rounded-full bg-accent-500"
-                            style={{ width: `${rating.percent}%` }}
-                          ></div>
-                        </div>
-                        <span className="w-8 text-sm text-primary-600">{rating.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <ReviewSummary
+                  averageRating={displayAverageRating}
+                  totalReviews={displayReviewCount}
+                  distribution={ratingDistribution}
+                />
 
-                <div className="space-y-6">
-                  {featuredReviews.map((review) => (
-                    <div key={review.name} className="border-b border-primary-100 pb-6">
-                      <div className="mb-3 flex items-start gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-100 text-sm font-bold text-accent-700">
-                          {review.initials}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-semibold text-primary-900">{review.name}</span>
-                            <div className="flex items-center gap-0.5">
-                              {[...Array(5)].map((_, i) => (
-                                <FiStar
-                                  key={i}
-                                  className={`h-3.5 w-3.5 ${
-                                    i < review.rating
-                                      ? "fill-current text-accent-400"
-                                      : "text-primary-200"
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                          <p className="text-xs text-primary-500">{review.date}</p>
-                        </div>
-                      </div>
-                      <p className="text-sm leading-relaxed text-primary-700">{review.comment}</p>
-                      <div className="mt-3 flex items-center gap-4">
-                        <button className="text-xs font-semibold text-primary-500 transition-colors hover:text-accent-600">
-                          Helpful ({review.helpfulCount})
-                        </button>
-                        <button className="text-xs font-semibold text-primary-500 transition-colors hover:text-accent-600">
-                          Reply
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <button className="mt-6 text-sm font-semibold text-primary-700 transition-colors hover:text-accent-600">
-                  Load More Reviews
-                </button>
+                <ReviewList reviews={reviews} loading={reviewLoading} />
               </div>
             </div>
 
@@ -673,6 +696,8 @@ const ProductDetails = () => {
               <div className="responsive-card-grid" style={{ gap: "2rem" }}>
                 {relatedProducts?.map((p) => {
                   const isRelatedWishlisted = wishlist.some((item) => item._id === p._id);
+                  const relatedRating = Number(p?.rating || 0);
+                  const relatedReviewCount = Number(p?.numReviews || 0);
 
                   return (
                     <div key={p._id} className="group">
@@ -703,7 +728,7 @@ const ProductDetails = () => {
                         </span>
                         <div className="flex items-center gap-1 text-xs font-semibold text-primary-600">
                           <FiStar className="h-4 w-4 fill-current text-accent-400" />
-                          4.5
+                          {relatedReviewCount > 0 ? relatedRating.toFixed(1) : "New"}
                         </div>
                       </div>
 

@@ -58,6 +58,7 @@ const HomePage = () => {
   const [selectedRating, setSelectedRating] = useState(0);
   const [sortBy, setSortBy] = useState("newest");
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
 
   const observerTarget = useRef(null);
   const sortMenuRef = useRef(null);
@@ -209,6 +210,15 @@ const HomePage = () => {
 
   useEffect(() => {
     setCurrentPage(1);
+  }, [debouncedSearchQuery, selectedCategory, selectedPrice, selectedRating, sortBy]);
+
+  useEffect(() => {
+    setIsFiltering(true);
+    const filterAnimationTimer = setTimeout(() => {
+      setIsFiltering(false);
+    }, 420);
+
+    return () => clearTimeout(filterAnimationTimer);
   }, [debouncedSearchQuery, selectedCategory, selectedPrice, selectedRating, sortBy]);
 
   const displayProducts = useMemo(() => {
@@ -529,7 +539,10 @@ const HomePage = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-accent-50">
+      <section
+        className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-accent-50"
+        data-fx="reveal"
+      >
         <div className="absolute -top-24 -left-20 h-72 w-72 rounded-full bg-primary-100/70 blur-3xl" />
         <div className="absolute -bottom-16 -right-20 h-72 w-72 rounded-full bg-accent-100/70 blur-3xl" />
 
@@ -811,7 +824,7 @@ const HomePage = () => {
       </section>
 
       {/* Main Content */}
-      <section className="bg-primary-50 pt-8 pb-24 md:pt-10 md:pb-10 min-h-screen">
+      <section className="bg-primary-50 pt-8 pb-24 md:pt-10 md:pb-10 min-h-screen" data-fx="reveal">
         <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="flex gap-5">
             {/* Desktop sidebar */}
@@ -879,7 +892,7 @@ const HomePage = () => {
 
             {/* Content column */}
             <div className="flex-1 min-w-0">
-              <div className="mb-4 rounded-xl border border-primary-200 bg-white p-3 sm:p-4 shadow-sm">
+              <div className={`mb-4 rounded-xl border border-primary-200 bg-white p-3 sm:p-4 shadow-sm ${isFiltering ? "fx-filter-pulse" : ""}`}>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
                   <p className="text-sm text-primary-700">
                     Showing <span className="font-semibold text-primary-900">{displayProducts.length}</span> of <span className="font-semibold text-primary-900">{filteredProducts.length}</span> matching titles
@@ -939,19 +952,20 @@ const HomePage = () => {
 
               {displayProducts.length > 0 ? (
                 <>
-                  <div className="catalog-grid">
-                    {displayProducts.map((p) => {
+                  <div className={`catalog-grid ${isFiltering ? "fx-grid-filtering" : ""}`}>
+                    {displayProducts.map((p, index) => {
                       const rating = getProductRating(p);
                       return (
                         <div
                           key={p._id}
-                          className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group border border-primary-100 flex flex-col"
+                          className="fx-product-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group border border-primary-100 flex flex-col"
+                          style={{ "--fx-stagger": `${Math.min((index % ITEMS_PER_PAGE) * 30, 330)}ms` }}
                         >
                           <div className="relative h-56 overflow-hidden bg-gradient-to-br from-primary-50 to-primary-100">
                             <img
                               src={p.imageUrl || p.imageUrls?.[0] || "https://placehold.co/300x400/f5f0e8/826b4d?text=No+Image"}
                               alt={p.name}
-                              className="w-full h-full object-contain p-3 transition-transform duration-300"
+                              className="w-full h-full object-contain p-3 transition-transform duration-500 group-hover:scale-[1.05]"
                               loading="lazy"
                             />
                             <div className="absolute top-2 left-2 rounded-full bg-white/95 border border-primary-200 px-2 py-0.5 text-[11px] font-semibold text-primary-700">
@@ -1021,7 +1035,7 @@ const HomePage = () => {
 
                   {loading && (
                     <div className="flex justify-center items-center py-8 mt-6">
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 fx-loading-bubbles">
                         <div
                           className="w-3 h-3 bg-accent-600 rounded-full animate-bounce"
                           style={{ animationDelay: "0s" }}
@@ -1053,7 +1067,7 @@ const HomePage = () => {
                   )}
                 </>
               ) : (
-                <div className="text-center py-16 bg-white rounded-xl border border-primary-200 shadow-sm">
+                <div className="text-center py-16 bg-white rounded-xl border border-primary-200 shadow-sm" data-fx="reveal">
                   <div className="bg-accent-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-accent-200">
                     <FiBook className="h-8 w-8 text-accent-600" />
                   </div>
@@ -1081,7 +1095,7 @@ const HomePage = () => {
         <button
           type="button"
           onClick={() => setSidebarOpen(true)}
-          className="lg:hidden fixed bottom-6 right-4 z-[55] h-12 pl-3.5 pr-4 rounded-full bg-accent-500 hover:bg-accent-600 active:scale-[0.98] text-white shadow-[0_12px_32px_-12px_rgba(249,115,22,0.72)] inline-flex items-center gap-2 border border-accent-400 transition-all"
+          className="lg:hidden fixed bottom-6 right-4 z-[55] h-12 pl-3.5 pr-4 rounded-full bg-accent-500 hover:bg-accent-600 active:scale-[0.98] text-white shadow-[0_12px_32px_-12px_rgba(249,115,22,0.72)] inline-flex items-center gap-2 border border-accent-400 transition-all fx-floating-action"
         >
           <FiFilter className="h-4.5 w-4.5" />
           <span className="text-sm font-semibold">Refine</span>

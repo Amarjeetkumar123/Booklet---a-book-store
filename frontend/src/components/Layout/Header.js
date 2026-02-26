@@ -84,7 +84,7 @@ const Header = () => {
     }`;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-primary-200 bg-white/95 backdrop-blur shadow-[0_6px_20px_rgba(85,67,43,0.08)]">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-primary-200 bg-white/95 backdrop-blur shadow-[0_6px_20px_rgba(85,67,43,0.08)] fx-header-entry">
       <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         <div className="h-16 flex items-center justify-between gap-3">
           {/* Logo */}
@@ -245,7 +245,7 @@ const Header = () => {
 
         {/* Mobile navigation */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-primary-100 py-3">
+          <div className="lg:hidden border-t border-primary-100 py-3 fx-mobile-menu">
             <div className="space-y-1.5">
               <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-2.5 mb-1">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 inline-flex items-center gap-1.5 mb-1.5">

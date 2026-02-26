@@ -33,6 +33,7 @@ const SORT_OPTIONS = [
   { value: "name-asc", label: "Name: A to Z" },
   { value: "name-desc", label: "Name: Z to A" },
 ];
+const ITEMS_PER_PAGE = 12;
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -41,17 +42,14 @@ const HomePage = () => {
   const { selectedLocation, selectedLocationLabel } = useLocationContext();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [displayProducts, setDisplayProducts] = useState([]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [itemsPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedPrice, setSelectedPrice] = useState(DEFAULT_PRICE);
   const [selectedRating, setSelectedRating] = useState(0);
@@ -114,9 +112,7 @@ const HomePage = () => {
       const { data } = await axios.get(`/api/v1/product/get-product${query}`);
       const allProducts = data?.products || [];
       setProducts(allProducts);
-      setFilteredProducts(allProducts);
-      setDisplayProducts(allProducts.slice(0, itemsPerPage));
-      setHasMore(allProducts.length > itemsPerPage);
+      setCurrentPage(1);
     } catch (error) {
       console.log(error);
     }
@@ -133,9 +129,17 @@ const HomePage = () => {
   }, [selectedLocation]);
 
   useEffect(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const debounceTimer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 220);
 
-    let filtered = products.filter((product) => {
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
+
+  const filteredProducts = useMemo(() => {
+    const query = debouncedSearchQuery.trim().toLowerCase();
+
+    const filtered = products.filter((product) => {
       const categoryId = getProductCategoryId(product);
       const rating = getProductRating(product);
 
@@ -153,41 +157,39 @@ const HomePage = () => {
       return matchesSearch && matchesCategory && matchesPrice && matchesRating;
     });
 
-    filtered = [...filtered].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       if (sortBy === "price-low") return Number(a.price || 0) - Number(b.price || 0);
       if (sortBy === "price-high") return Number(b.price || 0) - Number(a.price || 0);
       if (sortBy === "name-asc") return (a.name || "").localeCompare(b.name || "");
       if (sortBy === "name-desc") return (b.name || "").localeCompare(a.name || "");
       return new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0);
     });
-
-    setFilteredProducts(filtered);
-    setCurrentPage(1);
-    setDisplayProducts(filtered.slice(0, itemsPerPage));
-    setHasMore(filtered.length > itemsPerPage);
   }, [
     products,
-    searchQuery,
+    debouncedSearchQuery,
     selectedCategory,
     selectedPrice,
     selectedRating,
     sortBy,
-    itemsPerPage,
   ]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchQuery, selectedCategory, selectedPrice, selectedRating, sortBy]);
+
+  const displayProducts = useMemo(() => {
+    return filteredProducts.slice(0, currentPage * ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
+  const hasMore = displayProducts.length < filteredProducts.length;
 
   const loadMore = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      const nextPage = currentPage + 1;
-      const endIndex = nextPage * itemsPerPage;
-      const newItems = filteredProducts.slice(0, endIndex);
-
-      setDisplayProducts(newItems);
-      setCurrentPage(nextPage);
-      setHasMore(endIndex < filteredProducts.length);
+      setCurrentPage((prevPage) => prevPage + 1);
       setLoading(false);
-    }, 450);
-  }, [currentPage, filteredProducts, itemsPerPage]);
+    }, 350);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -283,11 +285,22 @@ const HomePage = () => {
     };
   }, [sortMenuOpen]);
 
+  useEffect(() => {
+    if (!sidebarOpen) return undefined;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [sidebarOpen]);
+
   const renderFilterPanel = (mobile = false) => (
-    <div className={`space-y-3.5 ${mobile ? "p-5" : "p-4"}`}>
+    <div className={`space-y-4 ${mobile ? "p-5" : "p-4"}`}>
       {activeFiltersCount > 0 && (
         <div className="rounded-xl border border-accent-200 bg-accent-50/70 p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-accent-700 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent-700 mb-2">
             Active Filters
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -295,7 +308,7 @@ const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="h-7 px-2 rounded-full border border-accent-200 bg-white text-accent-700 text-[11px] font-medium inline-flex items-center gap-1"
+                className="h-8 px-2.5 rounded-full border border-accent-200 bg-white text-accent-700 text-xs font-medium inline-flex items-center gap-1"
               >
                 Search
                 <FiX className="h-3 w-3" />
@@ -305,7 +318,7 @@ const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setSelectedCategory("")}
-                className="h-7 px-2 rounded-full border border-accent-200 bg-white text-accent-700 text-[11px] font-medium inline-flex items-center gap-1"
+                className="h-8 px-2.5 rounded-full border border-accent-200 bg-white text-accent-700 text-xs font-medium inline-flex items-center gap-1"
               >
                 {selectedCategoryLabel || "Category"}
                 <FiX className="h-3 w-3" />
@@ -315,7 +328,7 @@ const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setSelectedPrice(DEFAULT_PRICE)}
-                className="h-7 px-2 rounded-full border border-accent-200 bg-white text-accent-700 text-[11px] font-medium inline-flex items-center gap-1"
+                className="h-8 px-2.5 rounded-full border border-accent-200 bg-white text-accent-700 text-xs font-medium inline-flex items-center gap-1"
               >
                 {selectedPriceLabel}
                 <FiX className="h-3 w-3" />
@@ -325,7 +338,7 @@ const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setSelectedRating(0)}
-                className="h-7 px-2 rounded-full border border-accent-200 bg-white text-accent-700 text-[11px] font-medium inline-flex items-center gap-1"
+                className="h-8 px-2.5 rounded-full border border-accent-200 bg-white text-accent-700 text-xs font-medium inline-flex items-center gap-1"
               >
                 {selectedRating}+ stars
                 <FiX className="h-3 w-3" />
@@ -336,7 +349,7 @@ const HomePage = () => {
       )}
 
       <div className="rounded-xl border border-primary-200 bg-primary-50/70 p-3">
-        <label className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 mb-1.5 block">
+        <label className="text-xs font-semibold uppercase tracking-wide text-primary-500 mb-1.5 block">
           Quick Search
         </label>
         <div className="relative">
@@ -352,14 +365,14 @@ const HomePage = () => {
       </div>
 
       <div className="rounded-xl border border-primary-200 bg-white p-3">
-        <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 mb-2.5">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-primary-500 mb-2.5">
           Category
         </h4>
         <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto pr-1 scrollbar-thin">
           <button
             type="button"
             onClick={() => setSelectedCategory("")}
-            className={`h-8 px-2.5 rounded-full text-xs font-medium border transition-colors ${
+            className={`h-9 px-2.5 rounded-full text-sm font-medium border transition-colors ${
               selectedCategory === ""
                 ? "bg-accent-100 text-accent-700 border-accent-200"
                 : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
@@ -372,7 +385,7 @@ const HomePage = () => {
               key={cat._id}
               type="button"
               onClick={() => setSelectedCategory(cat._id)}
-              className={`h-8 px-2.5 rounded-full text-xs font-medium border transition-colors ${
+              className={`h-9 px-2.5 rounded-full text-sm font-medium border transition-colors ${
                 selectedCategory === cat._id
                   ? "bg-accent-100 text-accent-700 border-accent-200"
                   : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
@@ -385,14 +398,14 @@ const HomePage = () => {
       </div>
 
       <div className="rounded-xl border border-primary-200 bg-white p-3">
-        <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 mb-2.5">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-primary-500 mb-2.5">
           Budget Range
         </h4>
         <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1 scrollbar-thin">
           <button
             type="button"
             onClick={() => setSelectedPrice(DEFAULT_PRICE)}
-            className={`w-full h-8.5 rounded-lg border text-xs font-medium text-left px-3 transition-colors ${
+            className={`w-full h-9 rounded-lg border text-sm font-medium text-left px-3 transition-colors ${
               isPriceActive(DEFAULT_PRICE)
                 ? "bg-accent-100 text-accent-700 border-accent-200"
                 : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
@@ -405,7 +418,7 @@ const HomePage = () => {
               key={price._id}
               type="button"
               onClick={() => setSelectedPrice(price.array)}
-              className={`w-full h-8.5 rounded-lg border text-xs font-medium text-left px-3 transition-colors ${
+              className={`w-full h-9 rounded-lg border text-sm font-medium text-left px-3 transition-colors ${
                 isPriceActive(price.array)
                   ? "bg-accent-100 text-accent-700 border-accent-200"
                   : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
@@ -418,14 +431,14 @@ const HomePage = () => {
       </div>
 
       <div className="rounded-xl border border-primary-200 bg-white p-3">
-        <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 mb-2.5">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-primary-500 mb-2.5">
           Customer Rating
         </h4>
         <div className="space-y-1.5">
           <button
             type="button"
             onClick={() => setSelectedRating(0)}
-            className={`w-full h-8.5 rounded-lg border text-xs font-medium text-left px-3 transition-colors ${
+            className={`w-full h-9 rounded-lg border text-sm font-medium text-left px-3 transition-colors ${
               selectedRating === 0
                 ? "bg-accent-100 text-accent-700 border-accent-200"
                 : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
@@ -438,7 +451,7 @@ const HomePage = () => {
               key={rating}
               type="button"
               onClick={() => setSelectedRating(rating)}
-              className={`w-full h-8.5 rounded-lg border text-xs font-medium px-3 transition-colors inline-flex items-center justify-between ${
+              className={`w-full h-9 rounded-lg border text-sm font-medium px-3 transition-colors inline-flex items-center justify-between ${
                 selectedRating === rating
                   ? "bg-accent-100 text-accent-700 border-accent-200"
                   : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
@@ -446,7 +459,7 @@ const HomePage = () => {
             >
               <span className="inline-flex items-center gap-0.5">
                 {[...Array(rating)].map((_, i) => (
-                  <FiStar key={i} className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                  <FiStar key={i} className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
                 ))}
               </span>
               <span>{rating}+</span>
@@ -632,15 +645,15 @@ const HomePage = () => {
             {/* Desktop sidebar */}
             <aside
               className={`hidden lg:block transition-all duration-300 ${
-                sidebarCollapsed ? "w-[84px]" : "w-72"
+                sidebarCollapsed ? "w-[90px]" : "w-[18.5rem] xl:w-[19.5rem]"
               }`}
             >
               <div className="sticky top-20 rounded-2xl border border-primary-200 bg-white shadow-sm overflow-hidden max-h-[calc(100vh-6rem)] flex flex-col">
                 <div className={`h-16 border-b border-primary-100 px-3 pt-3 ${sidebarCollapsed ? "justify-center" : "justify-between"} flex items-center`}>
                   {!sidebarCollapsed && (
                     <div className="min-w-0 py-0.5">
-                      <h3 className="text-sm font-semibold text-accent-700">Filters</h3>
-                      <p className="text-xs text-primary-500">
+                      <h3 className="text-base font-semibold text-accent-700">Filters</h3>
+                      <p className="text-sm text-primary-500">
                         {activeFiltersCount > 0 ? (
                           <span className="inline-flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
@@ -678,7 +691,7 @@ const HomePage = () => {
                     <button
                       type="button"
                       onClick={handleResetFilters}
-                      className="w-full h-10 rounded-lg border border-primary-200 bg-primary-50 text-primary-700 text-xs font-semibold"
+                      className="w-full h-10 rounded-lg border border-primary-200 bg-primary-50 text-primary-700 text-sm font-semibold"
                       title="Reset filters"
                     >
                       Clear
@@ -754,7 +767,7 @@ const HomePage = () => {
 
               {displayProducts.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+                  <div className="catalog-grid">
                     {displayProducts.map((p) => {
                       const rating = getProductRating(p);
                       return (

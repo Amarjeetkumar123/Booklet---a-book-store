@@ -97,3 +97,10 @@
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: #c19a6b;
 }
+
+/* Responsive product grid: prevents overly wide cards on large screens */
+.catalog-grid {
+  display: grid;
+  gap: 0.875rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/cart";
 import { useWishlist } from "../context/wishlist";
 import { useLocationContext } from "../context/location";
+import { useConfirm } from "../context/confirm";
 import axios from "../config/axios";
 import toast from "react-hot-toast";
 import Layout from "./../components/Layout/Layout";
@@ -41,6 +42,7 @@ const HomePage = () => {
   const [cart, setCart] = useCart();
   const [wishlist, setWishlist] = useWishlist();
   const { selectedLocation, selectedLocationLabel } = useLocationContext();
+  const confirm = useConfirm();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
 
@@ -261,9 +263,18 @@ const HomePage = () => {
     setSortBy("newest");
   };
 
-  const toggleWishlist = (product) => {
+  const toggleWishlist = async (product) => {
     const existingItem = wishlist.find((item) => item._id === product._id);
     if (existingItem) {
+      const shouldRemove = await confirm({
+        title: "Remove from wishlist?",
+        message: `Remove "${product?.name || "this product"}" from your wishlist?`,
+        confirmText: "Remove",
+        cancelText: "Keep",
+        tone: "danger",
+      });
+      if (!shouldRemove) return;
+
       setWishlist(wishlist.filter((item) => item._id !== product._id));
       toast.success("Removed from wishlist");
     } else {

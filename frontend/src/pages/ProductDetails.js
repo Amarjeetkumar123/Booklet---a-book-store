@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/cart";
 import { useWishlist } from "../context/wishlist";
 import { useLocationContext } from "../context/location";
+import { useConfirm } from "../context/confirm";
 import toast from "react-hot-toast";
 import { FiShoppingCart, FiTag, FiPackage, FiArrowLeft, FiHeart, FiMinus, FiPlus, FiStar, FiTruck, FiShield, FiRefreshCw, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { isProductAvailableInLocation } from "../utils/locationUtils";
@@ -14,6 +15,7 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useCart();
   const [wishlist, setWishlist] = useWishlist();
+  const confirm = useConfirm();
   const [product, setProduct] = useState(null);
   const { selectedLocation, selectedLocationLabel } = useLocationContext();
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -137,9 +139,18 @@ const ProductDetails = () => {
     toast.success(`${quantity} item${quantity > 1 ? 's' : ''} added to cart`);
   };
 
-  const handleWishlistToggle = (prod = product) => {
+  const handleWishlistToggle = async (prod = product) => {
     const existingItem = wishlist.find(item => item._id === prod._id);
     if (existingItem) {
+      const shouldRemove = await confirm({
+        title: "Remove from wishlist?",
+        message: `Remove "${prod?.name || "this product"}" from your wishlist?`,
+        confirmText: "Remove",
+        cancelText: "Keep",
+        tone: "danger",
+      });
+      if (!shouldRemove) return;
+
       setWishlist(wishlist.filter(item => item._id !== prod._id));
       toast.success("Removed from wishlist");
     } else {

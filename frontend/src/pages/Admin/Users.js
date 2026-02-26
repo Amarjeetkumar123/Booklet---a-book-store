@@ -29,6 +29,7 @@ import {
   normalizeRole,
 } from "../../utils/roleUtils";
 import { useAuth } from "../../context/auth";
+import { useConfirm } from "../../context/confirm";
 
 const roleBadgeStyles = {
   [ROLE.SUPERADMIN]:
@@ -50,6 +51,7 @@ const initialFormState = {
 
 const Users = () => {
   const [auth] = useAuth();
+  const confirm = useConfirm();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -223,7 +225,14 @@ const Users = () => {
       return;
     }
 
-    const confirmed = window.confirm("Are you sure you want to delete this user?");
+    const userToDelete = users.find((user) => user._id === uid);
+    const confirmed = await confirm({
+      title: "Delete user?",
+      message: `Delete "${userToDelete?.name || "this user"}"? This action cannot be undone.`,
+      confirmText: "Delete User",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
     if (!confirmed) return;
 
     try {

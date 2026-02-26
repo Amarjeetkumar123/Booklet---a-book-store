@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import axios from "../../config/axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { getApiErrorMessage } from "../../utils/errorUtils";
+import { useConfirm } from "../../context/confirm";
 import {
   FiEdit3,
   FiFileText,
@@ -24,6 +25,7 @@ const FALLBACK_IMAGE = "https://placehold.co/600x400/f5f0e8/826b4d?text=No+Image
 const UpdateProduct = () => {
   const navigate = useNavigate();
   const params = useParams();
+  const confirm = useConfirm();
   const fileInputRef = useRef(null);
 
   const [categories, setCategories] = useState([]);
@@ -283,7 +285,13 @@ const UpdateProduct = () => {
 
   const handleDelete = async () => {
     try {
-      const answer = window.confirm("Are you sure you want to delete this product?");
+      const answer = await confirm({
+        title: "Delete product permanently?",
+        message: `Delete "${name || "this product"}"? This action cannot be undone.`,
+        confirmText: "Delete Product",
+        cancelText: "Cancel",
+        tone: "danger",
+      });
       if (!answer) return;
 
       await axios.delete(`/api/v1/product/delete-product/${id}`);

@@ -22,6 +22,7 @@ import {
 import axios from "../config/axios";
 import toast from "react-hot-toast";
 import { isProductAvailableInLocation } from "../utils/locationUtils";
+import { useConfirm } from "../context/confirm";
 
 const RAZORPAY_SCRIPT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 let razorpayScriptPromise;
@@ -141,6 +142,7 @@ const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const [checkoutReady, setCheckoutReady] = useState(false);
   const [selectedPaymentOption, setSelectedPaymentOption] = useState("all");
+  const confirm = useConfirm();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -197,14 +199,35 @@ const CartPage = () => {
     localStorage.setItem("cart", JSON.stringify(nextCart));
   };
 
-  const clearCart = () => {
+  const clearCart = async () => {
+    if (!cart.length) return;
+    const shouldClear = await confirm({
+      title: "Clear cart?",
+      message: "This will remove all products from your cart.",
+      confirmText: "Clear Cart",
+      cancelText: "Keep Items",
+      tone: "danger",
+    });
+    if (!shouldClear) return;
+
     persistCart([]);
     toast.success("Cart cleared");
   };
 
-  const removeCartItem = (pid) => {
+  const removeCartItem = async (product) => {
+    if (!product?._id) return;
+
+    const shouldRemove = await confirm({
+      title: "Remove from cart?",
+      message: `Remove "${product?.name || "this product"}" from your cart?`,
+      confirmText: "Remove",
+      cancelText: "Cancel",
+      tone: "danger",
+    });
+    if (!shouldRemove) return;
+
     try {
-      const nextCart = cart.filter((item) => item._id !== pid);
+      const nextCart = cart.filter((item) => item._id !== product._id);
       persistCart(nextCart);
       toast.success("Item removed from cart");
     } catch (error) {
@@ -507,7 +530,7 @@ const CartPage = () => {
                           {formatCurrency(product.price * product.qty)}
                         </p>
                         <button
-                          onClick={() => removeCartItem(product._id)}
+                          onClick={() => removeCartItem(product)}
                           className="h-8 w-8 rounded-md border border-red-200 text-red-600 hover:bg-red-50 inline-flex items-center justify-center"
                           title="Remove item"
                         >

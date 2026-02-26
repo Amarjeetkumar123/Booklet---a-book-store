@@ -7,20 +7,37 @@ import { useLocationContext } from "../context/location";
 import toast from "react-hot-toast";
 import { FiTrash2, FiShoppingCart, FiArrowLeft, FiEye } from "react-icons/fi";
 import { isProductAvailableInLocation } from "../utils/locationUtils";
+import { useConfirm } from "../context/confirm";
 
 const WishlistPage = () => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useWishlist();
   const [cart, setCart] = useCart();
   const { selectedLocation, selectedLocationLabel } = useLocationContext();
+  const confirm = useConfirm();
 
-  const removeFromWishlist = (productId) => {
+  const removeFromWishlist = async (
+    productId,
+    { skipConfirm = false, silent = false, productName = "this product" } = {}
+  ) => {
+    if (!skipConfirm) {
+      const shouldRemove = await confirm({
+        title: "Remove from wishlist?",
+        message: `Remove "${productName}" from your wishlist?`,
+        confirmText: "Remove",
+        cancelText: "Keep",
+        tone: "danger",
+      });
+      if (!shouldRemove) return false;
+    }
+
     const updatedWishlist = wishlist.filter((item) => item._id !== productId);
     setWishlist(updatedWishlist);
-    toast.success("Removed from wishlist");
+    if (!silent) toast.success("Removed from wishlist");
+    return true;
   };
 
-  const addToCart = (product) => {
+  const addToCart = async (product) => {
     if (!isProductAvailableInLocation(product, selectedLocation)) {
       toast.error(`Not available in ${selectedLocationLabel}`);
       return;
@@ -31,7 +48,11 @@ const WishlistPage = () => {
       toast.error("Product already in cart");
     } else {
       setCart([...cart, product]);
-      removeFromWishlist(product._id);
+      await removeFromWishlist(product._id, {
+        skipConfirm: true,
+        silent: true,
+        productName: product?.name,
+      });
       toast.success("Added to cart");
     }
   };
@@ -182,7 +203,11 @@ const WishlistPage = () => {
                           <span className="hidden sm:inline">Cart</span>
                         </button>
                         <button
-                          onClick={() => removeFromWishlist(product._id)}
+                          onClick={() =>
+                            removeFromWishlist(product._id, {
+                              productName: product?.name,
+                            })
+                          }
                           className="bg-red-50 text-red-600 px-1.5 py-2 rounded-lg hover:bg-red-100 transition-all font-semibold text-xs border border-red-200 flex items-center justify-center gap-0.5 whitespace-nowrap h-8 group"
                         >
                           <FiTrash2 className="w-3.5 h-3.5 flex-shrink-0 group-hover:scale-110 transition-transform" />

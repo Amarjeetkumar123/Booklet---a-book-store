@@ -9,6 +9,7 @@ import Layout from "./../components/Layout/Layout";
 import {
   FiBook,
   FiChevronDown,
+  FiChevronLeft,
   FiChevronRight,
   FiEye,
   FiFilter,
@@ -47,6 +48,8 @@ const HomePage = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [heroBookIndex, setHeroBookIndex] = useState(0);
+  const [pauseHeroAutoSlide, setPauseHeroAutoSlide] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -92,6 +95,18 @@ const HomePage = () => {
   }, [searchQuery, selectedCategory, selectedPrice, selectedRating]);
 
   const featuredProducts = useMemo(() => products.slice(0, 4), [products]);
+  const rotatedHeroBooks = useMemo(() => {
+    const total = featuredProducts.length;
+    if (!total) return [];
+
+    return Array.from({ length: total }, (_, index) => {
+      return featuredProducts[(heroBookIndex + index) % total];
+    });
+  }, [featuredProducts, heroBookIndex]);
+  const heroPrimaryBook = rotatedHeroBooks[0];
+  const heroPreviousBook =
+    rotatedHeroBooks.length > 1 ? rotatedHeroBooks[rotatedHeroBooks.length - 1] : null;
+  const heroNextBook = rotatedHeroBooks.length > 1 ? rotatedHeroBooks[1] : null;
 
   const getAllCategory = async () => {
     try {
@@ -127,6 +142,25 @@ const HomePage = () => {
     getAllProducts(selectedLocation);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLocation]);
+
+  useEffect(() => {
+    if (!featuredProducts.length) {
+      setHeroBookIndex(0);
+      return;
+    }
+
+    setHeroBookIndex((prevIndex) => prevIndex % featuredProducts.length);
+  }, [featuredProducts.length]);
+
+  useEffect(() => {
+    if (pauseHeroAutoSlide || featuredProducts.length < 2) return undefined;
+
+    const heroSlideTimer = setInterval(() => {
+      setHeroBookIndex((prevIndex) => (prevIndex + 1) % featuredProducts.length);
+    }, 5000);
+
+    return () => clearInterval(heroSlideTimer);
+  }, [featuredProducts.length, pauseHeroAutoSlide]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -612,26 +646,164 @@ const HomePage = () => {
             </div>
 
             <div className="lg:col-span-5">
-              <div className="grid grid-cols-2 gap-3">
-                {featuredProducts.slice(0, 4).map((book) => (
-                  <button
-                    key={book._id}
-                    onClick={() => navigate(`/product/${book.slug}`)}
-                    className="group text-left rounded-2xl border border-primary-200 bg-white p-2 shadow-sm hover:shadow-md transition-all"
-                  >
-                    <div className="h-40 sm:h-44 rounded-xl overflow-hidden bg-primary-50">
-                      <img
-                        src={book.imageUrl || book.imageUrls?.[0] || "https://placehold.co/320x420/f5f0e8/826b4d?text=Book"}
-                        alt={book.name}
-                        className="w-full h-full object-contain p-2 transition-transform duration-300"
-                      />
+              <div
+                className="mx-auto w-full max-w-[700px]"
+                onMouseEnter={() => setPauseHeroAutoSlide(true)}
+                onMouseLeave={() => setPauseHeroAutoSlide(false)}
+              >
+                {heroPrimaryBook ? (
+                  <div className="space-y-3">
+                    <div className="relative h-[360px] sm:h-[440px] overflow-hidden">
+                      <div className="absolute inset-x-8 sm:inset-x-10 inset-y-3 rounded-[2.1rem] bg-gradient-to-br from-white/72 via-primary-50/58 to-accent-100/56" />
+                      <div className="absolute inset-x-20 top-8 h-32 rounded-full bg-accent-200/40 blur-3xl" />
+
+                      {heroPreviousBook && (
+                        <button
+                          type="button"
+                          onClick={() => setHeroBookIndex((prevIndex) => (prevIndex - 1 + featuredProducts.length) % featuredProducts.length)}
+                          aria-label="Show previous featured book"
+                          className="absolute left-3 sm:left-5 top-1/2 z-10 w-[30%] max-w-[160px] -translate-y-1/2 text-left opacity-70 transition-opacity hover:opacity-95"
+                        >
+                          <div className="hero-side-frame rounded-2xl bg-white/85 p-1.5 shadow-[0_12px_26px_-22px_rgba(37,31,23,0.9)]">
+                            <div className="aspect-[2/3] overflow-hidden rounded-xl bg-primary-50">
+                              <img
+                                src={heroPreviousBook.imageUrl || heroPreviousBook.imageUrls?.[0] || "https://placehold.co/280x420/f5f0e8/826b4d?text=Book"}
+                                alt={heroPreviousBook.name}
+                                className="h-full w-full object-contain p-2"
+                              />
+                            </div>
+                          </div>
+                        </button>
+                      )}
+
+                      {heroNextBook && (
+                        <button
+                          type="button"
+                          onClick={() => setHeroBookIndex((prevIndex) => (prevIndex + 1) % featuredProducts.length)}
+                          aria-label="Show next featured book"
+                          className="absolute right-3 sm:right-5 top-1/2 z-10 w-[30%] max-w-[160px] -translate-y-1/2 text-left opacity-70 transition-opacity hover:opacity-95"
+                        >
+                          <div className="hero-side-frame rounded-2xl bg-white/85 p-1.5 shadow-[0_12px_26px_-22px_rgba(37,31,23,0.9)]">
+                            <div className="aspect-[2/3] overflow-hidden rounded-xl bg-primary-50">
+                              <img
+                                src={heroNextBook.imageUrl || heroNextBook.imageUrls?.[0] || "https://placehold.co/280x420/f5f0e8/826b4d?text=Book"}
+                                alt={heroNextBook.name}
+                                className="h-full w-full object-contain p-2"
+                              />
+                            </div>
+                          </div>
+                        </button>
+                      )}
+
+                      <button
+                        key={`hero-primary-${heroPrimaryBook._id}-${heroBookIndex}`}
+                        onClick={() => navigate(`/product/${heroPrimaryBook.slug}`)}
+                        className="group absolute left-1/2 top-1/2 z-20 w-[48%] min-w-[180px] max-w-[270px] -translate-x-1/2 -translate-y-1/2 text-center"
+                      >
+                        <div className="hero-main-frame rounded-[1.7rem] bg-white/95 p-2.5 shadow-[0_22px_46px_-30px_rgba(37,31,23,0.9)]">
+                          <div className="aspect-[2/3] overflow-hidden rounded-[1.4rem] bg-primary-50">
+                            <img
+                              src={heroPrimaryBook.imageUrl || heroPrimaryBook.imageUrls?.[0] || "https://placehold.co/320x420/f5f0e8/826b4d?text=Book"}
+                              alt={heroPrimaryBook.name}
+                              className="h-full w-full object-contain p-3.5 sm:p-4"
+                            />
+                          </div>
+                        </div>
+                      </button>
+
+                      {featuredProducts.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setHeroBookIndex(
+                                (prevIndex) =>
+                                  (prevIndex - 1 + featuredProducts.length) % featuredProducts.length
+                              )
+                            }
+                            aria-label="Show previous featured book"
+                            className="absolute left-2 sm:left-3 top-1/2 z-30 -translate-y-1/2 h-10 w-10 rounded-full bg-white/95 text-primary-700 shadow-sm transition-colors hover:bg-white"
+                          >
+                            <FiChevronLeft className="mx-auto h-4.5 w-4.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setHeroBookIndex(
+                                (prevIndex) => (prevIndex + 1) % featuredProducts.length
+                              )
+                            }
+                            aria-label="Show next featured book"
+                            className="absolute right-2 sm:right-3 top-1/2 z-30 -translate-y-1/2 h-10 w-10 rounded-full bg-white/95 text-primary-700 shadow-sm transition-colors hover:bg-white"
+                          >
+                            <FiChevronRight className="mx-auto h-4.5 w-4.5" />
+                          </button>
+                        </>
+                      )}
                     </div>
-                    <div className="pt-2 px-1">
-                      <p className="text-xs text-primary-500 truncate">{getProductCategoryName(book)}</p>
-                      <p className="text-sm font-semibold text-primary-900 truncate">{book.name}</p>
+
+                    <div className="mt-3 px-0.5">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-500">
+                        {getProductCategoryName(heroPrimaryBook)}
+                      </p>
+                      <p className="mt-1 text-sm sm:text-base font-semibold text-primary-900 line-clamp-2">
+                        {heroPrimaryBook.name}
+                      </p>
                     </div>
-                  </button>
-                ))}
+
+                    {featuredProducts.length > 1 && (
+                      <>
+                        <div className="mt-3 grid grid-cols-4 gap-2.5">
+                          {featuredProducts.map((book, index) => {
+                            const isActive = index === heroBookIndex;
+                            return (
+                              <button
+                                key={`hero-thumb-${book._id}`}
+                                type="button"
+                                onClick={() => setHeroBookIndex(index)}
+                                aria-label={`Show featured book ${index + 1}`}
+                                className={`h-[82px] rounded-xl overflow-hidden transition-all ${
+                                  isActive
+                                    ? "ring-2 ring-accent-500 shadow-sm"
+                                    : "opacity-80 hover:opacity-100 ring-1 ring-primary-200"
+                                }`}
+                              >
+                                <img
+                                  src={book.imageUrl || book.imageUrls?.[0] || "https://placehold.co/180x240/f5f0e8/826b4d?text=Book"}
+                                  alt={book.name}
+                                  className="h-full w-full object-contain bg-white p-1.5"
+                                />
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <div className="mt-3 flex items-center justify-center gap-2">
+                          {featuredProducts.map((book, index) => {
+                            const isActive = index === heroBookIndex;
+                            return (
+                              <button
+                                key={`hero-dot-${book._id}`}
+                                type="button"
+                                onClick={() => setHeroBookIndex(index)}
+                                aria-label={`Show featured book ${index + 1}`}
+                                className={`h-2.5 rounded-full transition-all ${
+                                  isActive
+                                    ? "w-7 bg-accent-500"
+                                    : "w-2.5 bg-primary-300 hover:bg-primary-400"
+                                }`}
+                              />
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-primary-200 bg-white p-8 text-center text-sm text-primary-600">
+                    Featured books will appear here.
+                  </div>
+                )}
               </div>
             </div>
           </div>

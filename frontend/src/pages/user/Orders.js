@@ -157,7 +157,7 @@ const Orders = () => {
 
   return (
     <Layout title={"Your Orders - Booklet"}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:h-[calc(100vh-4rem)]">
+      <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-6 lg:h-[calc(100vh-4rem)]">
         <div className="grid grid-cols-1 lg:grid-cols-[auto,1fr] gap-5 lg:gap-6 items-start lg:h-full">
           <div>
             <UserMenu />

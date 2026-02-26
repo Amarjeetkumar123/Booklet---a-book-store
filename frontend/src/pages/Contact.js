@@ -95,7 +95,7 @@ const Contact = () => {
     <Layout title={"Contact Us - Booklet"}>
       <div className="pt-24 pb-14 min-h-screen bg-gradient-to-b from-primary-50 via-white to-primary-50">
         <section className="bg-gradient-to-r from-primary-900 via-primary-800 to-accent-700 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-10 sm:py-12">
             <h1 className="text-3xl sm:text-4xl font-bold">Contact Booklet</h1>
             <p className="mt-2 text-sm sm:text-base text-primary-100 max-w-2xl">
               Questions about orders, payments, or recommendations? Reach out and our
@@ -104,7 +104,7 @@ const Contact = () => {
           </div>
         </section>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 sm:py-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-5 space-y-4">
               {contactCards.map((card) => {

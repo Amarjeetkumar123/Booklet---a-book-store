@@ -26,7 +26,7 @@ const SearchInput = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-lg">
+    <form onSubmit={handleSubmit} className="w-full">
       <div className="relative flex items-center">
         <input
           type="search"

@@ -486,7 +486,7 @@ const HomePage = () => {
         <div className="absolute -top-24 -left-20 h-72 w-72 rounded-full bg-primary-100/70 blur-3xl" />
         <div className="absolute -bottom-16 -right-20 h-72 w-72 rounded-full bg-accent-100/70 blur-3xl" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative z-10">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 md:py-16 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-accent-200 bg-accent-50 px-3 py-1.5 text-xs font-semibold text-accent-700">
@@ -627,7 +627,7 @@ const HomePage = () => {
 
       {/* Main Content */}
       <section className="bg-primary-50 pt-8 pb-24 md:pt-10 md:pb-10 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="flex gap-5">
             {/* Desktop sidebar */}
             <aside

@@ -75,7 +75,7 @@ const WishlistPage = () => {
   return (
     <Layout title={"Your Wishlist"}>
       <div className="pt-24 pb-16 bg-gradient-to-br from-primary-50 via-white to-accent-50 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
           {/* Header */}
           <div className="mb-12">
             <button

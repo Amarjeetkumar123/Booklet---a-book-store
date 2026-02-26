@@ -110,7 +110,7 @@ const About = () => {
   return (
     <Layout title={"About Us - Booklet"}>
       <div className="pt-24 pb-14 min-h-screen bg-gradient-to-b from-primary-50 via-white to-primary-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
             <div className="lg:col-span-7 rounded-2xl border border-primary-200 bg-white shadow-sm p-5 sm:p-7">
               <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full border border-accent-200 bg-accent-50 text-accent-700 text-xs font-semibold">

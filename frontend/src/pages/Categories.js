@@ -52,7 +52,7 @@ const Categories = () => {
         <div className="absolute -top-16 -left-20 h-72 w-72 rounded-full bg-primary-100/70 blur-3xl" />
         <div className="absolute -bottom-20 -right-16 h-72 w-72 rounded-full bg-accent-100/70 blur-3xl" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative z-10">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 md:py-16 relative z-10">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-accent-200 bg-accent-50 px-3 py-1.5 text-xs font-semibold text-accent-700">
               <FiGrid className="h-3.5 w-3.5" />
@@ -68,7 +68,7 @@ const Categories = () => {
               Discover curated sections and jump straight to the stories you love.
             </p>
 
-            <div className="mt-6 rounded-xl border border-primary-200 bg-white p-2 shadow-sm flex items-center gap-2 max-w-xl">
+            <div className="mt-6 rounded-xl border border-primary-200 bg-white p-2 shadow-sm flex items-center gap-2">
               <div className="relative flex-1">
                 <FiSearch className="h-4 w-4 text-primary-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -101,7 +101,7 @@ const Categories = () => {
 
       {/* Main Content */}
       <section className="min-h-screen bg-primary-50/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-10 md:py-12">
           {categories.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-2xl border border-primary-200 shadow-sm">
               <FiBook className="mx-auto w-16 h-16 text-primary-300 mb-4" />
@@ -163,7 +163,7 @@ const Categories = () => {
 
       {/* Bottom CTA */}
       <section className="bg-gradient-to-br from-accent-50 via-white to-primary-50 py-12 md:py-16 border-t border-primary-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="bg-white rounded-2xl border border-primary-200 p-7 md:p-10 text-center shadow-sm">
             <h2 className="text-2xl md:text-3xl font-bold text-primary-900 mb-3">
               Looking for something specific?

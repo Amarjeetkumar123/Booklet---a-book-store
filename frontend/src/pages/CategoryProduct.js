@@ -42,7 +42,7 @@ const CategoryProduct = () => {
       <div className="min-h-screen bg-white">
         {/* Header with Background */}
         <div className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-12 border-b border-primary-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
             {/* Back Button */}
             <button
               onClick={() => navigate(-1)}
@@ -71,7 +71,7 @@ const CategoryProduct = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12">
           {products?.length === 0 ? (
             <div className="text-center py-20">
               <div className="text-primary-200 text-7xl mb-4">📚</div>

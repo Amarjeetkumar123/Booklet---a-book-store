@@ -49,8 +49,8 @@ const Register = () => {
 
   return (
     <Layout title="Register - Booklet">
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 overflow-hidden rounded-3xl border border-primary-200 bg-white shadow-xl">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 py-8 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 flex items-center justify-center">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 overflow-hidden rounded-3xl border border-primary-200 bg-white shadow-xl">
           {/* Left panel */}
           <div className="hidden lg:flex flex-col justify-between bg-gradient-to-br from-accent-600 via-accent-500 to-primary-700 p-8 text-white">
             <div>

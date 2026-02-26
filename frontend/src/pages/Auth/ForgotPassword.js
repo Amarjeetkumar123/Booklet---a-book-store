@@ -41,8 +41,8 @@ const ForgotPassword = () => {
 
   return (
     <Layout title={"Forgot Password - Booklet"}>
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 py-10 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-        <div className="w-full max-w-xl rounded-3xl border border-primary-200 bg-white shadow-xl p-6 sm:p-8 lg:p-10">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 py-10 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 flex items-center justify-center">
+        <div className="w-full rounded-3xl border border-primary-200 bg-white shadow-xl p-6 sm:p-8 lg:p-10">
           <div className="text-center mb-6">
             <div className="mx-auto h-12 w-12 rounded-xl bg-accent-100 text-accent-700 border border-accent-200 flex items-center justify-center mb-3">
               <FiKey className="h-5 w-5" />

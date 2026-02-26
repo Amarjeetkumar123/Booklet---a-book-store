@@ -385,7 +385,7 @@ const CartPage = () => {
         <div className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-accent-100/60 blur-3xl" />
         <div className="absolute -bottom-28 -right-20 h-72 w-72 rounded-full bg-primary-100/80 blur-3xl" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-3">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 relative z-10 mt-3">
           <div className="mb-3 sm:mb-4">
             <div className="flex items-end justify-between gap-3">
               <h1 className="text-xl sm:text-2xl font-bold text-primary-900 inline-flex items-center gap-2">
@@ -685,7 +685,7 @@ const CartPage = () => {
 
         {cartItems.length > 0 && (
           <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-primary-200 bg-white/95 backdrop-blur px-4 py-3 shadow-[0_-8px_28px_-16px_rgba(90,74,56,0.35)]">
-            <div className="max-w-7xl mx-auto flex items-center gap-3">
+            <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 flex items-center gap-3">
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] text-primary-500">
                   {itemCount} item{itemCount === 1 ? "" : "s"}{selectedLocationLabel ? ` • ${selectedLocationLabel}` : ""}

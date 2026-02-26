@@ -43,7 +43,7 @@ const Search = () => {
   return (
     <Layout title="Search results">
       <section className="bg-primary-50 min-h-screen py-6 sm:py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="rounded-2xl border border-primary-200 bg-white shadow-sm p-4 sm:p-6">
             <h1 className="text-xl sm:text-2xl font-bold text-primary-900 mb-1">
               Search Results

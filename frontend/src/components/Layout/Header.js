@@ -85,7 +85,7 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-primary-200 bg-white/95 backdrop-blur shadow-[0_6px_20px_rgba(85,67,43,0.08)]">
-      <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8">
+      <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         <div className="h-16 flex items-center justify-between gap-3">
           {/* Logo */}
           <Link to="/" className="no-underline flex items-center gap-2.5 shrink-0 group">

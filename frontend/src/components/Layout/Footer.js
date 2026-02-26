@@ -44,7 +44,7 @@ const Footer = () => {
       <div className="absolute -top-24 -left-20 h-64 w-64 rounded-full bg-primary-100/70 blur-3xl" />
       <div className="absolute -bottom-24 -right-20 h-64 w-64 rounded-full bg-accent-100/70 blur-3xl" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         {isHomePage && (
           <section className="pt-8 sm:pt-10">
             <div className="rounded-2xl border border-accent-200 bg-white/95 shadow-sm p-4 sm:p-5">

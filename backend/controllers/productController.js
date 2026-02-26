@@ -9,6 +9,10 @@ import {
   normalizeLocationKey,
   sanitizeServiceLocations,
 } from "../utils/locationUtils.js";
+import {
+  deleteImage,
+  getCloudinaryPublicIdFromUrl,
+} from "../utils/cloudinaryUtils.js";
 
 const normalizeImageUrls = (imageUrls, imageUrl) => {
   const parsedImageUrls = Array.isArray(imageUrls)
@@ -39,6 +43,42 @@ const getActiveServiceAreaKeySet = async () => {
     .find({ isActive: true })
     .select("key");
   return new Set(serviceAreas.map((area) => normalizeLocationKey(area.key)));
+};
+
+const collectProductImageUrls = (product) => {
+  const urls = [
+    ...(Array.isArray(product?.imageUrls) ? product.imageUrls : []),
+    product?.imageUrl,
+  ];
+
+  return Array.from(
+    new Set(
+      urls
+        .map((url) => (typeof url === "string" ? url.trim() : ""))
+        .filter(Boolean)
+    )
+  );
+};
+
+const deleteCloudinaryImagesSafely = async (imageUrls = []) => {
+  const failedImageDeletions = [];
+
+  for (const imageUrl of imageUrls) {
+    const publicId = getCloudinaryPublicIdFromUrl(imageUrl);
+    if (!publicId) continue;
+
+    try {
+      await deleteImage(publicId);
+    } catch (error) {
+      failedImageDeletions.push(imageUrl);
+      console.log(
+        `Cloudinary delete failed for URL: ${imageUrl}`,
+        error?.message || error
+      );
+    }
+  }
+
+  return failedImageDeletions;
 };
 
 export const createProductController = async (req, res) => {
@@ -159,10 +199,25 @@ export const getSingleProductController = async (req, res) => {
 //delete controller
 export const deleteProductController = async (req, res) => {
   try {
+    const existingProduct = await productModel
+      .findById(req.params.pid)
+      .select("imageUrl imageUrls");
+
+    if (!existingProduct) {
+      return res.status(404).send({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    const imageUrls = collectProductImageUrls(existingProduct);
     await productModel.findByIdAndDelete(req.params.pid);
+    const failedImageDeletions = await deleteCloudinaryImagesSafely(imageUrls);
+
     res.status(200).send({
       success: true,
-      message: "Product Deleted successfully",
+      message: "Product deleted successfully",
+      failedImageDeletions: failedImageDeletions.length,
     });
   } catch (error) {
     console.log(error);

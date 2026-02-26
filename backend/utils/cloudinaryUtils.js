@@ -95,7 +95,42 @@ const deleteImage = async (publicId) => {
   return await cloudinary.uploader.destroy(publicId);
 };
 
+const getCloudinaryPublicIdFromUrl = (url) => {
+  if (typeof url !== "string" || !url.trim()) return null;
+
+  try {
+    const parsedUrl = new URL(url.trim());
+    if (!parsedUrl.hostname.includes("res.cloudinary.com")) return null;
+
+    const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
+    const uploadIndex = pathParts.indexOf("upload");
+    if (uploadIndex === -1 || uploadIndex === pathParts.length - 1) return null;
+
+    let publicIdParts = pathParts.slice(uploadIndex + 1);
+    const versionIndex = publicIdParts.findIndex((part) => /^v\d+$/.test(part));
+    if (versionIndex >= 0) {
+      publicIdParts = publicIdParts.slice(versionIndex + 1);
+    }
+
+    if (!publicIdParts.length) return null;
+
+    const lastIndex = publicIdParts.length - 1;
+    publicIdParts[lastIndex] = publicIdParts[lastIndex].replace(/\.[^/.]+$/, "");
+
+    const publicId = publicIdParts.join("/").trim();
+    return publicId || null;
+  } catch (error) {
+    return null;
+  }
+};
+
 // ==============================
 // Export Everything
 // ==============================
-export { upload, uploadSingleImage, uploadMultipleImages, deleteImage };
+export {
+  upload,
+  uploadSingleImage,
+  uploadMultipleImages,
+  deleteImage,
+  getCloudinaryPublicIdFromUrl,
+};

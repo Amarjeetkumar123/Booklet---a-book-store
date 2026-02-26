@@ -659,7 +659,7 @@ const ProductDetails = () => {
                 <p className="mt-1 text-sm text-primary-500">New recommendations will appear here soon.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+              <div className="responsive-card-grid" style={{ gap: "2rem" }}>
                 {relatedProducts?.map((p) => {
                   const isRelatedWishlisted = wishlist.some((item) => item._id === p._id);
 

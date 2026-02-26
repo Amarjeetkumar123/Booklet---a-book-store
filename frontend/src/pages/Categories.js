@@ -131,7 +131,7 @@ const Categories = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+            <div className="responsive-card-grid">
               {filteredCategories.map((c) => (
                 <Link
                   key={c._id}

@@ -218,7 +218,7 @@ const Products = () => {
 
             {/* Product Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div className="responsive-card-grid">
                 {Array.from({ length: 6 }).map((_, idx) => (
                   <div key={idx} className="h-[280px] rounded-xl border border-primary-200 bg-white p-3 animate-pulse" />
                 ))}
@@ -234,7 +234,7 @@ const Products = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div className="responsive-card-grid">
                 {filteredProducts.map((p) => (
                   <Link
                     key={p._id}

@@ -234,6 +234,12 @@ textarea {
   overflow: hidden;
 }
 
+.responsive-card-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

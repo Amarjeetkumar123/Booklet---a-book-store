@@ -65,7 +65,7 @@ const Search = () => {
               </p>
             </div>
           ) : (
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="mt-5 responsive-card-grid">
               {results.map((product) => (
                 <article
                   key={product._id}

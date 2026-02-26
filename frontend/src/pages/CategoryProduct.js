@@ -89,7 +89,7 @@ const CategoryProduct = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="responsive-card-grid">
               {products?.map((p) => (
                 <div
                   key={p._id}

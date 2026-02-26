@@ -245,7 +245,7 @@ const Products = () => {
                       <div className="relative h-48 overflow-hidden bg-primary-50">
                         <img
                           src={p.imageUrl || p.imageUrls?.[0] || FALLBACK_IMAGE}
-                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="h-full w-full object-contain p-3 transition-transform duration-300"
                           alt={p.name}
                         />
                         <div className="absolute left-3 top-3 rounded-full bg-white/95 border border-primary-200 px-2.5 py-1 text-[11px] font-semibold text-primary-700">

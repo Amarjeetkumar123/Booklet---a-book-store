@@ -623,7 +623,7 @@ const HomePage = () => {
                       <img
                         src={book.imageUrl || book.imageUrls?.[0] || "https://placehold.co/320x420/f5f0e8/826b4d?text=Book"}
                         alt={book.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-contain p-2 transition-transform duration-300"
                       />
                     </div>
                     <div className="pt-2 px-1">
@@ -779,7 +779,7 @@ const HomePage = () => {
                             <img
                               src={p.imageUrl || p.imageUrls?.[0] || "https://placehold.co/300x400/f5f0e8/826b4d?text=No+Image"}
                               alt={p.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              className="w-full h-full object-contain p-3 transition-transform duration-300"
                               loading="lazy"
                             />
                             <div className="absolute top-2 left-2 rounded-full bg-white/95 border border-primary-200 px-2 py-0.5 text-[11px] font-semibold text-primary-700">

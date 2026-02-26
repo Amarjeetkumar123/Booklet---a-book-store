@@ -607,7 +607,7 @@ const CreateProduct = () => {
                           <img
                             src={url}
                             alt={`product preview ${index + 1}`}
-                            className="h-[120px] w-full object-cover"
+                            className="h-[120px] w-full object-contain p-1"
                           />
                         </div>
                       ))}

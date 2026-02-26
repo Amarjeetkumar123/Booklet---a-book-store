@@ -448,7 +448,7 @@ const CartPage = () => {
                           "https://placehold.co/120x160/f5f0e8/826b4d?text=No+Image"
                         }
                         alt={product.name}
-                        className="h-24 w-16 sm:h-28 sm:w-20 rounded-xl object-cover border border-primary-200 bg-primary-50"
+                        className="h-24 w-16 sm:h-28 sm:w-20 rounded-xl object-contain p-1 border border-primary-200 bg-primary-50"
                       />
 
                       <div className="flex-1 min-w-0">

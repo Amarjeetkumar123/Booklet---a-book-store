@@ -74,7 +74,7 @@ const Search = () => {
                   <img
                     src={product.imageUrl || "https://placehold.co/600x800/f5f0e8/826b4d?text=No+Image"}
                     alt={product.name}
-                    className="h-56 w-full object-cover bg-primary-50"
+                    className="h-56 w-full object-contain bg-primary-50 p-3"
                   />
 
                   <div className="p-4 flex flex-col gap-3 flex-1">

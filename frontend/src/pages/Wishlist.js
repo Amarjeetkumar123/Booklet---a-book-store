@@ -143,7 +143,7 @@ const WishlistPage = () => {
                           )}`
                         }
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-125 transition-transform duration-500"
+                        className="w-full h-full object-contain p-3 transition-transform duration-300"
                       />
                       <div className="absolute top-4 right-4 bg-gradient-to-r from-accent-500 to-accent-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
                         ₹{product.price}

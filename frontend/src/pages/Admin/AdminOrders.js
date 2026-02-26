@@ -613,7 +613,7 @@ const getDeliveryLocation = (order) =>
                                       "https://placehold.co/120x160?text=No+Image"
                                     }
                                     alt={p?.name}
-                                    className="h-full w-full object-cover"
+                                    className="h-full w-full object-contain p-1"
                                   />
                                 </div>
                                 <div className="min-w-0 flex-1">

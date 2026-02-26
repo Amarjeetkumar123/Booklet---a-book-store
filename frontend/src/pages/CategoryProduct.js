@@ -99,7 +99,7 @@ const CategoryProduct = () => {
                     <img
                       src={p.imageUrl || `https://placehold.co/300x400/f5f0e8/826b4d?text=${encodeURIComponent(p.name)}`}
                       alt={p.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-contain p-2 transition-transform duration-300"
                     />
                     <div className="absolute top-2 right-2 bg-accent-100 text-accent-700 px-2 py-1 rounded-full text-xs font-bold shadow-sm border border-accent-200">
                       ✨ New

@@ -16,6 +16,7 @@ import {
   FiXCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { formatAddressText } from "../../utils/addressUtils";
 
 const normalizeStatus = (status = "") => {
   const value = String(status).trim().toLowerCase();
@@ -111,6 +112,9 @@ const getDeliveryLocation = (order) =>
   order?.deliveryLocation ||
   order?.payment?.deliveryLocation ||
   "";
+
+const getDeliveryAddressText = (order) =>
+  formatAddressText(order?.shippingAddress || order?.payment?.deliveryAddress);
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -321,6 +325,9 @@ const Orders = () => {
                                 </p>
                                 <p className="mt-1 text-xs font-semibold text-primary-900 line-clamp-2">
                                   {getDeliveryLocation(order) || "Location not captured"}
+                                </p>
+                                <p className="mt-1 text-[11px] text-primary-500 line-clamp-2">
+                                  {getDeliveryAddressText(order) || "Address not captured"}
                                 </p>
                               </div>
                             </div>

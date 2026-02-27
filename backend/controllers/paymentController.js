@@ -2,6 +2,7 @@ import orderModel from "../models/orderModel.js";
 import crypto from "crypto";
 import productModel from "../models/productModel.js";
 import serviceAreaModel from "../models/serviceAreaModel.js";
+import { normalizeAddressPayload } from "../utils/addressUtils.js";
 import {
   isLocationSupportedByProduct,
   normalizeLocationKey,
@@ -41,6 +42,14 @@ const parseCustomerLocation = (customerLocation = {}) => ({
   latitude: toNumberOrNull(customerLocation?.latitude),
   longitude: toNumberOrNull(customerLocation?.longitude),
 });
+
+const validateDeliveryAddress = (deliveryAddressInput = {}) => {
+  const normalizedDeliveryAddress = normalizeAddressPayload(deliveryAddressInput);
+  if (!normalizedDeliveryAddress.line1) {
+    throw createHttpError("Please select a delivery address");
+  }
+  return normalizedDeliveryAddress;
+};
 
 const validateCartForLocation = async (
   cart = [],
@@ -204,7 +213,7 @@ const createRazorpayOrder = async (payload) => {
 // razorpay payment order creation
 export const createRazorpayOrderController = async (req, res) => {
   try {
-    const { cart, selectedLocation, customerLocation } = req.body;
+    const { cart, selectedLocation, customerLocation, deliveryAddress } = req.body;
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       return res.status(500).send({
@@ -212,6 +221,8 @@ export const createRazorpayOrderController = async (req, res) => {
         message: "Razorpay is not configured on server",
       });
     }
+
+    const normalizedDeliveryAddress = validateDeliveryAddress(deliveryAddress);
 
     const validatedCart = await validateCartForLocation(
       cart,
@@ -237,6 +248,8 @@ export const createRazorpayOrderController = async (req, res) => {
         items: String(validatedCart.orderItems.length),
         deliveryLocation: validatedCart.locationKey,
         deliveryPincode: validatedCart.locationPincode,
+        deliveryAddressLine1: normalizedDeliveryAddress.line1,
+        deliveryAddressPincode: normalizedDeliveryAddress.pincode || "",
       },
     });
 
@@ -262,6 +275,7 @@ export const verifyRazorpayPaymentController = async (req, res) => {
       cart,
       selectedLocation,
       customerLocation,
+      deliveryAddress,
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
@@ -309,6 +323,7 @@ export const verifyRazorpayPaymentController = async (req, res) => {
       selectedLocation,
       customerLocation
     );
+    const normalizedDeliveryAddress = validateDeliveryAddress(deliveryAddress);
 
     const order = await new orderModel({
       products: validatedCart.productIds,
@@ -325,12 +340,14 @@ export const verifyRazorpayPaymentController = async (req, res) => {
         deliveryLocationLabel: validatedCart.locationLabel,
         deliveryPincode: validatedCart.locationPincode,
         deliveryDistanceKm: validatedCart.distanceKm,
+        deliveryAddress: normalizedDeliveryAddress,
       },
       buyer: req.user._id,
       deliveryLocation: validatedCart.locationKey,
       deliveryLocationLabel: validatedCart.locationLabel,
       deliveryPincode: validatedCart.locationPincode,
       deliveryDistanceKm: validatedCart.distanceKm,
+      shippingAddress: normalizedDeliveryAddress,
     }).save();
 
     return res.status(200).send({

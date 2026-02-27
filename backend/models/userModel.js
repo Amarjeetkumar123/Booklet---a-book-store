@@ -1,6 +1,66 @@
 import mongoose from "mongoose";
 import { ROLE } from "../utils/roleUtils.js";
 
+const addressSchema = new mongoose.Schema(
+  {
+    fullName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    phone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    line1: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    line2: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    city: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    state: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    pincode: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    country: {
+      type: String,
+      trim: true,
+      default: "India",
+    },
+    landmark: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    addressType: {
+      type: String,
+      enum: ["home", "work", "other"],
+      default: "home",
+    },
+    isDefault: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  { _id: true }
+);
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -21,9 +81,19 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    address: {
-      type: {},
+    profileAddress: {
+      type: addressSchema,
       required: true,
+      default: () => ({}),
+    },
+    addresses: {
+      type: [addressSchema],
+      default: [],
+    },
+    address: {
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
+      default: "",
     },
     answer: {
       type: String,

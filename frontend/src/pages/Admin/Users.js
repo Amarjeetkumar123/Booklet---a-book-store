@@ -30,6 +30,11 @@ import {
 } from "../../utils/roleUtils";
 import { useAuth } from "../../context/auth";
 import { useConfirm } from "../../context/confirm";
+import {
+  createAddressPayload,
+  formatAddressText,
+  normalizeAddressForForm,
+} from "../../utils/addressUtils";
 
 const roleBadgeStyles = {
   [ROLE.SUPERADMIN]:
@@ -44,7 +49,14 @@ const initialFormState = {
   email: "",
   password: "",
   phone: "",
-  address: "",
+  addressLine1: "",
+  addressLine2: "",
+  addressCity: "",
+  addressState: "",
+  addressPincode: "",
+  addressCountry: "India",
+  addressLandmark: "",
+  addressType: "home",
   answer: "",
   role: ROLE.CUSTOMER,
 };
@@ -67,7 +79,14 @@ const Users = () => {
     name: "",
     email: "",
     phone: "",
-    address: "",
+    addressLine1: "",
+    addressLine2: "",
+    addressCity: "",
+    addressState: "",
+    addressPincode: "",
+    addressCountry: "India",
+    addressLandmark: "",
+    addressType: "home",
     answer: "",
     role: ROLE.CUSTOMER,
     password: "",
@@ -111,8 +130,23 @@ const Users = () => {
       return;
     }
 
-    const { name, email, password, phone, address, answer, role } = formState;
-    if (!name || !email || !password || !phone || !address || !answer) {
+    const {
+      name,
+      email,
+      password,
+      phone,
+      answer,
+      role,
+      addressLine1,
+      addressLine2,
+      addressCity,
+      addressState,
+      addressPincode,
+      addressCountry,
+      addressLandmark,
+      addressType,
+    } = formState;
+    if (!name || !email || !password || !phone || !addressLine1 || !answer) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -124,9 +158,27 @@ const Users = () => {
 
     try {
       setCreating(true);
+      const profileAddress = createAddressPayload({
+        fullName: name,
+        phone,
+        line1: addressLine1,
+        line2: addressLine2,
+        city: addressCity,
+        state: addressState,
+        pincode: addressPincode,
+        country: addressCountry,
+        landmark: addressLandmark,
+        addressType,
+        isDefault: true,
+      });
       const payload = {
-        ...formState,
+        name,
+        email,
+        password,
+        phone,
+        answer,
         role: Number(role),
+        profileAddress,
       };
 
       const { data } = await axios.post("/api/v1/auth/create-user", payload);
@@ -147,16 +199,30 @@ const Users = () => {
   };
 
   const startEditUser = (user) => {
+    const normalizedAddress = normalizeAddressForForm(
+      user?.profileAddress || user?.address,
+      {
+        fullName: user?.name || "",
+        phone: user?.phone || "",
+      }
+    );
     setEditingUserId(user._id);
-    setEditFormState({
-      name: user?.name || "",
-      email: user?.email || "",
-      phone: user?.phone || "",
-      address: user?.address || "",
-      answer: user?.answer || "",
-      role: normalizeRole(user?.role),
-      password: "",
-    });
+      setEditFormState({
+        name: user?.name || "",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        addressLine1: normalizedAddress.line1 || "",
+        addressLine2: normalizedAddress.line2 || "",
+        addressCity: normalizedAddress.city || "",
+        addressState: normalizedAddress.state || "",
+        addressPincode: normalizedAddress.pincode || "",
+        addressCountry: normalizedAddress.country || "India",
+        addressLandmark: normalizedAddress.landmark || "",
+        addressType: normalizedAddress.addressType || "home",
+        answer: user?.answer || "",
+        role: normalizeRole(user?.role),
+        password: "",
+      });
   };
 
   const cancelEditUser = () => {
@@ -165,7 +231,14 @@ const Users = () => {
       name: "",
       email: "",
       phone: "",
-      address: "",
+      addressLine1: "",
+      addressLine2: "",
+      addressCity: "",
+      addressState: "",
+      addressPincode: "",
+      addressCountry: "India",
+      addressLandmark: "",
+      addressType: "home",
       answer: "",
       role: ROLE.CUSTOMER,
       password: "",
@@ -185,8 +258,13 @@ const Users = () => {
       return;
     }
 
-    if (!editFormState.name || !editFormState.email || !editFormState.phone) {
-      toast.error("Name, email and phone are required");
+    if (
+      !editFormState.name ||
+      !editFormState.email ||
+      !editFormState.phone ||
+      !editFormState.addressLine1
+    ) {
+      toast.error("Name, email, phone and address line 1 are required");
       return;
     }
 
@@ -197,10 +275,32 @@ const Users = () => {
 
     try {
       setSavingEdit(true);
+      const profileAddress = createAddressPayload({
+        fullName: editFormState.name,
+        phone: editFormState.phone,
+        line1: editFormState.addressLine1,
+        line2: editFormState.addressLine2,
+        city: editFormState.addressCity,
+        state: editFormState.addressState,
+        pincode: editFormState.addressPincode,
+        country: editFormState.addressCountry,
+        landmark: editFormState.addressLandmark,
+        addressType: editFormState.addressType,
+        isDefault: true,
+      });
       const payload = {
         ...editFormState,
         role: Number(editFormState.role),
+        profileAddress,
       };
+      delete payload.addressLine1;
+      delete payload.addressLine2;
+      delete payload.addressCity;
+      delete payload.addressState;
+      delete payload.addressPincode;
+      delete payload.addressCountry;
+      delete payload.addressLandmark;
+      delete payload.addressType;
       const { data } = await axios.put(`/api/v1/auth/user/${uid}`, payload);
       if (data?.success) {
         toast.success(data?.message || "User updated successfully");
@@ -427,18 +527,91 @@ const Users = () => {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="space-y-3">
                     <label className="mb-1 text-xs font-semibold text-primary-600 inline-flex items-center gap-1">
                       <FiMapPin className="h-3.5 w-3.5" />
-                      Address
+                      Profile Address
                     </label>
                     <input
                       type="text"
-                      value={formState.address}
-                      onChange={(e) => handleInputChange("address", e.target.value)}
-                      placeholder="Enter address"
+                      value={formState.addressLine1}
+                      onChange={(e) =>
+                        handleInputChange("addressLine1", e.target.value)
+                      }
+                      placeholder="Address line 1 *"
                       className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
                     />
+                    <input
+                      type="text"
+                      value={formState.addressLine2}
+                      onChange={(e) =>
+                        handleInputChange("addressLine2", e.target.value)
+                      }
+                      placeholder="Address line 2"
+                      className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        value={formState.addressCity}
+                        onChange={(e) =>
+                          handleInputChange("addressCity", e.target.value)
+                        }
+                        placeholder="City"
+                        className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      />
+                      <input
+                        type="text"
+                        value={formState.addressState}
+                        onChange={(e) =>
+                          handleInputChange("addressState", e.target.value)
+                        }
+                        placeholder="State"
+                        className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        value={formState.addressPincode}
+                        onChange={(e) =>
+                          handleInputChange("addressPincode", e.target.value)
+                        }
+                        placeholder="Pincode"
+                        className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      />
+                      <input
+                        type="text"
+                        value={formState.addressCountry}
+                        onChange={(e) =>
+                          handleInputChange("addressCountry", e.target.value)
+                        }
+                        placeholder="Country"
+                        className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        value={formState.addressLandmark}
+                        onChange={(e) =>
+                          handleInputChange("addressLandmark", e.target.value)
+                        }
+                        placeholder="Landmark"
+                        className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      />
+                      <select
+                        value={formState.addressType}
+                        onChange={(e) =>
+                          handleInputChange("addressType", e.target.value)
+                        }
+                        className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      >
+                        <option value="home">Home</option>
+                        <option value="work">Work</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
@@ -529,7 +702,9 @@ const Users = () => {
 
                             <div className="min-w-0">
                               <p className="text-sm text-primary-700 truncate">{user.phone || "N/A"}</p>
-                              <p className="text-xs text-primary-500 truncate">{user.address || "No address"}</p>
+                              <p className="text-xs text-primary-500 truncate">
+                                {formatAddressText(user.profileAddress || user.address) || "No address"}
+                              </p>
                             </div>
 
                             <div>
@@ -635,13 +810,78 @@ const Users = () => {
                                 </select>
                                 <input
                                   type="text"
-                                  value={editFormState.address}
+                                  value={editFormState.addressLine1}
                                   onChange={(e) =>
-                                    handleEditInputChange("address", e.target.value)
+                                    handleEditInputChange("addressLine1", e.target.value)
                                   }
-                                  placeholder="Address"
-                                  className="h-9 rounded-md border border-primary-200 px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300 md:col-span-2"
+                                  placeholder="Address line 1 *"
+                                  className="h-9 rounded-md border border-primary-200 px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
                                 />
+                                <input
+                                  type="text"
+                                  value={editFormState.addressLine2}
+                                  onChange={(e) =>
+                                    handleEditInputChange("addressLine2", e.target.value)
+                                  }
+                                  placeholder="Address line 2"
+                                  className="h-9 rounded-md border border-primary-200 px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                                />
+                                <input
+                                  type="text"
+                                  value={editFormState.addressCity}
+                                  onChange={(e) =>
+                                    handleEditInputChange("addressCity", e.target.value)
+                                  }
+                                  placeholder="City"
+                                  className="h-9 rounded-md border border-primary-200 px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                                />
+                                <input
+                                  type="text"
+                                  value={editFormState.addressState}
+                                  onChange={(e) =>
+                                    handleEditInputChange("addressState", e.target.value)
+                                  }
+                                  placeholder="State"
+                                  className="h-9 rounded-md border border-primary-200 px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                                />
+                                <input
+                                  type="text"
+                                  value={editFormState.addressPincode}
+                                  onChange={(e) =>
+                                    handleEditInputChange("addressPincode", e.target.value)
+                                  }
+                                  placeholder="Pincode"
+                                  className="h-9 rounded-md border border-primary-200 px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                                />
+                                <input
+                                  type="text"
+                                  value={editFormState.addressCountry}
+                                  onChange={(e) =>
+                                    handleEditInputChange("addressCountry", e.target.value)
+                                  }
+                                  placeholder="Country"
+                                  className="h-9 rounded-md border border-primary-200 px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                                />
+                                <input
+                                  type="text"
+                                  value={editFormState.addressLandmark}
+                                  onChange={(e) =>
+                                    handleEditInputChange("addressLandmark", e.target.value)
+                                  }
+                                  placeholder="Landmark"
+                                  className="h-9 rounded-md border border-primary-200 px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                                />
+                                <select
+                                  value={editFormState.addressType}
+                                  onChange={(e) =>
+                                    handleEditInputChange("addressType", e.target.value)
+                                  }
+                                  className="h-9 rounded-md border border-primary-200 px-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent-300"
+                                >
+                                  <option value="home">Home</option>
+                                  <option value="work">Work</option>
+                                  <option value="other">Other</option>
+                                </select>
                                 <input
                                   type="text"
                                   value={editFormState.answer}

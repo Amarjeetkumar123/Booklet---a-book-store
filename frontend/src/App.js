@@ -25,6 +25,7 @@ import Categories from "./pages/Categories";
 import CategoryProduct from "./pages/CategoryProduct";
 import AdminOrders from "./pages/Admin/AdminOrders";
 import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
 import WishlistPage from "./pages/Wishlist";
 import ScrollToTop from "./components/ScrollToTop";
 import ServiceLocations from "./pages/Admin/ServiceLocations";
@@ -39,6 +40,7 @@ function App() {
         <Route path="/categories" element={<Categories />} />
 
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/category/:slug" element={<CategoryProduct />} />
         <Route path="/search" element={<Search />} />

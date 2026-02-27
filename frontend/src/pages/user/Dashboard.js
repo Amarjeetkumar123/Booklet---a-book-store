@@ -15,6 +15,7 @@ import {
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { getRoleLabel } from "../../utils/roleUtils";
+import { formatAddressText } from "../../utils/addressUtils";
 
 const Dashboard = () => {
   const [auth] = useAuth();
@@ -39,6 +40,9 @@ const Dashboard = () => {
         year: "numeric",
       })
     : "N/A";
+  const displayAddress = formatAddressText(
+    auth?.user?.profileAddress || auth?.user?.address
+  );
 
   return (
     <Layout title={"User Dashboard - Booklet"}>
@@ -101,7 +105,7 @@ const Dashboard = () => {
                       Address
                     </p>
                     <p className="mt-1 text-sm font-semibold text-primary-900 truncate">
-                      {auth?.user?.address || "Not Added"}
+                      {displayAddress || "Not Added"}
                     </p>
                   </div>
                 </div>
@@ -128,7 +132,7 @@ const Dashboard = () => {
                       <div className="flex items-start gap-2.5 text-sm">
                         <FiMapPin className="h-4 w-4 text-primary-500 shrink-0 mt-0.5" />
                         <span className="text-primary-700">
-                          {auth?.user?.address || "No address provided"}
+                          {displayAddress || "No address provided"}
                         </span>
                       </div>
                     </div>

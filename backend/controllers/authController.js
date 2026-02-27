@@ -4,10 +4,51 @@ import orderModel from "../models/orderModel.js";
 import { comparePassword, hashPassword } from "./../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
 import { ROLE, normalizeRoleInput } from "../utils/roleUtils.js";
+import { buildUserAddressState } from "../utils/addressUtils.js";
+
+const withNormalizedUserAddresses = (userInput) => {
+  const normalizedUser =
+    userInput && typeof userInput.toObject === "function"
+      ? userInput.toObject()
+      : { ...(userInput || {}) };
+
+  const addressState = buildUserAddressState({
+    fullName: normalizedUser?.name || "",
+    phone: normalizedUser?.phone || "",
+    profileAddress: normalizedUser?.profileAddress,
+    legacyAddress: normalizedUser?.address,
+    addresses: normalizedUser?.addresses,
+    existingProfileAddress: normalizedUser?.profileAddress,
+    existingLegacyAddress: normalizedUser?.address,
+    existingAddresses: normalizedUser?.addresses,
+  });
+
+  normalizedUser.profileAddress = addressState.profileAddress;
+  normalizedUser.address = addressState.address;
+  normalizedUser.addresses = addressState.addresses;
+
+  return normalizedUser;
+};
 
 export const registerController = async (req, res) => {
   try {
-    const { name, email, password, phone, address, answer } = req.body;
+    const {
+      name,
+      email,
+      password,
+      phone,
+      address,
+      profileAddress,
+      addresses,
+      answer,
+    } = req.body;
+    const addressState = buildUserAddressState({
+      fullName: name,
+      phone,
+      profileAddress: profileAddress !== undefined ? profileAddress : address,
+      legacyAddress: address,
+      addresses,
+    });
     //validations
     if (!name) {
       return res.send({ error: "Name is Required" });
@@ -21,7 +62,7 @@ export const registerController = async (req, res) => {
     if (!phone) {
       return res.send({ message: "Phone no is Required" });
     }
-    if (!address) {
+    if (!addressState.profileAddress.line1) {
       return res.send({ message: "Address is Required" });
     }
     if (!answer) {
@@ -43,7 +84,9 @@ export const registerController = async (req, res) => {
       name,
       email,
       phone,
-      address,
+      profileAddress: addressState.profileAddress,
+      addresses: addressState.addresses,
+      address: addressState.address,
       password: hashedPassword,
       answer,
       role: ROLE.CUSTOMER,
@@ -67,7 +110,24 @@ export const registerController = async (req, res) => {
 // admin create user with role
 export const createUserByAdminController = async (req, res) => {
   try {
-    const { name, email, password, phone, address, answer, role } = req.body;
+    const {
+      name,
+      email,
+      password,
+      phone,
+      address,
+      profileAddress,
+      addresses,
+      answer,
+      role,
+    } = req.body;
+    const addressState = buildUserAddressState({
+      fullName: name,
+      phone,
+      profileAddress: profileAddress !== undefined ? profileAddress : address,
+      legacyAddress: address,
+      addresses,
+    });
 
     if (!name) return res.status(400).send({ message: "Name is Required" });
     if (!email) return res.status(400).send({ message: "Email is Required" });
@@ -79,7 +139,7 @@ export const createUserByAdminController = async (req, res) => {
         .send({ message: "Password should be at least 6 characters" });
     }
     if (!phone) return res.status(400).send({ message: "Phone is Required" });
-    if (!address)
+    if (!addressState.profileAddress.line1)
       return res.status(400).send({ message: "Address is Required" });
     if (!answer)
       return res.status(400).send({ message: "Answer is Required" });
@@ -99,7 +159,9 @@ export const createUserByAdminController = async (req, res) => {
       name,
       email,
       phone,
-      address,
+      profileAddress: addressState.profileAddress,
+      addresses: addressState.addresses,
+      address: addressState.address,
       password: hashedPassword,
       answer,
       role: normalizedRole,
@@ -113,6 +175,8 @@ export const createUserByAdminController = async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        profileAddress: user.profileAddress,
+        addresses: user.addresses,
         address: user.address,
         role: user.role,
         createdAt: user.createdAt,
@@ -154,6 +218,8 @@ export const loginController = async (req, res) => {
         message: "Invalid Password",
       });
     }
+    const normalizedUser = withNormalizedUserAddresses(user);
+
     //token
     const token = await JWT.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
@@ -163,11 +229,13 @@ export const loginController = async (req, res) => {
       message: "login successfully",
       user: {
         _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        address: user.address,
-        role: user.role,
+        name: normalizedUser.name,
+        email: normalizedUser.email,
+        phone: normalizedUser.phone,
+        profileAddress: normalizedUser.profileAddress,
+        addresses: normalizedUser.addresses,
+        address: normalizedUser.address,
+        role: normalizedUser.role,
       },
       token,
     });
@@ -233,33 +301,100 @@ export const testController = (req, res) => {
 //update prfole
 export const updateProfileController = async (req, res) => {
   try {
-    const { name, email, password, address, phone } = req.body;
+    const {
+      name,
+      email,
+      password,
+      phone,
+      address,
+      profileAddress,
+      addresses,
+    } = req.body;
     const user = await userModel.findById(req.user._id);
     //password
     if (password && password.length < 6) {
       return res.json({ error: "Passsword is required and 6 character long" });
     }
+    const nextName = name || user.name;
+    const nextPhone = phone || user.phone;
+    const isAddressUpdateRequest =
+      address !== undefined ||
+      profileAddress !== undefined ||
+      addresses !== undefined;
+    const addressState = buildUserAddressState({
+      fullName: nextName,
+      phone: nextPhone,
+      profileAddress:
+        profileAddress !== undefined
+          ? profileAddress
+          : address !== undefined
+            ? address
+            : user.profileAddress,
+      legacyAddress: address !== undefined ? address : user.address,
+      addresses: addresses !== undefined ? addresses : user.addresses,
+      existingProfileAddress: user.profileAddress,
+      existingLegacyAddress: user.address,
+      existingAddresses: user.addresses,
+    });
+
+    if (isAddressUpdateRequest && !addressState.profileAddress.line1) {
+      return res.status(400).send({
+        success: false,
+        message: "Profile address line is required",
+      });
+    }
+
     const hashedPassword = password ? await hashPassword(password) : undefined;
     const updatedUser = await userModel.findByIdAndUpdate(
       req.user._id,
       {
-        name: name || user.name,
+        name: nextName,
         password: hashedPassword || user.password,
-        phone: phone || user.phone,
-        address: address || user.address,
+        phone: nextPhone,
+        profileAddress: addressState.profileAddress,
+        addresses: addressState.addresses,
+        address: addressState.address,
       },
       { new: true }
     );
+    const normalizedUpdatedUser = withNormalizedUserAddresses(updatedUser);
     res.status(200).send({
       success: true,
       message: "Profile Updated SUccessfully",
-      updatedUser,
+      updatedUser: normalizedUpdatedUser,
     });
   } catch (error) {
     console.log(error);
     res.status(400).send({
       success: false,
       message: "Error WHile Update profile",
+      error,
+    });
+  }
+};
+
+//get current profile
+export const getProfileController = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id).select("-password -answer");
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const normalizedUser = withNormalizedUserAddresses(user);
+
+    return res.status(200).send({
+      success: true,
+      user: normalizedUser,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error while fetching profile",
       error,
     });
   }
@@ -365,7 +500,17 @@ export const getAllUsersController = async (req, res) => {
 export const updateUserByAdminController = async (req, res) => {
   try {
     const { uid } = req.params;
-    const { name, email, phone, address, answer, role, password } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      address,
+      profileAddress,
+      addresses,
+      answer,
+      role,
+      password,
+    } = req.body;
 
     const user = await userModel.findById(uid);
     if (!user) {
@@ -392,6 +537,35 @@ export const updateUserByAdminController = async (req, res) => {
       });
     }
 
+    const nextName = name ?? user.name;
+    const nextPhone = phone ?? user.phone;
+    const isAddressUpdateRequest =
+      address !== undefined ||
+      profileAddress !== undefined ||
+      addresses !== undefined;
+    const addressState = buildUserAddressState({
+      fullName: nextName,
+      phone: nextPhone,
+      profileAddress:
+        profileAddress !== undefined
+          ? profileAddress
+          : address !== undefined
+            ? address
+            : user.profileAddress,
+      legacyAddress: address !== undefined ? address : user.address,
+      addresses: addresses !== undefined ? addresses : user.addresses,
+      existingProfileAddress: user.profileAddress,
+      existingLegacyAddress: user.address,
+      existingAddresses: user.addresses,
+    });
+
+    if (isAddressUpdateRequest && !addressState.profileAddress.line1) {
+      return res.status(400).send({
+        success: false,
+        message: "Profile address line is required",
+      });
+    }
+
     const hashedPassword = password ? await hashPassword(password) : undefined;
     const normalizedRole = normalizeRoleInput(role, user.role);
 
@@ -399,10 +573,12 @@ export const updateUserByAdminController = async (req, res) => {
       .findByIdAndUpdate(
         uid,
         {
-          name: name ?? user.name,
+          name: nextName,
           email: email ?? user.email,
-          phone: phone ?? user.phone,
-          address: address ?? user.address,
+          phone: nextPhone,
+          profileAddress: addressState.profileAddress,
+          addresses: addressState.addresses,
+          address: addressState.address,
           answer: answer ?? user.answer,
           role: normalizedRole,
           password: hashedPassword || user.password,
@@ -414,7 +590,7 @@ export const updateUserByAdminController = async (req, res) => {
     return res.status(200).send({
       success: true,
       message: "User updated successfully",
-      user: updatedUser,
+      user: withNormalizedUserAddresses(updatedUser),
     });
   } catch (error) {
     console.log(error);

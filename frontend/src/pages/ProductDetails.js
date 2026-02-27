@@ -8,8 +8,9 @@ import { useLocationContext } from "../context/location";
 import { useConfirm } from "../context/confirm";
 import { useAuth } from "../context/auth";
 import toast from "react-hot-toast";
-import { FiShoppingCart, FiTag, FiPackage, FiArrowLeft, FiHeart, FiMinus, FiPlus, FiStar, FiTruck, FiShield, FiRefreshCw, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiShoppingCart, FiTag, FiPackage, FiArrowLeft, FiHeart, FiMinus, FiPlus, FiStar, FiTruck, FiShield, FiRefreshCw, FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiChevronLeft, FiChevronRight, FiCreditCard } from "react-icons/fi";
 import { isProductAvailableInLocation } from "../utils/locationUtils";
+import { setBuyNowCheckoutItem } from "../utils/checkoutUtils";
 import useProductReviews from "../features/reviews/useProductReviews";
 import ReviewSummary from "../features/reviews/ReviewSummary";
 import ReviewForm from "../features/reviews/ReviewForm";
@@ -128,25 +129,60 @@ const ProductDetails = () => {
     );
   };
 
+  const persistCart = (nextCart) => {
+    setCart(nextCart);
+    localStorage.setItem("cart", JSON.stringify(nextCart));
+  };
+
+  const addItemToCart = (productToAdd, qtyToAdd = 1) => {
+    if (!productToAdd?._id) return 0;
+
+    const safeQty = Number.isFinite(Number(qtyToAdd)) && Number(qtyToAdd) > 0
+      ? Number(qtyToAdd)
+      : 1;
+    const existingItemIndex = cart.findIndex((item) => item._id === productToAdd._id);
+
+    if (existingItemIndex !== -1) {
+      const updatedCart = [...cart];
+      const currentQty = Number(
+        updatedCart[existingItemIndex]?.qty ||
+        updatedCart[existingItemIndex]?.quantity
+      );
+      updatedCart[existingItemIndex] = {
+        ...updatedCart[existingItemIndex],
+        qty: Number.isFinite(currentQty) && currentQty > 0 ? currentQty + safeQty : safeQty,
+      };
+      persistCart(updatedCart);
+      return safeQty;
+    }
+
+    const nextCart = [...cart, { ...productToAdd, qty: safeQty }];
+    persistCart(nextCart);
+    return safeQty;
+  };
+
   const handleAddToCart = () => {
     if (!isDeliverable) {
       toast.error(`This book is not available in ${selectedLocationLabel}`);
       return;
     }
 
-    const cartItem = { ...product, quantity };
-    const existingItemIndex = cart.findIndex(item => item._id === product._id);
-
-    if (existingItemIndex !== -1) {
-      const updatedCart = [...cart];
-      updatedCart[existingItemIndex].quantity += quantity;
-      setCart(updatedCart);
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-    } else {
-      setCart([...cart, cartItem]);
-      localStorage.setItem("cart", JSON.stringify([...cart, cartItem]));
+    const addedQty = addItemToCart(product, quantity);
+    if (addedQty) {
+      toast.success(`${addedQty} item${addedQty > 1 ? "s" : ""} added to cart`);
     }
-    toast.success(`${quantity} item${quantity > 1 ? 's' : ''} added to cart`);
+  };
+
+  const handleBuyNow = () => {
+    if (!isDeliverable) {
+      toast.error(`This book is not available in ${selectedLocationLabel}`);
+      return;
+    }
+
+    const checkoutItem = { ...product, qty: quantity };
+    setBuyNowCheckoutItem(checkoutItem);
+    toast.success("Redirecting to buy now checkout");
+    navigate("/checkout?mode=buy-now");
   };
 
   const handleWishlistToggle = async (prod = product) => {
@@ -170,23 +206,10 @@ const ProductDetails = () => {
   };
 
   const handleQuickAddRelated = (relatedProduct) => {
-    const existingItemIndex = cart.findIndex(
-      (item) => item._id === relatedProduct._id
-    );
-
-    if (existingItemIndex !== -1) {
-      const updatedCart = [...cart];
-      updatedCart[existingItemIndex].quantity =
-        (updatedCart[existingItemIndex].quantity || 1) + 1;
-      setCart(updatedCart);
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-    } else {
-      const cartItem = { ...relatedProduct, quantity: 1 };
-      const updatedCart = [...cart, cartItem];
-      setCart(updatedCart);
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+    const addedQty = addItemToCart(relatedProduct, 1);
+    if (addedQty) {
+      toast.success("Item added to cart");
     }
-    toast.success("Item added to cart");
   };
 
   const {
@@ -330,7 +353,7 @@ const ProductDetails = () => {
         <div className="pointer-events-none absolute -left-32 -top-24 h-72 w-72 rounded-full bg-accent-100 blur-3xl"></div>
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-primary-100 blur-3xl"></div>
 
-        <div className="relative w-full px-4 py-8 sm:px-8 lg:px-12 xl:px-16 2xl:px-24">
+        <div className="relative mx-auto w-full max-w-[1720px] px-4 py-8 sm:px-8 lg:px-10 xl:px-12 2xl:px-14">
           <nav className="mb-5 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-primary-600">
             <button
               onClick={() => navigate("/")}
@@ -359,9 +382,9 @@ const ProductDetails = () => {
             <span>Back to products</span>
           </button>
 
-          <section className="grid grid-cols-1 gap-10 xl:grid-cols-[1.15fr_1fr]">
+          <section className="grid grid-cols-1 gap-8 xl:grid-cols-[1.08fr_1fr] 2xl:gap-10">
             <div>
-              <div className="relative h-80 overflow-hidden rounded-[28px] bg-gradient-to-br from-primary-100 via-white to-accent-50 sm:h-[460px] lg:h-[560px]">
+              <div className="relative h-80 overflow-hidden rounded-[28px] bg-gradient-to-br from-primary-100 via-white to-accent-50 sm:h-[420px] lg:h-[480px] xl:h-[500px]">
                 <img
                   src={activeImage}
                   alt={product.name}
@@ -439,7 +462,7 @@ const ProductDetails = () => {
               </div>
             </div>
 
-            <div className="xl:pl-4">
+            <div>
               <div className="mb-4 flex flex-wrap items-center gap-3">
                 <span className="text-xs font-bold uppercase tracking-wide text-accent-700">
                   {product?.category?.name || "Book"}
@@ -472,52 +495,83 @@ const ProductDetails = () => {
                 </span>
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 shadow-sm">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="h-8 w-8 rounded-full bg-primary-100 text-primary-700 transition-colors hover:bg-primary-200"
-                  >
-                    <FiMinus className="mx-auto h-3.5 w-3.5" />
-                  </button>
-                  <span className="w-8 text-center text-base font-bold text-primary-900">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="h-8 w-8 rounded-full bg-primary-100 text-primary-700 transition-colors hover:bg-primary-200"
-                  >
-                    <FiPlus className="mx-auto h-3.5 w-3.5" />
-                  </button>
+              <div className="mt-8 space-y-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <div className="inline-flex w-fit items-center gap-2 rounded-full bg-white/90 px-2 py-1.5 ring-1 ring-primary-200 shadow-sm">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="h-8 w-8 rounded-full bg-white text-primary-700 ring-1 ring-primary-200 transition-colors hover:bg-primary-100"
+                    >
+                      <FiMinus className="mx-auto h-3.5 w-3.5" />
+                    </button>
+                    <span className="min-w-[2.5rem] text-center text-base font-bold text-primary-900">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="h-8 w-8 rounded-full bg-white text-primary-700 ring-1 ring-primary-200 transition-colors hover:bg-primary-100"
+                    >
+                      <FiPlus className="mx-auto h-3.5 w-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="grid flex-1 grid-cols-1 gap-2.5 sm:grid-cols-2">
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={!isDeliverable}
+                      className={`h-12 rounded-2xl px-5 text-sm font-semibold transition-all ${
+                        isDeliverable
+                          ? "bg-primary-900 text-white shadow-sm hover:bg-primary-800"
+                          : "cursor-not-allowed bg-primary-200 text-primary-600"
+                      }`}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <FiShoppingCart className="h-4 w-4" />
+                        Add to Cart
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={handleBuyNow}
+                      disabled={!isDeliverable}
+                      className={`h-12 rounded-2xl px-5 text-sm font-semibold transition-all ${
+                        isDeliverable
+                          ? "bg-gradient-to-r from-accent-500 to-accent-600 text-white shadow-lg shadow-accent-200/70 hover:from-accent-600 hover:to-accent-700"
+                          : "cursor-not-allowed bg-primary-200 text-primary-600"
+                      }`}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <FiCreditCard className="h-4 w-4" />
+                        Buy Now
+                      </span>
+                    </button>
+                  </div>
                 </div>
 
-                <button
-                  onClick={handleAddToCart}
-                  disabled={!isDeliverable}
-                  className={`rounded-full px-8 py-3 text-sm font-semibold transition-all duration-300 ${
-                    isDeliverable
-                      ? "bg-gradient-to-r from-accent-500 to-accent-600 text-white shadow-lg hover:from-accent-600 hover:to-accent-700"
-                      : "cursor-not-allowed bg-primary-200 text-primary-600"
-                  }`}
-                >
-                  <span className="inline-flex items-center gap-2">
-                    <FiShoppingCart className="h-4 w-4" />
-                    {isDeliverable
-                      ? `Add to Cart - ₹${totalPrice.toLocaleString("en-IN")}`
-                      : `Unavailable in ${selectedLocationLabel}`}
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => handleWishlistToggle()}
-                  className={`rounded-full px-5 py-3 text-sm font-semibold transition-colors ${
-                    isWishlisted
-                      ? "bg-red-50 text-red-600"
-                      : "bg-white/80 text-primary-700 hover:bg-white"
-                  }`}
-                >
-                  {isWishlisted ? "Wishlisted" : "Add to Wishlist"}
-                </button>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-primary-600">
+                      {isDeliverable
+                        ? `Total for ${quantity} item${quantity === 1 ? "" : "s"}: ₹${totalPrice.toLocaleString("en-IN")}`
+                        : `Unavailable in ${selectedLocationLabel}`}
+                    </p>
+                    {isDeliverable && (
+                      <p className="text-[11px] text-primary-500">
+                        Buy Now takes you directly to secure checkout.
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleWishlistToggle()}
+                    className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+                      isWishlisted
+                        ? "bg-red-50 text-red-600"
+                        : "bg-white text-primary-700 ring-1 ring-primary-200 hover:bg-primary-50"
+                    }`}
+                  >
+                    {isWishlisted ? "Wishlisted" : "Add to Wishlist"}
+                  </button>
+                </div>
               </div>
 
               {!isDeliverable && (
@@ -526,7 +580,7 @@ const ProductDetails = () => {
                 </p>
               )}
 
-              <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-primary-700">
                   <FiTruck className="h-4 w-4 text-accent-600" />
                   <span>Free Shipping</span>
@@ -543,7 +597,7 @@ const ProductDetails = () => {
             </div>
           </section>
 
-          <section className="mt-14 grid grid-cols-1 gap-10 xl:grid-cols-12">
+          <section className="mt-8 grid grid-cols-1 gap-10 xl:mt-10 xl:grid-cols-12">
             <div className="space-y-10 xl:col-span-8">
               <div className="border-b border-primary-100 pb-8">
                 <h2 className="mb-4 flex items-center text-xl font-bold text-primary-900">

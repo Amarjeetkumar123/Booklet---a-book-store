@@ -573,38 +573,39 @@ const HomePage = () => {
     <Layout>
       {/* Hero Section */}
       <section
-        className="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-accent-50"
+        className="relative overflow-hidden bg-gradient-to-br from-[#fff9f2] via-[#fffdfa] to-[#fef2e4]"
         data-fx="reveal"
       >
-        <div className="absolute -top-24 -left-20 h-72 w-72 rounded-full bg-primary-100/70 blur-3xl" />
-        <div className="absolute -bottom-16 -right-20 h-72 w-72 rounded-full bg-accent-100/70 blur-3xl" />
+        <div className="absolute -top-28 -left-24 h-80 w-80 rounded-full bg-primary-100/80 blur-3xl" />
+        <div className="absolute -bottom-20 -right-24 h-80 w-80 rounded-full bg-accent-100/80 blur-3xl" />
+        <div className="absolute top-1/3 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-white/70 blur-3xl" />
 
         <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-12 md:py-16 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-5">
-              <div className="inline-flex items-center gap-2 rounded-full border border-accent-200 bg-accent-50 px-3 py-1.5 text-xs font-semibold text-accent-700">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/55 px-3.5 py-1.5 text-xs font-semibold text-accent-700 shadow-[0_10px_24px_-18px_rgba(71,52,31,0.75)] ring-1 ring-white/80 backdrop-blur-md">
                 <FiTrendingUp className="h-3.5 w-3.5" />
-                Fresh arrivals every week
+                Bestsellers and new arrivals this week
               </div>
 
               {selectedLocationLabel && (
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white px-3 py-1.5 text-xs font-semibold text-primary-700">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/60 px-3.5 py-1.5 text-xs font-semibold text-primary-700 shadow-[0_10px_24px_-18px_rgba(71,52,31,0.75)] ring-1 ring-white/80 backdrop-blur-md">
                   <FiMapPin className="h-3.5 w-3.5 text-accent-700" />
                   Delivering to {selectedLocationLabel}
                 </div>
               )}
 
               <h1 className="text-3xl md:text-4xl xl:text-5xl font-bold text-primary-900 leading-tight">
-                Discover stories that
-                <span className="block text-accent-600">shape your next chapter</span>
+                Shop books that match
+                <span className="block text-accent-600">your goals and your mood</span>
               </h1>
 
               <p className="text-base md:text-lg text-primary-700 max-w-2xl">
-                Explore curated books across genres, filter by your preferences,
-                and find your perfect read in minutes.
+                Compare genres, check ratings, and order in minutes with dependable
+                delivery to your selected location.
               </p>
 
-              <div className="rounded-xl border border-primary-200 bg-white p-2 shadow-sm flex items-center gap-2 max-w-2xl">
+              <div className="max-w-2xl rounded-[1.35rem] bg-gradient-to-r from-white/70 via-primary-50/55 to-accent-50/60 px-2.5 py-2 shadow-[0_22px_44px_-30px_rgba(75,56,34,0.68)] ring-1 ring-white/80 backdrop-blur-md flex items-center gap-2">
                 <div className="relative flex-1">
                   <FiSearch className="h-4.5 w-4.5 text-primary-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -612,14 +613,14 @@ const HomePage = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search books, descriptions or categories..."
-                    className="w-full h-10 rounded-lg border border-transparent bg-transparent pl-10 pr-3 text-sm text-primary-900 focus:outline-none focus:ring-0"
+                    className="w-full h-10 bg-transparent pl-10 pr-3 text-sm text-primary-900 placeholder:text-primary-500 focus:outline-none"
                   />
                 </div>
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="h-9 px-3 rounded-lg border border-primary-200 bg-primary-50 text-primary-700 text-sm font-medium"
+                    className="h-9 px-3 rounded-full bg-white/75 text-primary-700 text-sm font-medium hover:bg-white transition-colors"
                   >
                     Clear
                   </button>
@@ -627,29 +628,30 @@ const HomePage = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/categories")}
-                  className="h-9 px-4 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold"
+                  className="h-9 px-4 rounded-full bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white text-sm font-semibold transition-colors"
                 >
                   Browse
                 </button>
               </div>
 
               <div className="pt-1.5 sm:pt-2 max-w-2xl">
-                <div className="rounded-2xl border border-primary-200/90 bg-white/95 shadow-sm p-3.5 sm:p-4">
+                <div className="relative overflow-hidden rounded-[1.55rem] bg-gradient-to-r from-white/58 via-white/36 to-accent-50/52 px-4 py-4 sm:px-5 sm:py-4.5 shadow-[0_26px_56px_-36px_rgba(75,56,34,0.75)] ring-1 ring-white/75 backdrop-blur-md">
+                  <div className="pointer-events-none absolute -top-8 right-6 h-20 w-20 rounded-full bg-accent-100/70 blur-2xl" />
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-primary-900 inline-flex items-center gap-1.5">
                         <FiTrendingUp className="h-4 w-4 text-accent-700" />
-                        Explore Collections
+                        Shop by Collection
                       </p>
                       <p className="text-xs text-primary-600 mt-0.5 pr-2">
-                        Jump into curated categories and trending picks.
+                        Start with curated categories, trending picks, and exam-focused reads.
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-[auto_auto] gap-2 w-full md:w-auto">
                       <button
                         onClick={() => navigate("/categories")}
-                        className="h-10 px-4 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold inline-flex items-center justify-center gap-2 shadow-sm"
+                        className="h-10 px-4 rounded-full bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
                       >
                         <FiBook className="h-4 w-4" />
                         Explore
@@ -660,7 +662,7 @@ const HomePage = () => {
                           handleResetFilters();
                           window.scrollTo({ top: 460, behavior: "smooth" });
                         }}
-                        className="hidden md:inline-flex h-10 px-2 rounded-lg border border-primary-200 bg-white hover:bg-primary-50 text-primary-700 text-sm font-semibold items-center justify-center gap-2"
+                        className="hidden md:inline-flex h-10 px-4 min-w-[8.75rem] whitespace-nowrap rounded-full bg-white/70 hover:bg-white text-primary-700 text-sm font-semibold items-center justify-center gap-2 transition-colors"
                       >
                         <FiSliders className="h-4 w-4" />
                         Quick Filters
@@ -679,7 +681,7 @@ const HomePage = () => {
                           key={cat._id}
                           type="button"
                           onClick={() => navigate(`/category/${cat.slug}`)}
-                          className="h-7 px-2.5 shrink-0 snap-start rounded-full border border-accent-200 bg-accent-50 hover:bg-accent-100 text-accent-700 text-xs font-medium"
+                          className="h-7 px-2.5 shrink-0 snap-start rounded-full bg-white/75 hover:bg-white text-accent-700 text-xs font-medium transition-colors"
                         >
                           {cat.name}
                         </button>
@@ -700,8 +702,9 @@ const HomePage = () => {
                 {heroPrimaryBook ? (
                   <div className="space-y-3">
                     <div className="relative h-[360px] sm:h-[440px] overflow-hidden">
-                      <div className="absolute inset-x-8 sm:inset-x-10 inset-y-3 rounded-[2.1rem] bg-gradient-to-br from-white/72 via-primary-50/58 to-accent-100/56" />
-                      <div className="absolute inset-x-20 top-8 h-32 rounded-full bg-accent-200/40 blur-3xl" />
+                      <div className="absolute inset-x-8 sm:inset-x-10 inset-y-3 rounded-[2.2rem] bg-gradient-to-br from-white/54 via-primary-50/34 to-accent-100/44 ring-1 ring-white/70 backdrop-blur-md" />
+                      <div className="absolute inset-x-20 top-8 h-32 rounded-full bg-accent-200/48 blur-3xl" />
+                      <div className="absolute inset-x-24 bottom-8 h-24 rounded-full bg-white/75 blur-3xl" />
 
                       {heroPreviousBook && (
                         <button
@@ -710,8 +713,8 @@ const HomePage = () => {
                           aria-label="Show previous featured book"
                           className="absolute left-3 sm:left-5 top-1/2 z-10 w-[30%] max-w-[160px] -translate-y-1/2 text-left opacity-70 transition-opacity hover:opacity-95"
                         >
-                          <div className="hero-side-frame rounded-2xl bg-white/85 p-1.5 shadow-[0_12px_26px_-22px_rgba(37,31,23,0.9)]">
-                            <div className="aspect-[2/3] overflow-hidden rounded-xl bg-primary-50">
+                          <div className="hero-side-frame rounded-2xl bg-gradient-to-br from-white/58 via-white/34 to-primary-100/30 p-1.5 shadow-[0_16px_30px_-24px_rgba(37,31,23,0.9)] ring-1 ring-white/70 backdrop-blur-[7px]">
+                            <div className="aspect-[2/3] overflow-hidden rounded-xl bg-gradient-to-b from-white/72 to-primary-50/58">
                               <img
                                 src={heroPreviousBook.imageUrl || heroPreviousBook.imageUrls?.[0] || "https://placehold.co/280x420/f5f0e8/826b4d?text=Book"}
                                 alt={heroPreviousBook.name}
@@ -729,8 +732,8 @@ const HomePage = () => {
                           aria-label="Show next featured book"
                           className="absolute right-3 sm:right-5 top-1/2 z-10 w-[30%] max-w-[160px] -translate-y-1/2 text-left opacity-70 transition-opacity hover:opacity-95"
                         >
-                          <div className="hero-side-frame rounded-2xl bg-white/85 p-1.5 shadow-[0_12px_26px_-22px_rgba(37,31,23,0.9)]">
-                            <div className="aspect-[2/3] overflow-hidden rounded-xl bg-primary-50">
+                          <div className="hero-side-frame rounded-2xl bg-gradient-to-br from-white/58 via-white/34 to-primary-100/30 p-1.5 shadow-[0_16px_30px_-24px_rgba(37,31,23,0.9)] ring-1 ring-white/70 backdrop-blur-[7px]">
+                            <div className="aspect-[2/3] overflow-hidden rounded-xl bg-gradient-to-b from-white/72 to-primary-50/58">
                               <img
                                 src={heroNextBook.imageUrl || heroNextBook.imageUrls?.[0] || "https://placehold.co/280x420/f5f0e8/826b4d?text=Book"}
                                 alt={heroNextBook.name}
@@ -746,8 +749,8 @@ const HomePage = () => {
                         onClick={() => navigate(`/product/${heroPrimaryBook.slug}`)}
                         className="group absolute left-1/2 top-1/2 z-20 w-[48%] min-w-[180px] max-w-[270px] -translate-x-1/2 -translate-y-1/2 text-center"
                       >
-                        <div className="hero-main-frame rounded-[1.7rem] bg-white/95 p-2.5 shadow-[0_22px_46px_-30px_rgba(37,31,23,0.9)]">
-                          <div className="aspect-[2/3] overflow-hidden rounded-[1.4rem] bg-primary-50">
+                        <div className="hero-main-frame rounded-[1.7rem] bg-gradient-to-br from-white/66 via-primary-50/44 to-accent-100/42 p-2.5 shadow-[0_24px_50px_-32px_rgba(37,31,23,0.9)] ring-1 ring-white/80 backdrop-blur-lg">
+                          <div className="aspect-[2/3] overflow-hidden rounded-[1.4rem] bg-gradient-to-b from-white/85 to-primary-50/58">
                             <img
                               src={heroPrimaryBook.imageUrl || heroPrimaryBook.imageUrls?.[0] || "https://placehold.co/320x420/f5f0e8/826b4d?text=Book"}
                               alt={heroPrimaryBook.name}
@@ -768,7 +771,7 @@ const HomePage = () => {
                               )
                             }
                             aria-label="Show previous featured book"
-                            className="absolute left-2 sm:left-3 top-1/2 z-30 -translate-y-1/2 h-10 w-10 rounded-full bg-white/95 text-primary-700 shadow-sm transition-colors hover:bg-white"
+                            className="absolute left-2 sm:left-3 top-1/2 z-30 -translate-y-1/2 h-10 w-10 rounded-full bg-white/68 text-primary-700 shadow-[0_12px_28px_-16px_rgba(37,31,23,0.9)] ring-1 ring-white/75 backdrop-blur-sm transition-colors hover:bg-white"
                           >
                             <FiChevronLeft className="mx-auto h-4.5 w-4.5" />
                           </button>
@@ -780,7 +783,7 @@ const HomePage = () => {
                               )
                             }
                             aria-label="Show next featured book"
-                            className="absolute right-2 sm:right-3 top-1/2 z-30 -translate-y-1/2 h-10 w-10 rounded-full bg-white/95 text-primary-700 shadow-sm transition-colors hover:bg-white"
+                            className="absolute right-2 sm:right-3 top-1/2 z-30 -translate-y-1/2 h-10 w-10 rounded-full bg-white/68 text-primary-700 shadow-[0_12px_28px_-16px_rgba(37,31,23,0.9)] ring-1 ring-white/75 backdrop-blur-sm transition-colors hover:bg-white"
                           >
                             <FiChevronRight className="mx-auto h-4.5 w-4.5" />
                           </button>
@@ -810,14 +813,14 @@ const HomePage = () => {
                                 aria-label={`Show featured book ${index + 1}`}
                                 className={`h-[82px] rounded-xl overflow-hidden transition-all ${
                                   isActive
-                                    ? "ring-2 ring-accent-500 shadow-sm"
-                                    : "opacity-80 hover:opacity-100 ring-1 ring-primary-200"
+                                    ? "ring-2 ring-accent-500 shadow-[0_16px_28px_-20px_rgba(249,115,22,0.75)] bg-gradient-to-br from-white/70 to-accent-50/60"
+                                    : "opacity-80 hover:opacity-100 ring-1 ring-white/75 bg-gradient-to-br from-white/58 to-primary-50/50"
                                 }`}
                               >
                                 <img
                                   src={book.imageUrl || book.imageUrls?.[0] || "https://placehold.co/180x240/f5f0e8/826b4d?text=Book"}
                                   alt={book.name}
-                                  className="h-full w-full object-contain bg-white p-1.5"
+                                  className="h-full w-full object-contain p-1.5"
                                 />
                               </button>
                             );
@@ -846,7 +849,7 @@ const HomePage = () => {
                     )}
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-primary-200 bg-white p-8 text-center text-sm text-primary-600">
+                  <div className="rounded-2xl bg-gradient-to-br from-white/60 via-primary-50/40 to-accent-100/45 p-8 text-center text-sm text-primary-600 ring-1 ring-white/75 backdrop-blur-md">
                     Featured books will appear here.
                   </div>
                 )}

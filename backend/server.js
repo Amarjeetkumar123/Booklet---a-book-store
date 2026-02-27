@@ -13,6 +13,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 import uploadFilesRoutes from "./routes/uploadFileRoute.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import siteSettingsRoutes from "./routes/siteSettingsRoutes.js";
 import cors from "cors";
 import errorHandler from "./middlewares/errorMiddleware.js";
 
@@ -81,6 +82,7 @@ app.use("/api/v1/review", reviewRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/location", locationRoutes);
 app.use("/api/v1/uploads", uploadFilesRoutes);
+app.use("/api/v1/site-settings", siteSettingsRoutes);
 // Centralized error handler (should be last middleware)
 app.use(errorHandler);
 

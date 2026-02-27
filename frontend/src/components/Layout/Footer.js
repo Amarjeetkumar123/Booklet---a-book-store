@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FiArrowUp,
@@ -13,6 +13,7 @@ import {
   FiSend,
   FiTwitter,
 } from "react-icons/fi";
+import useSiteSettings from "../../hooks/useSiteSettings";
 
 const supportLinks = [
   { to: "/policy", label: "Privacy Policy" },
@@ -21,16 +22,42 @@ const supportLinks = [
   { to: "/contact", label: "Returns & Refunds" },
 ];
 
-const socials = [
-  { label: "Facebook", href: "https://facebook.com", icon: FiFacebook },
-  { label: "Twitter", href: "https://twitter.com", icon: FiTwitter },
-  { label: "Instagram", href: "https://instagram.com", icon: FiInstagram },
-  { label: "LinkedIn", href: "https://linkedin.com", icon: FiLinkedin },
-];
-
 const Footer = () => {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const { support } = useSiteSettings();
+
+  const socials = useMemo(
+    () =>
+      [
+        {
+          label: "Facebook",
+          href: support?.socialLinks?.facebook,
+          icon: FiFacebook,
+        },
+        {
+          label: "Twitter",
+          href: support?.socialLinks?.twitter,
+          icon: FiTwitter,
+        },
+        {
+          label: "Instagram",
+          href: support?.socialLinks?.instagram,
+          icon: FiInstagram,
+        },
+        {
+          label: "LinkedIn",
+          href: support?.socialLinks?.linkedin,
+          icon: FiLinkedin,
+        },
+      ].filter((item) => Boolean(item.href)),
+    [
+      support?.socialLinks?.facebook,
+      support?.socialLinks?.twitter,
+      support?.socialLinks?.instagram,
+      support?.socialLinks?.linkedin,
+    ]
+  );
 
   return (
     <footer className="relative mt-auto border-t border-primary-200 bg-gradient-to-b from-white via-primary-50/80 to-primary-100/60 text-primary-900 overflow-hidden">
@@ -120,22 +147,22 @@ const Footer = () => {
               </h3>
               <div className="space-y-2.5">
                 <a
-                  href="mailto:support@booklet.com"
+                  href={`mailto:${support?.secondaryEmail || support?.primaryEmail}`}
                   className="no-underline text-sm text-primary-700 hover:text-accent-700 inline-flex items-center gap-2"
                 >
                   <FiMail className="h-4 w-4 text-accent-600" />
-                  support@booklet.com
+                  {support?.secondaryEmail || support?.primaryEmail}
                 </a>
                 <a
-                  href="tel:+15551234567"
+                  href={`tel:${String(support?.primaryPhone || "").replace(/[^\d+]/g, "")}`}
                   className="no-underline text-sm text-primary-700 hover:text-accent-700 inline-flex items-center gap-2"
                 >
                   <FiPhone className="h-4 w-4 text-accent-600" />
-                  +1 (555) 123-4567
+                  {support?.primaryPhone}
                 </a>
                 <p className="text-sm text-primary-700 inline-flex items-center gap-2 m-0">
                   <FiMapPin className="h-4 w-4 text-accent-600" />
-                  123 Book Street, Reading City
+                  {support?.address}
                 </p>
               </div>
 

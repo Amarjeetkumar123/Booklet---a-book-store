@@ -29,6 +29,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import WishlistPage from "./pages/Wishlist";
 import ScrollToTop from "./components/ScrollToTop";
 import ServiceLocations from "./pages/Admin/ServiceLocations";
+import SiteSettings from "./pages/Admin/SiteSettings";
 
 function App() {
   return (
@@ -60,6 +61,10 @@ function App() {
           <Route
             path="admin/service-locations"
             element={<ServiceLocations />}
+          />
+          <Route
+            path="admin/site-settings"
+            element={<SiteSettings />}
           />
           <Route path="admin/users" element={<Users />} />
           <Route path="admin/orders" element={<AdminOrders />} />

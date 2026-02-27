@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Layout from "./../components/Layout/Layout";
 import toast from "react-hot-toast";
 import {
@@ -13,30 +13,7 @@ import {
   FiSend,
   FiTwitter,
 } from "react-icons/fi";
-
-const contactCards = [
-  {
-    title: "Email Support",
-    subtitle: "Response within 24 hours",
-    primary: "help@booklet.com",
-    secondary: "support@booklet.com",
-    icon: FiMail,
-  },
-  {
-    title: "Phone Support",
-    subtitle: "Available all week",
-    primary: "+1 (800) 123-4567",
-    secondary: "+1 (800) 266-5538",
-    icon: FiPhone,
-  },
-  {
-    title: "Office",
-    subtitle: "Headquarters",
-    primary: "Booklet Inc.",
-    secondary: "123 Book Street, BC 12345, Canada",
-    icon: FiMapPin,
-  },
-];
+import useSiteSettings from "../hooks/useSiteSettings";
 
 const faqs = [
   {
@@ -61,14 +38,8 @@ const faqs = [
   },
 ];
 
-const socialLinks = [
-  { label: "Facebook", icon: FiFacebook, href: "https://facebook.com" },
-  { label: "Twitter", icon: FiTwitter, href: "https://twitter.com" },
-  { label: "Instagram", icon: FiInstagram, href: "https://instagram.com" },
-  { label: "LinkedIn", icon: FiLinkedin, href: "https://linkedin.com" },
-];
-
 const Contact = () => {
+  const { support } = useSiteSettings();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -91,20 +62,77 @@ const Contact = () => {
     setFormData({ name: "", email: "", subject: "", message: "" });
   };
 
+  const contactCards = useMemo(
+    () => [
+      {
+        title: "Email Support",
+        subtitle: support?.responseTime || "Response within 24 hours",
+        primary: support?.primaryEmail || "",
+        secondary: support?.secondaryEmail || "",
+        icon: FiMail,
+      },
+      {
+        title: "Phone Support",
+        subtitle: support?.phoneAvailability || "Available all week",
+        primary: support?.primaryPhone || "",
+        secondary: support?.secondaryPhone || "",
+        icon: FiPhone,
+      },
+      {
+        title: "Office",
+        subtitle: "Headquarters",
+        primary: support?.officeName || "",
+        secondary: support?.address || "",
+        icon: FiMapPin,
+      },
+    ],
+    [
+      support?.address,
+      support?.officeName,
+      support?.phoneAvailability,
+      support?.primaryEmail,
+      support?.primaryPhone,
+      support?.responseTime,
+      support?.secondaryEmail,
+      support?.secondaryPhone,
+    ]
+  );
+
+  const socialLinks = useMemo(
+    () =>
+      [
+        { label: "Facebook", icon: FiFacebook, href: support?.socialLinks?.facebook },
+        { label: "Twitter", icon: FiTwitter, href: support?.socialLinks?.twitter },
+        { label: "Instagram", icon: FiInstagram, href: support?.socialLinks?.instagram },
+        { label: "LinkedIn", icon: FiLinkedin, href: support?.socialLinks?.linkedin },
+      ].filter((social) => Boolean(social.href)),
+    [
+      support?.socialLinks?.facebook,
+      support?.socialLinks?.instagram,
+      support?.socialLinks?.linkedin,
+      support?.socialLinks?.twitter,
+    ]
+  );
+
   return (
     <Layout title={"Contact Us - Booklet"}>
-      <div className="pt-24 pb-14 min-h-screen bg-gradient-to-b from-primary-50 via-white to-primary-50">
+      <div className="relative pt-24 pb-14 min-h-screen overflow-hidden bg-gradient-to-b from-[#fff8ef] via-white to-[#fff7ef]">
+        <div className="absolute -top-20 -left-16 h-72 w-72 rounded-full bg-primary-100/70 blur-3xl" />
+        <div className="absolute top-1/3 -right-12 h-72 w-72 rounded-full bg-accent-100/70 blur-3xl" />
+
         <section className="bg-gradient-to-r from-primary-900 via-primary-800 to-accent-700 text-white">
           <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-10 sm:py-12">
-            <h1 className="text-3xl sm:text-4xl font-bold">Contact Booklet</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold">
+              {support?.contactHeroTitle || "Contact Booklet"}
+            </h1>
             <p className="mt-2 text-sm sm:text-base text-primary-100 max-w-2xl">
-              Questions about orders, payments, or recommendations? Reach out and our
-              support team will help quickly.
+              {support?.contactHeroDescription ||
+                "Questions about orders, payments, or recommendations? Reach out and our support team will help quickly."}
             </p>
           </div>
         </section>
 
-        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 sm:py-10">
+        <div className="relative w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 py-8 sm:py-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-5 space-y-4">
               {contactCards.map((card) => {
@@ -112,10 +140,10 @@ const Contact = () => {
                 return (
                   <article
                     key={card.title}
-                    className="rounded-2xl border border-primary-200 bg-white p-5 shadow-sm"
+                    className="pb-4 border-b border-primary-200/80"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-accent-100 text-accent-700 inline-flex items-center justify-center shrink-0">
+                      <div className="h-10 w-10 rounded-full bg-white/70 text-accent-700 inline-flex items-center justify-center shrink-0 ring-1 ring-white/80">
                         <Icon className="h-4.5 w-4.5" />
                       </div>
                       <div>
@@ -127,14 +155,20 @@ const Contact = () => {
                         </p>
                       </div>
                     </div>
-                    <p className="mt-3 text-sm font-medium text-primary-800 m-0">{card.primary}</p>
-                    <p className="mt-1 text-sm text-primary-600 m-0">{card.secondary}</p>
+                    {card.primary && (
+                      <p className="mt-3 text-sm font-medium text-primary-800 m-0">
+                        {card.primary}
+                      </p>
+                    )}
+                    {card.secondary && (
+                      <p className="mt-1 text-sm text-primary-600 m-0">{card.secondary}</p>
+                    )}
                   </article>
                 );
               })}
 
-              <article className="rounded-2xl border border-primary-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center gap-2 mb-3">
+              <article className="mt-2 rounded-[1.3rem] bg-gradient-to-r from-white/58 via-primary-50/45 to-accent-50/56 p-4 sm:p-5 ring-1 ring-white/75 backdrop-blur-sm">
+                <div className="flex items-center gap-2 mb-2">
                   <FiHeadphones className="h-4.5 w-4.5 text-accent-700" />
                   <h2 className="text-base sm:text-lg font-semibold text-primary-900 m-0">
                     Social Support
@@ -153,7 +187,7 @@ const Contact = () => {
                         target="_blank"
                         rel="noreferrer"
                         aria-label={social.label}
-                        className="h-10 w-10 rounded-lg border border-accent-200 bg-accent-50 text-accent-700 hover:bg-accent-100 inline-flex items-center justify-center transition-colors"
+                        className="h-10 w-10 rounded-full bg-white/75 text-accent-700 hover:bg-white inline-flex items-center justify-center transition-colors"
                       >
                         <Icon className="h-4.5 w-4.5" />
                       </a>
@@ -164,7 +198,7 @@ const Contact = () => {
             </div>
 
             <div className="lg:col-span-7">
-              <article className="rounded-2xl border border-primary-200 bg-white p-5 sm:p-6 shadow-sm">
+              <article className="pb-6 border-b border-primary-200/80">
                 <h2 className="text-xl sm:text-2xl font-semibold text-primary-900">
                   Send us a message
                 </h2>
@@ -181,7 +215,7 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="Your name"
-                      className="mt-1.5 w-full h-11 rounded-lg border border-primary-200 bg-white px-3.5 text-sm text-primary-900 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      className="mt-1.5 w-full h-11 border-b border-primary-300 bg-transparent px-0 text-sm text-primary-900 focus:outline-none focus:border-accent-500"
                     />
                   </label>
 
@@ -193,7 +227,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="you@example.com"
-                      className="mt-1.5 w-full h-11 rounded-lg border border-primary-200 bg-white px-3.5 text-sm text-primary-900 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      className="mt-1.5 w-full h-11 border-b border-primary-300 bg-transparent px-0 text-sm text-primary-900 focus:outline-none focus:border-accent-500"
                     />
                   </label>
 
@@ -205,7 +239,7 @@ const Contact = () => {
                       value={formData.subject}
                       onChange={handleChange}
                       placeholder="How can we help?"
-                      className="mt-1.5 w-full h-11 rounded-lg border border-primary-200 bg-white px-3.5 text-sm text-primary-900 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      className="mt-1.5 w-full h-11 border-b border-primary-300 bg-transparent px-0 text-sm text-primary-900 focus:outline-none focus:border-accent-500"
                     />
                   </label>
 
@@ -217,13 +251,13 @@ const Contact = () => {
                       onChange={handleChange}
                       rows="6"
                       placeholder="Tell us more..."
-                      className="mt-1.5 w-full rounded-lg border border-primary-200 bg-white px-3.5 py-3 text-sm text-primary-900 focus:outline-none focus:ring-2 focus:ring-accent-300 resize-y"
+                      className="mt-1.5 w-full border-b border-primary-300 bg-transparent px-0 py-2 text-sm text-primary-900 focus:outline-none focus:border-accent-500 resize-y"
                     />
                   </label>
 
                   <button
                     type="submit"
-                    className="sm:col-span-2 h-11 rounded-lg bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
+                    className="sm:col-span-2 h-11 rounded-full bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-2"
                   >
                     <FiSend className="h-4 w-4" />
                     Send Message
@@ -232,29 +266,35 @@ const Contact = () => {
               </article>
 
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <article className="rounded-xl border border-primary-200 bg-white p-4 shadow-sm">
+                <article className="py-3 border-b border-primary-200/80">
                   <div className="flex items-center gap-2 mb-2">
                     <FiClock className="h-4.5 w-4.5 text-accent-700" />
                     <h3 className="text-base font-semibold text-primary-900 m-0">Business Hours</h3>
                   </div>
-                  <p className="text-sm text-primary-600 m-0">Mon - Fri: 9:00 AM to 6:00 PM</p>
-                  <p className="text-sm text-primary-600 m-0">Sat: 10:00 AM to 4:00 PM</p>
-                  <p className="text-sm text-primary-600 m-0">Sun: Limited support</p>
+                  <p className="text-sm text-primary-600 m-0">
+                    {support?.businessHours?.weekdays}
+                  </p>
+                  <p className="text-sm text-primary-600 m-0">
+                    {support?.businessHours?.saturday}
+                  </p>
+                  <p className="text-sm text-primary-600 m-0">
+                    {support?.businessHours?.sunday}
+                  </p>
                 </article>
-                <article className="rounded-xl border border-primary-200 bg-white p-4 shadow-sm">
+                <article className="py-3 border-b border-primary-200/80">
                   <div className="flex items-center gap-2 mb-2">
                     <FiHeadphones className="h-4.5 w-4.5 text-accent-700" />
                     <h3 className="text-base font-semibold text-primary-900 m-0">Quick Help</h3>
                   </div>
                   <p className="text-sm text-primary-600 m-0">
-                    For urgent order questions, phone and email support are prioritized.
+                    {support?.quickHelpText}
                   </p>
                 </article>
               </div>
             </div>
           </div>
 
-          <section className="mt-8 rounded-2xl border border-primary-200 bg-white p-5 sm:p-6 shadow-sm">
+          <section className="mt-8 pt-1">
             <h2 className="text-xl sm:text-2xl font-semibold text-primary-900">
               Frequently Asked Questions
             </h2>
@@ -262,7 +302,7 @@ const Contact = () => {
               {faqs.map((faq) => (
                 <article
                   key={faq.question}
-                  className="rounded-xl border border-primary-100 bg-primary-50/60 p-4"
+                  className="py-3 border-b border-primary-200/80"
                 >
                   <h3 className="text-sm sm:text-base font-semibold text-primary-900 m-0">
                     {faq.question}

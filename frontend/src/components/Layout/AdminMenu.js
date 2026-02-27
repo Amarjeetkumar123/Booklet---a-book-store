@@ -9,6 +9,7 @@ import {
   FiUsers,
   FiChevronLeft,
   FiChevronRight,
+  FiHeadphones,
   FiMapPin,
 } from "react-icons/fi";
 
@@ -40,6 +41,11 @@ const AdminMenu = () => {
       to: "/dashboard/admin/service-locations",
       label: "Service Locations",
       icon: FiMapPin,
+    },
+    {
+      to: "/dashboard/admin/site-settings",
+      label: "Support Settings",
+      icon: FiHeadphones,
     },
     { to: "/dashboard/admin/products", label: "Products", icon: FiPackage },
     { to: "/dashboard/admin/orders", label: "Orders", icon: FiShoppingBag },

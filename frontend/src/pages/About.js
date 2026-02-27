@@ -109,11 +109,14 @@ const journey = [
 const About = () => {
   return (
     <Layout title={"About Us - Booklet"}>
-      <div className="pt-24 pb-14 min-h-screen bg-gradient-to-b from-primary-50 via-white to-primary-50">
-        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-            <div className="lg:col-span-7 rounded-2xl border border-primary-200 bg-white shadow-sm p-5 sm:p-7">
-              <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full border border-accent-200 bg-accent-50 text-accent-700 text-xs font-semibold">
+      <div className="relative pt-24 pb-14 min-h-screen overflow-hidden bg-gradient-to-b from-[#fff8ef] via-white to-[#fff7ef]">
+        <div className="absolute -top-20 -left-16 h-72 w-72 rounded-full bg-primary-100/70 blur-3xl" />
+        <div className="absolute top-1/3 -right-12 h-72 w-72 rounded-full bg-accent-100/75 blur-3xl" />
+
+        <div className="relative w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-10 items-start pb-8 border-b border-primary-200/80">
+            <div className="lg:col-span-7">
+              <span className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-white/65 text-accent-700 text-xs font-semibold ring-1 ring-white/80 backdrop-blur-md">
                 <FiBook className="h-3.5 w-3.5" />
                 About Booklet
               </span>
@@ -130,21 +133,19 @@ const About = () => {
               </p>
             </div>
 
-            <div className="lg:col-span-5 rounded-2xl border border-accent-200 bg-gradient-to-br from-accent-50 to-primary-50 shadow-sm p-5 sm:p-6">
-              <h2 className="text-xl sm:text-2xl font-semibold text-primary-900">
-                Our Promise
-              </h2>
+            <div className="lg:col-span-5">
+              <h2 className="text-xl sm:text-2xl font-semibold text-primary-900">Our Promise</h2>
               <p className="mt-2 text-sm sm:text-base text-primary-700 leading-relaxed">
                 Curated catalog quality, fair pricing, and dependable support for every
                 order.
               </p>
-              <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="mt-5 grid grid-cols-2 gap-4">
                 {highlights.map((item) => (
                   <div
                     key={item.label}
-                    className="rounded-xl border border-primary-200 bg-white p-3.5"
+                    className="pb-3 border-b border-primary-200/80"
                   >
-                    <p className="text-lg sm:text-xl font-bold text-accent-700 m-0">
+                    <p className="text-xl sm:text-2xl font-bold text-accent-700 m-0">
                       {item.value}
                     </p>
                     <p className="mt-1 text-xs sm:text-sm text-primary-600 m-0 leading-snug">
@@ -156,16 +157,13 @@ const About = () => {
             </div>
           </section>
 
-          <section className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          <section className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pb-8 border-b border-primary-200/80">
             {pillars.map((pillar) => {
               const Icon = pillar.icon;
               return (
-                <article
-                  key={pillar.title}
-                  className="rounded-2xl border border-primary-200 bg-white shadow-sm p-5"
-                >
-                  <div className="h-11 w-11 rounded-xl bg-accent-100 text-accent-700 inline-flex items-center justify-center">
-                    <Icon className="h-5 w-5" />
+                <article key={pillar.title} className="min-w-0">
+                  <div className="h-10 w-10 rounded-full bg-white/75 text-accent-700 inline-flex items-center justify-center ring-1 ring-white/80 backdrop-blur-sm">
+                    <Icon className="h-4.5 w-4.5" />
                   </div>
                   <h3 className="mt-3 text-lg font-semibold text-primary-900">{pillar.title}</h3>
                   <p className="mt-2 text-sm text-primary-600 leading-relaxed">
@@ -176,7 +174,7 @@ const About = () => {
             })}
           </section>
 
-          <section className="mt-10">
+          <section className="mt-10 pb-8 border-b border-primary-200/80">
             <div className="mb-4 sm:mb-5">
               <h2 className="text-2xl sm:text-3xl font-bold text-primary-900">
                 Why readers choose Booklet
@@ -191,7 +189,7 @@ const About = () => {
                 return (
                   <article
                     key={reason.title}
-                    className="rounded-xl border border-primary-200 bg-white p-4 sm:p-5 shadow-sm"
+                    className="py-3 border-b border-primary-200/70"
                   >
                     <div className="inline-flex items-center gap-2 text-accent-700">
                       <Icon className="h-4.5 w-4.5" />
@@ -208,29 +206,29 @@ const About = () => {
             </div>
           </section>
 
-          <section className="mt-10 rounded-2xl border border-primary-200 bg-white shadow-sm p-5 sm:p-6">
+          <section className="mt-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-primary-900">Our Journey</h2>
-            <div className="mt-5 space-y-4">
+            <div className="mt-6 space-y-1">
               {journey.map((step) => {
                 const Icon = step.icon;
                 return (
-                  <article
-                    key={step.title}
-                    className="rounded-xl border border-primary-100 bg-primary-50/60 p-4 sm:p-5 flex gap-3"
-                  >
-                    <div className="h-10 w-10 rounded-lg bg-accent-100 text-accent-700 shrink-0 inline-flex items-center justify-center">
-                      <Icon className="h-4.5 w-4.5" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-accent-700 mb-1">
-                        {step.year}
-                      </p>
-                      <h3 className="text-base sm:text-lg font-semibold text-primary-900 m-0">
-                        {step.title}
-                      </h3>
-                      <p className="mt-1.5 text-sm text-primary-600 leading-relaxed m-0">
-                        {step.text}
-                      </p>
+                  <article key={step.title} className="relative pl-5 py-4 border-l-2 border-primary-200/80">
+                    <span className="absolute -left-[7px] top-8 h-3 w-3 rounded-full bg-accent-500" />
+                    <div className="flex gap-3">
+                      <div className="h-9 w-9 rounded-full bg-white/75 text-accent-700 shrink-0 inline-flex items-center justify-center ring-1 ring-white/80">
+                        <Icon className="h-4.5 w-4.5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-accent-700 mb-1">
+                          {step.year}
+                        </p>
+                        <h3 className="text-base sm:text-lg font-semibold text-primary-900 m-0">
+                          {step.title}
+                        </h3>
+                        <p className="mt-1.5 text-sm text-primary-600 leading-relaxed m-0">
+                          {step.text}
+                        </p>
+                      </div>
                     </div>
                   </article>
                 );

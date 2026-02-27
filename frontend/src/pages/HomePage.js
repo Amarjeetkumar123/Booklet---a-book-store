@@ -355,201 +355,219 @@ const HomePage = () => {
     };
   }, [sidebarOpen]);
 
-  const renderFilterPanel = (mobile = false) => (
-    <div className={`space-y-4 ${mobile ? "p-5" : "p-4"}`}>
-      {activeFiltersCount > 0 && (
-        <div className="rounded-xl border border-accent-200 bg-accent-50/70 p-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent-700 mb-2">
-            Active Filters
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {searchQuery.trim() && (
+  const renderFilterPanel = (mobile = false) => {
+    const chipClass = (isActive) =>
+      `h-8 px-3 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 transition-colors ${
+        isActive
+          ? "bg-accent-100 text-accent-700"
+          : "bg-primary-100 text-primary-700 hover:bg-primary-200"
+      }`;
+
+    const optionClass = (isActive) =>
+      `w-full min-h-[2.25rem] px-2.5 rounded-lg text-sm font-medium text-left transition-colors inline-flex items-center justify-between ${
+        isActive
+          ? "bg-accent-50 text-accent-700"
+          : "text-primary-700 hover:bg-primary-100/80"
+      }`;
+
+    return (
+      <div className={`space-y-5 ${mobile ? "px-5 py-4" : "px-1 py-3"}`}>
+        {activeFiltersCount > 0 && (
+          <div className="pb-4 border-b border-primary-200/80">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-accent-700 m-0">
+                Active Filters
+              </p>
+              <span className="text-[11px] text-primary-500">
+                {activeFiltersCount} applied
+              </span>
+            </div>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              {searchQuery.trim() && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className={chipClass(true)}
+                >
+                  Search
+                  <FiX className="h-3 w-3" />
+                </button>
+              )}
+              {selectedCategory && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory("")}
+                  className={chipClass(true)}
+                >
+                  {selectedCategoryLabel || "Category"}
+                  <FiX className="h-3 w-3" />
+                </button>
+              )}
+              {selectedPriceLabel && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedPrice(DEFAULT_PRICE)}
+                  className={chipClass(true)}
+                >
+                  {selectedPriceLabel}
+                  <FiX className="h-3 w-3" />
+                </button>
+              )}
+              {selectedRating > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedRating(0)}
+                  className={chipClass(true)}
+                >
+                  {selectedRating}+ stars
+                  <FiX className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="pb-4 border-b border-primary-100">
+          <label className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 block">
+            Search
+          </label>
+          <div className="relative mt-2">
+            <FiSearch className="h-4 w-4 text-primary-400 absolute left-2 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search title or keyword"
+              className="w-full h-10 border-b border-primary-300 bg-transparent pl-8 pr-8 text-sm text-primary-900 focus:outline-none focus:border-accent-500"
+            />
+            {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="h-8 px-2.5 rounded-full border border-accent-200 bg-white text-accent-700 text-xs font-medium inline-flex items-center gap-1"
+                className="absolute right-0 top-1/2 -translate-y-1/2 h-7 w-7 text-primary-500 hover:text-primary-700 inline-flex items-center justify-center"
+                aria-label="Clear search"
               >
-                Search
-                <FiX className="h-3 w-3" />
-              </button>
-            )}
-            {selectedCategory && (
-              <button
-                type="button"
-                onClick={() => setSelectedCategory("")}
-                className="h-8 px-2.5 rounded-full border border-accent-200 bg-white text-accent-700 text-xs font-medium inline-flex items-center gap-1"
-              >
-                {selectedCategoryLabel || "Category"}
-                <FiX className="h-3 w-3" />
-              </button>
-            )}
-            {selectedPriceLabel && (
-              <button
-                type="button"
-                onClick={() => setSelectedPrice(DEFAULT_PRICE)}
-                className="h-8 px-2.5 rounded-full border border-accent-200 bg-white text-accent-700 text-xs font-medium inline-flex items-center gap-1"
-              >
-                {selectedPriceLabel}
-                <FiX className="h-3 w-3" />
-              </button>
-            )}
-            {selectedRating > 0 && (
-              <button
-                type="button"
-                onClick={() => setSelectedRating(0)}
-                className="h-8 px-2.5 rounded-full border border-accent-200 bg-white text-accent-700 text-xs font-medium inline-flex items-center gap-1"
-              >
-                {selectedRating}+ stars
-                <FiX className="h-3 w-3" />
+                <FiX className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
         </div>
-      )}
 
-      <div className="rounded-xl border border-primary-200 bg-primary-50/70 p-3">
-        <label className="text-xs font-semibold uppercase tracking-wide text-primary-500 mb-1.5 block">
-          Quick Search
-        </label>
-        <div className="relative">
-          <FiSearch className="h-4 w-4 text-primary-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search title, category, or keywords"
-            className="w-full h-10 rounded-lg border border-primary-200 bg-white pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
-          />
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-primary-200 bg-white p-3">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-primary-500 mb-2.5">
-          Category
-        </h4>
-        <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto pr-1 scrollbar-thin">
-          <button
-            type="button"
-            onClick={() => setSelectedCategory("")}
-            className={`h-9 px-2.5 rounded-full text-sm font-medium border transition-colors ${
-              selectedCategory === ""
-                ? "bg-accent-100 text-accent-700 border-accent-200"
-                : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
-            }`}
-          >
-            All
-          </button>
-          {categories?.map((cat) => (
+        <div className="pb-4 border-b border-primary-100">
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 m-0">
+              Category
+            </h4>
+            {selectedCategory && (
+              <button
+                type="button"
+                onClick={() => setSelectedCategory("")}
+                className="text-[11px] font-semibold text-accent-700 hover:text-accent-800"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <div className="mt-2.5 flex flex-wrap gap-2 max-h-44 overflow-y-auto pr-1 scrollbar-thin">
             <button
-              key={cat._id}
               type="button"
-              onClick={() => setSelectedCategory(cat._id)}
-              className={`h-9 px-2.5 rounded-full text-sm font-medium border transition-colors ${
-                selectedCategory === cat._id
-                  ? "bg-accent-100 text-accent-700 border-accent-200"
-                  : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
-              }`}
+              onClick={() => setSelectedCategory("")}
+              className={chipClass(selectedCategory === "")}
             >
-              {cat.name}
+              All
             </button>
-          ))}
+            {categories?.map((cat) => (
+              <button
+                key={cat._id}
+                type="button"
+                onClick={() => setSelectedCategory(cat._id)}
+                className={chipClass(selectedCategory === cat._id)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="rounded-xl border border-primary-200 bg-white p-3">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-primary-500 mb-2.5">
-          Budget Range
-        </h4>
-        <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1 scrollbar-thin">
-          <button
-            type="button"
-            onClick={() => setSelectedPrice(DEFAULT_PRICE)}
-            className={`w-full h-9 rounded-lg border text-sm font-medium text-left px-3 transition-colors ${
-              isPriceActive(DEFAULT_PRICE)
-                ? "bg-accent-100 text-accent-700 border-accent-200"
-                : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
-            }`}
-          >
-            All prices
-          </button>
-          {Prices.map((price) => (
+        <div className="pb-4 border-b border-primary-100">
+          <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 m-0">
+            Budget
+          </h4>
+          <div className="mt-2 space-y-1.5 max-h-44 overflow-y-auto pr-1 scrollbar-thin">
             <button
-              key={price._id}
               type="button"
-              onClick={() => setSelectedPrice(price.array)}
-              className={`w-full h-9 rounded-lg border text-sm font-medium text-left px-3 transition-colors ${
-                isPriceActive(price.array)
-                  ? "bg-accent-100 text-accent-700 border-accent-200"
-                  : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
-              }`}
+              onClick={() => setSelectedPrice(DEFAULT_PRICE)}
+              className={optionClass(isPriceActive(DEFAULT_PRICE))}
             >
-              {price.name}
+              <span>All prices</span>
             </button>
-          ))}
+            {Prices.map((price) => (
+              <button
+                key={price._id}
+                type="button"
+                onClick={() => setSelectedPrice(price.array)}
+                className={optionClass(isPriceActive(price.array))}
+              >
+                <span>{price.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="rounded-xl border border-primary-200 bg-white p-3">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-primary-500 mb-2.5">
-          Customer Rating
-        </h4>
-        <div className="space-y-1.5">
-          <button
-            type="button"
-            onClick={() => setSelectedRating(0)}
-            className={`w-full h-9 rounded-lg border text-sm font-medium text-left px-3 transition-colors ${
-              selectedRating === 0
-                ? "bg-accent-100 text-accent-700 border-accent-200"
-                : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
-            }`}
-          >
-            Any rating
-          </button>
-          {[5, 4, 3, 2, 1].map((rating) => (
+        <div className="pb-1">
+          <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 m-0">
+            Rating
+          </h4>
+          <div className="mt-2 space-y-1.5">
             <button
-              key={rating}
               type="button"
-              onClick={() => setSelectedRating(rating)}
-              className={`w-full h-9 rounded-lg border text-sm font-medium px-3 transition-colors inline-flex items-center justify-between ${
-                selectedRating === rating
-                  ? "bg-accent-100 text-accent-700 border-accent-200"
-                  : "bg-white text-primary-700 border-primary-200 hover:bg-primary-50"
-              }`}
+              onClick={() => setSelectedRating(0)}
+              className={optionClass(selectedRating === 0)}
             >
-              <span className="inline-flex items-center gap-0.5">
-                {[...Array(rating)].map((_, i) => (
-                  <FiStar key={i} className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
-                ))}
-              </span>
-              <span>{rating}+</span>
+              <span>Any rating</span>
             </button>
-          ))}
+            {[5, 4, 3, 2, 1].map((rating) => (
+              <button
+                key={rating}
+                type="button"
+                onClick={() => setSelectedRating(rating)}
+                className={optionClass(selectedRating === rating)}
+              >
+                <span className="inline-flex items-center gap-0.5">
+                  {[...Array(rating)].map((_, i) => (
+                    <FiStar key={i} className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
+                  ))}
+                </span>
+                <span>{rating}+</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className={`grid gap-2 ${mobile ? "grid-cols-2" : "grid-cols-1"}`}>
-        <button
-          type="button"
-          onClick={() => {
-            handleResetFilters();
-            if (mobile) setSidebarOpen(false);
-          }}
-          className="w-full h-10 rounded-lg border border-primary-200 bg-primary-100 hover:bg-primary-200 text-primary-800 text-sm font-semibold"
-        >
-          Clear All
-        </button>
-        {mobile && (
+        <div className={`grid gap-2 pt-1 ${mobile ? "grid-cols-2" : "grid-cols-1"}`}>
           <button
             type="button"
-            onClick={() => setSidebarOpen(false)}
-            className="w-full h-10 rounded-lg border border-accent-200 bg-accent-50 hover:bg-accent-100 text-accent-700 text-sm font-semibold"
+            onClick={() => {
+              handleResetFilters();
+              if (mobile) setSidebarOpen(false);
+            }}
+            className="w-full h-10 rounded-full bg-primary-900 hover:bg-primary-800 text-white text-sm font-semibold transition-colors"
           >
-            Done
+            Clear All
           </button>
-        )}
+          {mobile && (
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              className="w-full h-10 rounded-full bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold transition-colors"
+            >
+              Apply
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <Layout>
@@ -848,12 +866,12 @@ const HomePage = () => {
                 sidebarCollapsed ? "w-[90px]" : "w-[18.5rem] xl:w-[19.5rem]"
               }`}
             >
-              <div className="sticky top-20 rounded-2xl border border-primary-200 bg-white shadow-sm overflow-hidden max-h-[calc(100vh-6rem)] flex flex-col">
-                <div className={`h-16 border-b border-primary-100 px-3 pt-3 ${sidebarCollapsed ? "justify-center" : "justify-between"} flex items-center`}>
+              <div className="sticky top-20 max-h-[calc(100vh-6rem)] pr-3 xl:pr-4 flex flex-col">
+                <div className={`h-14 border-b border-primary-200/80 px-1 ${sidebarCollapsed ? "justify-center" : "justify-between"} flex items-center`}>
                   {!sidebarCollapsed && (
                     <div className="min-w-0 py-0.5">
-                      <h3 className="text-base font-semibold text-accent-700">Filters</h3>
-                      <p className="text-sm text-primary-500">
+                      <h3 className="text-base font-semibold text-primary-900">Filters</h3>
+                      <p className="text-xs text-primary-500">
                         {activeFiltersCount > 0 ? (
                           <span className="inline-flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
@@ -868,7 +886,7 @@ const HomePage = () => {
                   <button
                     type="button"
                     onClick={() => setSidebarCollapsed((prev) => !prev)}
-                    className="h-9 w-9 rounded-lg border border-primary-200 bg-white hover:bg-primary-50 text-primary-700 inline-flex items-center justify-center"
+                    className="h-8 w-8 rounded-full bg-primary-100 hover:bg-primary-200 text-primary-700 inline-flex items-center justify-center transition-colors"
                   >
                     {sidebarCollapsed ? (
                       <FiFilter className="h-4 w-4" />
@@ -879,11 +897,11 @@ const HomePage = () => {
                 </div>
 
                 {sidebarCollapsed ? (
-                  <div className="p-3 space-y-2">
+                  <div className="pt-3 space-y-2 px-1">
                     <button
                       type="button"
                       onClick={() => setSidebarCollapsed(false)}
-                      className="w-full h-10 rounded-lg border border-accent-200 bg-accent-50 text-accent-700 inline-flex items-center justify-center"
+                      className="w-full h-10 rounded-full bg-accent-100 text-accent-700 hover:bg-accent-200 inline-flex items-center justify-center transition-colors"
                       title="Expand filters"
                     >
                       <FiSliders className="h-4 w-4" />
@@ -891,14 +909,14 @@ const HomePage = () => {
                     <button
                       type="button"
                       onClick={handleResetFilters}
-                      className="w-full h-10 rounded-lg border border-primary-200 bg-primary-50 text-primary-700 text-sm font-semibold"
+                      className="w-full h-10 rounded-full bg-primary-100 text-primary-800 hover:bg-primary-200 text-sm font-semibold transition-colors"
                       title="Reset filters"
                     >
                       Clear
                     </button>
                   </div>
                 ) : (
-                  <div className="flex-1 overflow-y-auto scrollbar-thin">
+                  <div className="flex-1 overflow-y-auto scrollbar-thin mt-2">
                     {renderFilterPanel()}
                   </div>
                 )}
@@ -907,7 +925,7 @@ const HomePage = () => {
 
             {/* Content column */}
             <div className="flex-1 min-w-0">
-              <div className={`mb-4 rounded-xl border border-primary-200 bg-white p-3 sm:p-4 shadow-sm ${isFiltering ? "fx-filter-pulse" : ""}`}>
+              <div className={`mb-5 pb-3 border-b border-primary-200 ${isFiltering ? "fx-filter-pulse" : ""}`}>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
                   <p className="text-sm text-primary-700">
                     Showing <span className="font-semibold text-primary-900">{displayProducts.length}</span> of <span className="font-semibold text-primary-900">{filteredProducts.length}</span> matching titles
@@ -918,7 +936,7 @@ const HomePage = () => {
                       <button
                         type="button"
                         onClick={() => setSortMenuOpen((prev) => !prev)}
-                        className="h-10 min-w-[10.5rem] rounded-lg border border-primary-200 bg-white px-3 text-sm text-primary-800 inline-flex items-center justify-between gap-2"
+                        className="h-10 min-w-[10.5rem] rounded-full bg-primary-100 px-3 text-sm text-primary-800 inline-flex items-center justify-between gap-2"
                       >
                         <span>{selectedSortLabel}</span>
                         <FiChevronDown
@@ -953,7 +971,7 @@ const HomePage = () => {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="hidden sm:block h-10 rounded-lg border border-primary-200 bg-white px-3 text-sm text-primary-800 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                      className="hidden sm:block h-10 rounded-full bg-primary-100 px-3 text-sm text-primary-800 focus:outline-none focus:ring-2 focus:ring-accent-300"
                     >
                       {SORT_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -1134,11 +1152,11 @@ const HomePage = () => {
             className="absolute inset-0 bg-black/45"
             onClick={() => setSidebarOpen(false)}
           />
-          <div className="absolute inset-x-0 bottom-0 max-h-[86vh] rounded-t-3xl border-t border-primary-200 bg-white shadow-2xl overflow-hidden">
+          <div className="absolute inset-x-0 bottom-0 max-h-[86vh] rounded-t-3xl bg-white shadow-2xl overflow-hidden">
             <div className="pt-2 pb-1 flex justify-center">
               <span className="h-1 w-10 rounded-full bg-primary-200" />
             </div>
-            <div className="h-16 px-5 border-b border-primary-100 flex items-center justify-between">
+            <div className="h-16 px-5 border-b border-primary-200/80 flex items-center justify-between">
               <div className="py-0.5">
                 <h3 className="text-sm font-semibold text-primary-900">Refine Results</h3>
                 <p className="text-xs text-primary-500">
@@ -1148,7 +1166,7 @@ const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setSidebarOpen(false)}
-                className="h-9 w-9 rounded-lg border border-primary-200 bg-white text-primary-700 inline-flex items-center justify-center"
+                className="h-9 w-9 rounded-full bg-primary-100 hover:bg-primary-200 text-primary-700 inline-flex items-center justify-center transition-colors"
               >
                 <FiX className="h-4 w-4" />
               </button>

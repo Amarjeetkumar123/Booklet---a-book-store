@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
 import { useCart } from "../../context/cart";
 import { useWishlist } from "../../context/wishlist";
 import { useLocationContext } from "../../context/location";
+import CartWishlistDrawer from "./CartWishlistDrawer";
 import {
   FiChevronDown,
   FiHeart,
@@ -37,7 +38,14 @@ const Header = () => {
     loading: locationLoading,
   } = useLocationContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeDrawer, setActiveDrawer] = useState(null);
+  const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setActiveDrawer(null);
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     setAuth({
@@ -76,17 +84,23 @@ const Header = () => {
         : "text-primary-700 hover:bg-primary-50 hover:text-accent-700"
     }`;
 
-  const desktopIconLinkClass = ({ isActive }) =>
-    `no-underline relative h-10 min-w-[2.5rem] sm:min-w-0 sm:px-3 rounded-lg inline-flex items-center justify-center sm:justify-start gap-2 text-sm font-medium transition-colors ${
+  const desktopIconButtonClass = (isActive) =>
+    `relative h-10 min-w-[2.5rem] sm:min-w-0 sm:px-3 rounded-lg inline-flex items-center justify-center sm:justify-start gap-2 text-sm font-medium transition-colors ${
       isActive
         ? "bg-accent-100 text-accent-700 border border-accent-200"
         : "text-primary-700 hover:bg-primary-50 hover:text-accent-700"
     }`;
 
+  const openDrawer = (panel) => {
+    setActiveDrawer(panel);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-primary-200 bg-white/95 backdrop-blur shadow-[0_6px_20px_rgba(85,67,43,0.08)] fx-header-entry">
-      <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
-        <div className="h-16 flex items-center justify-between gap-3">
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-primary-200 bg-white/95 backdrop-blur shadow-[0_6px_20px_rgba(85,67,43,0.08)] fx-header-entry">
+        <div className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
+          <div className="h-16 flex items-center justify-between gap-3">
           {/* Logo */}
           <Link to="/" className="no-underline flex items-center gap-2.5 shrink-0 group">
             <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl border border-accent-200 bg-white p-0.5 flex items-center justify-center overflow-hidden group-hover:bg-accent-50 transition-colors">
@@ -152,7 +166,12 @@ const Header = () => {
 
           {/* Right actions */}
           <div className="flex items-center gap-1 sm:gap-1.5">
-            <NavLink to="/wishlist" className={desktopIconLinkClass}>
+            <button
+              type="button"
+              onClick={() => openDrawer("wishlist")}
+              className={desktopIconButtonClass(activeDrawer === "wishlist")}
+              aria-label="Open wishlist"
+            >
               <FiHeart className="h-4.5 w-4.5" />
               <span className="hidden xl:inline">Wishlist</span>
               {wishlist?.length > 0 && (
@@ -160,9 +179,14 @@ const Header = () => {
                   {wishlist.length}
                 </span>
               )}
-            </NavLink>
+            </button>
 
-            <NavLink to="/cart" className={desktopIconLinkClass}>
+            <button
+              type="button"
+              onClick={() => openDrawer("cart")}
+              className={desktopIconButtonClass(activeDrawer === "cart")}
+              aria-label="Open cart"
+            >
               <FiShoppingCart className="h-4.5 w-4.5" />
               <span className="hidden xl:inline">Cart</span>
               {cart?.length > 0 && (
@@ -170,7 +194,7 @@ const Header = () => {
                   {cart.length}
                 </span>
               )}
-            </NavLink>
+            </button>
 
             {/* Desktop auth */}
             <div className="hidden md:flex items-center">
@@ -243,10 +267,10 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile navigation */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-primary-100 py-3 fx-mobile-menu">
-            <div className="space-y-1.5">
+          {/* Mobile navigation */}
+          {isMobileMenuOpen && (
+            <div className="lg:hidden border-t border-primary-100 py-3 fx-mobile-menu">
+              <div className="space-y-1.5">
               <div className="rounded-lg border border-primary-200 bg-primary-50/60 p-2.5 mb-1">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 inline-flex items-center gap-1.5 mb-1.5">
                   <FiMapPin className="h-3.5 w-3.5 text-accent-700" />
@@ -330,85 +354,80 @@ const Header = () => {
                 Contact
               </NavLink>
 
-              <div className="grid grid-cols-2 gap-2 pt-1">
-                <NavLink
-                  to="/wishlist"
-                  className={({ isActive }) =>
-                    `no-underline h-10 px-3 rounded-lg inline-flex items-center justify-center gap-2 text-sm font-medium ${
-                      isActive
-                        ? "bg-accent-100 text-accent-700"
-                        : "text-primary-700 hover:bg-primary-50"
-                    }`
-                  }
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <FiHeart className="h-4 w-4" />
-                  Wishlist
-                </NavLink>
-                <NavLink
-                  to="/cart"
-                  className={({ isActive }) =>
-                    `no-underline h-10 px-3 rounded-lg inline-flex items-center justify-center gap-2 text-sm font-medium ${
-                      isActive
-                        ? "bg-accent-100 text-accent-700"
-                        : "text-primary-700 hover:bg-primary-50"
-                    }`
-                  }
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <FiShoppingCart className="h-4 w-4" />
-                  Cart
-                </NavLink>
-              </div>
-
-              {!auth?.user ? (
-                <div className="pt-2 border-t border-primary-100">
-                  <NavLink
-                    to="/login"
-                    className="no-underline h-10 px-3 rounded-lg bg-accent-50 hover:bg-accent-100 border border-accent-200 text-accent-700 text-sm font-semibold inline-flex items-center justify-center w-full"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Login
-                  </NavLink>
-                </div>
-              ) : (
-                <div className="pt-2 border-t border-primary-100 space-y-2">
-                  <div className="px-3 py-2.5 rounded-lg border border-accent-200 bg-accent-50">
-                    <p className="text-sm font-semibold text-primary-900 m-0 truncate">
-                      {auth?.user?.name}
-                    </p>
-                    <p className="text-xs text-primary-500 capitalize m-0 mt-0.5">
-                      {getRoleLabel(auth?.user?.role)}
-                    </p>
-                  </div>
-
-                  <Link
-                    to={dashboardPath}
-                    className="no-underline h-10 px-3 rounded-lg text-sm font-medium text-primary-700 hover:bg-primary-50 inline-flex items-center gap-2 w-full"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <FiUser className="h-4 w-4" />
-                    Dashboard
-                  </Link>
-
+                <div className="grid grid-cols-2 gap-2 pt-1">
                   <button
                     type="button"
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="h-10 px-3 rounded-lg text-sm font-medium text-red-700 hover:bg-red-50 inline-flex items-center gap-2 w-full"
+                    className="h-10 px-3 rounded-lg inline-flex items-center justify-center gap-2 text-sm font-medium text-primary-700 hover:bg-primary-50"
+                    onClick={() => openDrawer("wishlist")}
                   >
-                    <FiLogOut className="h-4 w-4" />
-                    Logout
+                  <FiHeart className="h-4 w-4" />
+                  Wishlist
+                  </button>
+                  <button
+                    type="button"
+                    className="h-10 px-3 rounded-lg inline-flex items-center justify-center gap-2 text-sm font-medium text-primary-700 hover:bg-primary-50"
+                    onClick={() => openDrawer("cart")}
+                  >
+                  <FiShoppingCart className="h-4 w-4" />
+                  Cart
                   </button>
                 </div>
-              )}
+
+                {!auth?.user ? (
+                  <div className="pt-2 border-t border-primary-100">
+                    <NavLink
+                      to="/login"
+                      className="no-underline h-10 px-3 rounded-lg bg-accent-50 hover:bg-accent-100 border border-accent-200 text-accent-700 text-sm font-semibold inline-flex items-center justify-center w-full"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Login
+                    </NavLink>
+                  </div>
+                ) : (
+                  <div className="pt-2 border-t border-primary-100 space-y-2">
+                    <div className="px-3 py-2.5 rounded-lg border border-accent-200 bg-accent-50">
+                      <p className="text-sm font-semibold text-primary-900 m-0 truncate">
+                        {auth?.user?.name}
+                      </p>
+                      <p className="text-xs text-primary-500 capitalize m-0 mt-0.5">
+                        {getRoleLabel(auth?.user?.role)}
+                      </p>
+                    </div>
+
+                    <Link
+                      to={dashboardPath}
+                      className="no-underline h-10 px-3 rounded-lg text-sm font-medium text-primary-700 hover:bg-primary-50 inline-flex items-center gap-2 w-full"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <FiUser className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleLogout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="h-10 px-3 rounded-lg text-sm font-medium text-red-700 hover:bg-red-50 inline-flex items-center gap-2 w-full"
+                    >
+                      <FiLogOut className="h-4 w-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-    </header>
+          )}
+        </div>
+      </header>
+
+      <CartWishlistDrawer
+        panel={activeDrawer}
+        onClose={() => setActiveDrawer(null)}
+        onSetPanel={setActiveDrawer}
+      />
+    </>
   );
 };
 

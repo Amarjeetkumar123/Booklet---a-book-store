@@ -14,13 +14,6 @@ import {
   FiTwitter,
 } from "react-icons/fi";
 
-const quickLinks = [
-  { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
-  { to: "/categories", label: "Categories" },
-  { to: "/contact", label: "Contact" },
-];
-
 const supportLinks = [
   { to: "/policy", label: "Privacy Policy" },
   { to: "/contact", label: "Help Center" },
@@ -78,7 +71,7 @@ const Footer = () => {
         )}
 
         <section className="py-8 sm:py-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 sm:gap-8">
             <div>
               <Link to="/" className="inline-flex items-center gap-2 no-underline text-primary-900">
                 <span className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-white border border-accent-200 p-0.5 inline-flex items-center justify-center overflow-hidden">
@@ -100,25 +93,6 @@ const Footer = () => {
               <p className="mt-3 text-sm text-primary-700 inline-flex items-center gap-1.5">
                 Built with <FiHeart className="h-4 w-4 text-accent-600" /> for readers
               </p>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-accent-700 mb-3">
-                Quick Links
-              </h3>
-              <ul className="space-y-2.5">
-                {quickLinks.map((item) => (
-                  <li key={item.label}>
-                    <Link
-                      to={item.to}
-                      className="no-underline text-sm text-primary-700 hover:text-accent-700 inline-flex items-center gap-1.5"
-                    >
-                      <FiChevronRight className="h-3.5 w-3.5" />
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
             </div>
 
             <div>

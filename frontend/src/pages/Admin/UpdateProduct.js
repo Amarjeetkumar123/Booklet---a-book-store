@@ -33,9 +33,28 @@ const UpdateProduct = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [mrp, setMrp] = useState("");
   const [category, setCategory] = useState("");
   const [quantity, setQuantity] = useState("");
   const [shipping, setShipping] = useState("0");
+  const [shippingCharge, setShippingCharge] = useState("0");
+  const [estimatedDeliveryMinDays, setEstimatedDeliveryMinDays] = useState("2");
+  const [estimatedDeliveryMaxDays, setEstimatedDeliveryMaxDays] = useState("5");
+  const [returnWindowDays, setReturnWindowDays] = useState("7");
+  const [priceIncludesTax, setPriceIncludesTax] = useState("1");
+  const [taxRate, setTaxRate] = useState("0");
+  const [sku, setSku] = useState("");
+  const [isbn, setIsbn] = useState("");
+  const [author, setAuthor] = useState("");
+  const [publisher, setPublisher] = useState("");
+  const [language, setLanguage] = useState("English");
+  const [format, setFormat] = useState("Paperback");
+  const [edition, setEdition] = useState("");
+  const [pages, setPages] = useState("");
+  const [weightInGrams, setWeightInGrams] = useState("");
+  const [highlights, setHighlights] = useState("");
+  const [perfectFor, setPerfectFor] = useState("");
+  const [detailsAndCare, setDetailsAndCare] = useState("");
   const [id, setId] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -79,8 +98,39 @@ const UpdateProduct = () => {
       setId(product._id || "");
       setDescription(product.description || "");
       setPrice(product.price ?? "");
+      setMrp(product.mrp ?? "");
       setQuantity(product.quantity ?? "");
       setShipping(String(product.shipping === true || String(product.shipping) === "1" ? "1" : "0"));
+      setShippingCharge(product.shippingCharge ?? "0");
+      setEstimatedDeliveryMinDays(product.estimatedDeliveryMinDays ?? "2");
+      setEstimatedDeliveryMaxDays(product.estimatedDeliveryMaxDays ?? "5");
+      setReturnWindowDays(product.returnWindowDays ?? "7");
+      setPriceIncludesTax(
+        String(
+          product.priceIncludesTax === true || String(product.priceIncludesTax) === "1"
+            ? "1"
+            : "0"
+        )
+      );
+      setTaxRate(product.taxRate ?? "0");
+      setSku(product.sku || "");
+      setIsbn(product.isbn || "");
+      setAuthor(product.author || "");
+      setPublisher(product.publisher || "");
+      setLanguage(product.language || "English");
+      setFormat(product.format || "Paperback");
+      setEdition(product.edition || "");
+      setPages(product.pages ?? "");
+      setWeightInGrams(product.weightInGrams ?? "");
+      setHighlights(
+        Array.isArray(product.highlights) ? product.highlights.join("\n") : ""
+      );
+      setPerfectFor(
+        Array.isArray(product.perfectFor) ? product.perfectFor.join("\n") : ""
+      );
+      setDetailsAndCare(
+        Array.isArray(product.detailsAndCare) ? product.detailsAndCare.join("\n") : ""
+      );
       setCategory(product?.category?._id || "");
 
       const serverImageUrls = Array.isArray(product.imageUrls)
@@ -244,9 +294,37 @@ const UpdateProduct = () => {
         name,
         description,
         price,
+        mrp,
         quantity,
         category,
         shipping: shipping === "1",
+        shippingCharge,
+        estimatedDeliveryMinDays,
+        estimatedDeliveryMaxDays,
+        returnWindowDays,
+        priceIncludesTax: priceIncludesTax === "1",
+        taxRate,
+        sku,
+        isbn,
+        author,
+        publisher,
+        language,
+        format,
+        edition,
+        pages,
+        weightInGrams,
+        highlights: highlights
+          .split("\n")
+          .map((item) => item.trim())
+          .filter(Boolean),
+        perfectFor: perfectFor
+          .split("\n")
+          .map((item) => item.trim())
+          .filter(Boolean),
+        detailsAndCare: detailsAndCare
+          .split("\n")
+          .map((item) => item.trim())
+          .filter(Boolean),
         imageUrl: finalImageUrls[0] || "",
         imageUrls: finalImageUrls,
         serviceLocations: selectedServiceLocations,
@@ -438,11 +516,11 @@ const UpdateProduct = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500 inline-flex items-center gap-1.5">
                     <span className="text-sm leading-none">₹</span>
-                    Price (INR)
+                    Selling Price (INR)
                   </label>
                   <input
                     type="number"
@@ -451,6 +529,19 @@ const UpdateProduct = () => {
                     step="0.01"
                     className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
                     onChange={(e) => setPrice(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    MRP (INR)
+                  </label>
+                  <input
+                    type="number"
+                    value={mrp}
+                    placeholder="0.00"
+                    step="0.01"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setMrp(e.target.value)}
                   />
                 </div>
                 <div>
@@ -464,6 +555,240 @@ const UpdateProduct = () => {
                     placeholder="0"
                     className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
                     onChange={(e) => setQuantity(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Price Includes Tax
+                  </label>
+                  <select
+                    value={priceIncludesTax}
+                    onChange={(e) => setPriceIncludesTax(e.target.value)}
+                    className="w-full h-10 rounded-lg border border-primary-200 bg-white px-3 text-sm text-primary-900 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                  >
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Tax Rate (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={taxRate}
+                    placeholder="0"
+                    step="0.01"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setTaxRate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Shipping Charge (INR)
+                  </label>
+                  <input
+                    type="number"
+                    value={shippingCharge}
+                    placeholder="0"
+                    step="0.01"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setShippingCharge(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Delivery Min Days
+                  </label>
+                  <input
+                    type="number"
+                    value={estimatedDeliveryMinDays}
+                    placeholder="2"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setEstimatedDeliveryMinDays(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Delivery Max Days
+                  </label>
+                  <input
+                    type="number"
+                    value={estimatedDeliveryMaxDays}
+                    placeholder="5"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setEstimatedDeliveryMaxDays(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Return Window (Days)
+                  </label>
+                  <input
+                    type="number"
+                    value={returnWindowDays}
+                    placeholder="7"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setReturnWindowDays(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    SKU
+                  </label>
+                  <input
+                    type="text"
+                    value={sku}
+                    placeholder="SKU-001"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setSku(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    ISBN
+                  </label>
+                  <input
+                    type="text"
+                    value={isbn}
+                    placeholder="978..."
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setIsbn(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Author
+                  </label>
+                  <input
+                    type="text"
+                    value={author}
+                    placeholder="Author name"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setAuthor(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Publisher
+                  </label>
+                  <input
+                    type="text"
+                    value={publisher}
+                    placeholder="Publisher"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setPublisher(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Language
+                  </label>
+                  <input
+                    type="text"
+                    value={language}
+                    placeholder="English"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setLanguage(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Format
+                  </label>
+                  <input
+                    type="text"
+                    value={format}
+                    placeholder="Paperback"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setFormat(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Edition
+                  </label>
+                  <input
+                    type="text"
+                    value={edition}
+                    placeholder="1st Edition"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setEdition(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Pages
+                  </label>
+                  <input
+                    type="number"
+                    value={pages}
+                    placeholder="0"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setPages(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Weight (Grams)
+                  </label>
+                  <input
+                    type="number"
+                    value={weightInGrams}
+                    placeholder="0"
+                    className="w-full h-10 rounded-lg border border-primary-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setWeightInGrams(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Perfect For (One per line)
+                  </label>
+                  <textarea
+                    value={perfectFor}
+                    placeholder={"Students\nExam prep\nDaily practice"}
+                    className="w-full min-h-[90px] rounded-lg border border-primary-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setPerfectFor(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Highlights (One per line)
+                  </label>
+                  <textarea
+                    value={highlights}
+                    placeholder={"Premium quality print\nEasy returns\nFast dispatch"}
+                    className="w-full min-h-[90px] rounded-lg border border-primary-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setHighlights(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-primary-500">
+                    Reading & Handling Notes (One per line)
+                  </label>
+                  <textarea
+                    value={detailsAndCare}
+                    placeholder={"Reading level: Class XI\nKeep away from moisture\nStore upright on shelf"}
+                    className="w-full min-h-[90px] rounded-lg border border-primary-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent-300"
+                    onChange={(e) => setDetailsAndCare(e.target.value)}
                   />
                 </div>
               </div>

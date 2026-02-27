@@ -82,22 +82,133 @@ const deleteCloudinaryImagesSafely = async (imageUrls = []) => {
   return failedImageDeletions;
 };
 
+const normalizeTextInput = (value, fallback = "") =>
+  typeof value === "string" ? value.trim() : fallback;
+
+const toNonNegativeNumber = (value, fallback = 0) => {
+  if (value === "" || value === null || typeof value === "undefined") {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0) return fallback;
+  return parsed;
+};
+
+const normalizeBooleanInput = (value, fallback = false) => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value === 1;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (["1", "true", "yes"].includes(normalized)) return true;
+    if (["0", "false", "no"].includes(normalized)) return false;
+  }
+  return fallback;
+};
+
+const normalizeStringArray = (value) => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => normalizeTextInput(item))
+      .filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(/\n|,/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
+const getProductPayloadFromRequest = ({
+  body,
+  normalizedImageUrls,
+  normalizedServiceLocations,
+}) => {
+  const name = normalizeTextInput(body?.name);
+  const description = normalizeTextInput(body?.description);
+  const category = normalizeTextInput(body?.category);
+
+  const priceRaw =
+    body?.price === "" || body?.price === null || typeof body?.price === "undefined"
+      ? NaN
+      : Number(body.price);
+  const quantityRaw =
+    body?.quantity === "" ||
+    body?.quantity === null ||
+    typeof body?.quantity === "undefined"
+      ? NaN
+      : Number(body.quantity);
+
+  if (!name) return { error: "Name is Required" };
+  if (!description) return { error: "Description is Required" };
+  if (!category) return { error: "Category is Required" };
+  if (!Number.isFinite(priceRaw) || priceRaw < 0) {
+    return { error: "Price must be a valid non-negative number" };
+  }
+  if (!Number.isFinite(quantityRaw) || quantityRaw < 0) {
+    return { error: "Quantity must be a valid non-negative number" };
+  }
+
+  const price = Number(priceRaw.toFixed(2));
+  const quantity = Math.floor(quantityRaw);
+  const shipping = normalizeBooleanInput(body?.shipping, false);
+  const mrp = Math.max(toNonNegativeNumber(body?.mrp, price), price);
+
+  let estimatedDeliveryMinDays = Math.floor(
+    toNonNegativeNumber(body?.estimatedDeliveryMinDays, 2)
+  );
+  let estimatedDeliveryMaxDays = Math.floor(
+    toNonNegativeNumber(body?.estimatedDeliveryMaxDays, 5)
+  );
+  if (estimatedDeliveryMaxDays < estimatedDeliveryMinDays) {
+    [estimatedDeliveryMinDays, estimatedDeliveryMaxDays] = [
+      estimatedDeliveryMaxDays,
+      estimatedDeliveryMinDays,
+    ];
+  }
+
+  return {
+    payload: {
+      name,
+      description,
+      price,
+      mrp,
+      category,
+      quantity,
+      shipping,
+      shippingCharge: shipping ? toNonNegativeNumber(body?.shippingCharge, 0) : 0,
+      estimatedDeliveryMinDays,
+      estimatedDeliveryMaxDays,
+      returnWindowDays: Math.floor(toNonNegativeNumber(body?.returnWindowDays, 7)),
+      priceIncludesTax: normalizeBooleanInput(body?.priceIncludesTax, true),
+      taxRate: toNonNegativeNumber(body?.taxRate, 0),
+      sku: normalizeTextInput(body?.sku),
+      isbn: normalizeTextInput(body?.isbn),
+      author: normalizeTextInput(body?.author),
+      publisher: normalizeTextInput(body?.publisher),
+      language: normalizeTextInput(body?.language, "English") || "English",
+      format: normalizeTextInput(body?.format, "Paperback") || "Paperback",
+      edition: normalizeTextInput(body?.edition),
+      pages: Math.floor(toNonNegativeNumber(body?.pages, 0)),
+      weightInGrams: toNonNegativeNumber(body?.weightInGrams, 0),
+      highlights: normalizeStringArray(body?.highlights),
+      perfectFor: normalizeStringArray(body?.perfectFor),
+      detailsAndCare: normalizeStringArray(body?.detailsAndCare),
+      imageUrl: normalizedImageUrls[0] || "",
+      imageUrls: normalizedImageUrls,
+      serviceLocations: normalizedServiceLocations,
+      slug: slugify(name),
+    },
+  };
+};
+
 export const createProductController = async (req, res) => {
   try {
-    const { name, description, price, category, quantity, shipping, imageUrl, imageUrls, serviceLocations } = req.body;
-    //alidation
-    switch (true) {
-      case !name:
-        return res.status(500).send({ error: "Name is Required" });
-      case !description:
-        return res.status(500).send({ error: "Description is Required" });
-      case !price:
-        return res.status(500).send({ error: "Price is Required" });
-      case !category:
-        return res.status(500).send({ error: "Category is Required" });
-      case !quantity:
-        return res.status(500).send({ error: "Quantity is Required" });
-    }
+    const { imageUrl, imageUrls, serviceLocations } = req.body;
 
     const normalizedImageUrls = normalizeImageUrls(imageUrls, imageUrl);
     const activeServiceAreaKeys = await getActiveServiceAreaKeySet();
@@ -115,18 +226,19 @@ export const createProductController = async (req, res) => {
       });
     }
 
-    const products = new productModel({
-      name,
-      description,
-      price,
-      category,
-      quantity,
-      shipping,
-      imageUrl: normalizedImageUrls[0] || "",
-      imageUrls: normalizedImageUrls,
-      serviceLocations: normalizedServiceLocations,
-      slug: slugify(name),
+    const { payload, error: payloadError } = getProductPayloadFromRequest({
+      body: req.body,
+      normalizedImageUrls,
+      normalizedServiceLocations,
     });
+    if (payloadError) {
+      return res.status(400).send({
+        success: false,
+        message: payloadError,
+      });
+    }
+
+    const products = new productModel(payload);
     await products.save();
     res.status(201).send({
       success: true,
@@ -234,30 +346,7 @@ export const deleteProductController = async (req, res) => {
 //upate producta
 export const updateProductController = async (req, res) => {
   try {
-    const {
-      name,
-      description,
-      price,
-      category,
-      quantity,
-      shipping,
-      imageUrl,
-      imageUrls,
-      serviceLocations,
-    } = req.body;
-    //alidation
-    switch (true) {
-      case !name:
-        return res.status(500).send({ error: "Name is Required" });
-      case !description:
-        return res.status(500).send({ error: "Description is Required" });
-      case !price:
-        return res.status(500).send({ error: "Price is Required" });
-      case !category:
-        return res.status(500).send({ error: "Category is Required" });
-      case !quantity:
-        return res.status(500).send({ error: "Quantity is Required" });
-    }
+    const { imageUrl, imageUrls, serviceLocations } = req.body;
 
     const normalizedImageUrls = normalizeImageUrls(imageUrls, imageUrl);
     const activeServiceAreaKeys = await getActiveServiceAreaKeySet();
@@ -275,22 +364,31 @@ export const updateProductController = async (req, res) => {
       });
     }
 
+    const { payload, error: payloadError } = getProductPayloadFromRequest({
+      body: req.body,
+      normalizedImageUrls,
+      normalizedServiceLocations,
+    });
+    if (payloadError) {
+      return res.status(400).send({
+        success: false,
+        message: payloadError,
+      });
+    }
+
     const products = await productModel.findByIdAndUpdate(
       req.params.pid,
-      {
-        name,
-        description,
-        price,
-        category,
-        quantity,
-        shipping,
-        imageUrl: normalizedImageUrls[0] || "",
-        imageUrls: normalizedImageUrls,
-        serviceLocations: normalizedServiceLocations,
-        slug: slugify(name),
-      },
+      payload,
       { new: true }
     );
+
+    if (!products) {
+      return res.status(404).send({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
     await products.save();
     res.status(201).send({
       success: true,

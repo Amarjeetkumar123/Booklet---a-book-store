@@ -613,7 +613,7 @@ const HomePage = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search books, descriptions or categories..."
-                    className="w-full h-10 bg-transparent pl-10 pr-3 text-sm text-primary-900 placeholder:text-primary-500 focus:outline-none"
+                    className="w-full h-10 rounded-full border border-primary-200/90 bg-transparent pl-10 pr-3 text-sm text-primary-900 placeholder:text-primary-500 focus:outline-none focus:border-accent-400"
                   />
                 </div>
                 {searchQuery && (

@@ -179,6 +179,9 @@ export const createUserByAdminController = async (req, res) => {
         addresses: user.addresses,
         address: user.address,
         role: user.role,
+        currentDeliveryLocation: user.currentDeliveryLocation || null,
+        currentWarehouseId: user.currentWarehouseId || "",
+        deliveryLocationUpdatedAt: user.deliveryLocationUpdatedAt || null,
         createdAt: user.createdAt,
       },
     });
@@ -236,6 +239,9 @@ export const loginController = async (req, res) => {
         addresses: normalizedUser.addresses,
         address: normalizedUser.address,
         role: normalizedUser.role,
+        currentDeliveryLocation: normalizedUser.currentDeliveryLocation || null,
+        currentWarehouseId: normalizedUser.currentWarehouseId || "",
+        deliveryLocationUpdatedAt: normalizedUser.deliveryLocationUpdatedAt || null,
       },
       token,
     });

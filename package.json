@@ -9,7 +9,8 @@
     "server": "nodemon backend/server.js",
     "project": "npm start --prefix ./frontend",
     "dev": "concurrently \"npm run server\" \"npm run project\"",
-    "seed": "node backend/seed/seed.js"
+    "seed": "node backend/seed/seed.js",
+    "migrate:location-context": "node backend/seed/migrateLocationContext.js"
   },
   "keywords": [],
   "author": "booklet",

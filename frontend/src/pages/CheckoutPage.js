@@ -166,9 +166,11 @@ const CheckoutPage = () => {
     selectedLocation,
     selectedLocationLabel,
     customerLocation,
+    locationContextId,
+    locationContext,
+    isServiceable,
+    deliveryEta,
     selectedAreaDistanceKm,
-    selectedServiceArea,
-    isSelectedAreaInRange,
   } = useLocationContext();
   const [loading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -329,7 +331,9 @@ const CheckoutPage = () => {
   const hasUnavailableItems = unavailableItems.length > 0;
 
   const hasDistanceRangeConflict =
-    selectedAreaDistanceKm !== null && !isSelectedAreaInRange;
+    Boolean(selectedLocation) &&
+    Boolean(locationContext?.contextId) &&
+    !isServiceable;
 
   const paymentLocationMeta = {
     latitude: customerLocation?.latitude ?? null,
@@ -344,6 +348,23 @@ const CheckoutPage = () => {
       price: item.price,
       qty: item.qty,
     }));
+
+  const validateCartAgainstLocation = async (paymentCart) => {
+    const { data } = await axios.post("/api/v1/location/validate-cart", {
+      cart: paymentCart,
+      locationContextId,
+      selectedLocation,
+      customerLocation: paymentLocationMeta,
+    });
+
+    if (!data?.success) {
+      throw new Error(data?.message || "Unable to validate cart for delivery");
+    }
+    if (!data?.allowed) {
+      throw new Error(data?.message || "Selected location is not serviceable");
+    }
+    return data;
+  };
 
   const getRazorpayMethodConfig = () => {
     if (selectedPaymentOption === "all") return undefined;
@@ -656,10 +677,12 @@ const CheckoutPage = () => {
       }
 
       const paymentCart = getPaymentCartPayload();
+      await validateCartAgainstLocation(paymentCart);
       const { data: orderData } = await axios.post(
         "/api/v1/payment/razorpay/create-order",
         {
           cart: paymentCart,
+          locationContextId,
           selectedLocation,
           customerLocation: paymentLocationMeta,
           deliveryAddress: selectedDeliveryAddress,
@@ -698,6 +721,7 @@ const CheckoutPage = () => {
               "/api/v1/payment/razorpay/verify-payment",
               {
                 cart: paymentCart,
+                locationContextId,
                 selectedLocation,
                 customerLocation: paymentLocationMeta,
                 deliveryAddress: selectedDeliveryAddress,
@@ -801,6 +825,7 @@ const CheckoutPage = () => {
               {selectedLocationLabel && (
                 <p className="mt-1.5 text-xs font-medium text-primary-500">
                   Delivering to <span className="font-semibold text-primary-700">{selectedLocationLabel}</span>
+                  {deliveryEta ? ` • ETA ${deliveryEta}` : ""}
                 </p>
               )}
             </div>
@@ -1252,7 +1277,9 @@ const CheckoutPage = () => {
                     <p className="inline-flex items-start gap-1.5 text-xs font-semibold text-red-700">
                       <FiAlertTriangle className="mt-0.5 h-4 w-4" />
                       <span>
-                        You are {selectedAreaDistanceKm?.toFixed(1)} km away from {selectedLocationLabel}. Service radius is {selectedServiceArea?.radiusKm || 0} km.
+                        {selectedAreaDistanceKm !== null
+                          ? `This location is ${selectedAreaDistanceKm.toFixed(1)} km away and currently outside delivery range. Coming Soon.`
+                          : "This location is currently outside delivery range. Coming Soon."}
                       </span>
                     </p>
                   )}

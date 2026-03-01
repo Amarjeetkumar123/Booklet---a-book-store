@@ -5,13 +5,16 @@ import {
   hasSuperAdminAccess,
 } from "../utils/roleUtils.js";
 
+const extractToken = (authHeader = "") => {
+  const value = String(authHeader || "");
+  if (!value) return "";
+  return value.startsWith("Bearer ") ? value.split(" ")[1] : value;
+};
+
 //Protected Routes token base
 export const requireSignIn = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization || "";
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : authHeader;
+    const token = extractToken(req.headers.authorization || "");
 
     if (!token) {
       return res.status(401).send({
@@ -32,6 +35,22 @@ export const requireSignIn = async (req, res, next) => {
       success: false,
       message: "Invalid or expired token",
     });
+  }
+};
+
+// Optional auth middleware for public routes that can enrich user context
+export const optionalSignIn = async (req, res, next) => {
+  try {
+    const token = extractToken(req.headers.authorization || "");
+    if (!token) {
+      return next();
+    }
+
+    const decode = JWT.verify(token, process.env.JWT_SECRET);
+    req.user = decode;
+    return next();
+  } catch (error) {
+    return next();
   }
 };
 

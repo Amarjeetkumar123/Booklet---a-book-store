@@ -16,6 +16,7 @@ import {
   FiMapPin,
   FiMenu,
   FiNavigation,
+  FiSearch,
   FiShoppingCart,
   FiUser,
   FiX,
@@ -28,19 +29,26 @@ const Header = () => {
   const [wishlist] = useWishlist();
   const {
     serviceAreas,
-    selectedLocation,
     selectedLocationLabel,
     selectedLocationPincode,
-    setSelectedLocation,
     detectCurrentLocation,
     detectingCurrentLocation,
     locationDetectionError,
-    loading: locationLoading,
+    searchManualLocations,
+    searchingLocations,
+    selectLocationSuggestion,
+    deliveryEta,
   } = useLocationContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [locationSearchOpen, setLocationSearchOpen] = useState(false);
+  const [locationSearchTerm, setLocationSearchTerm] = useState("");
+  const [locationSuggestions, setLocationSuggestions] = useState([]);
+  const [selectingLocationSuggestion, setSelectingLocationSuggestion] = useState(false);
+  const [locationModalNotice, setLocationModalNotice] = useState(null);
   const [activeDrawer, setActiveDrawer] = useState(null);
   const profileMenuRef = useRef(null);
+  const locationPickerRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -48,6 +56,7 @@ const Header = () => {
     setActiveDrawer(null);
     setIsMobileMenuOpen(false);
     setIsProfileMenuOpen(false);
+    setLocationSearchOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -76,6 +85,84 @@ const Header = () => {
     };
   }, [isProfileMenuOpen]);
 
+  useEffect(() => {
+    if (!locationSearchOpen) return undefined;
+
+    const onEscape = (event) => {
+      if (event.key === "Escape") {
+        setLocationSearchOpen(false);
+      }
+    };
+    const onOutsideClick = (event) => {
+      if (typeof window !== "undefined" && window.innerWidth < 1024) return;
+      if (!locationPickerRef.current) return;
+      if (!locationPickerRef.current.contains(event.target)) {
+        setLocationSearchOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onEscape);
+    document.addEventListener("mousedown", onOutsideClick);
+    document.addEventListener("touchstart", onOutsideClick);
+    return () => {
+      document.removeEventListener("keydown", onEscape);
+      document.removeEventListener("mousedown", onOutsideClick);
+      document.removeEventListener("touchstart", onOutsideClick);
+    };
+  }, [locationSearchOpen]);
+
+  useEffect(() => {
+    if (!locationSearchOpen) return undefined;
+
+    const toSuggestion = (area) => ({
+      placeId: `service-area:${area.id}`,
+      label: area.label,
+      coordinates: {
+        latitude: area.latitude,
+        longitude: area.longitude,
+      },
+      address: {
+        line1: area.label,
+        city: "",
+        state: "",
+        country: "India",
+        pincode: area.pincode || "",
+      },
+    });
+
+    const trimmed = locationSearchTerm.trim();
+    if (!trimmed) {
+      setLocationSuggestions([]);
+      return undefined;
+    }
+
+    let active = true;
+    const searchTimer = setTimeout(async () => {
+      const remoteSuggestions = await searchManualLocations(trimmed);
+      if (!active) return;
+
+      if (remoteSuggestions.length) {
+        setLocationSuggestions(remoteSuggestions.slice(0, 8));
+        return;
+      }
+
+      const query = trimmed.toLowerCase();
+      const localMatches = serviceAreas
+        .filter((area) => {
+          const label = String(area?.label || "").toLowerCase();
+          const pincode = String(area?.pincode || "");
+          return label.includes(query) || pincode.includes(query);
+        })
+        .slice(0, 8)
+        .map(toSuggestion);
+      setLocationSuggestions(localMatches);
+    }, 240);
+
+    return () => {
+      active = false;
+      clearTimeout(searchTimer);
+    };
+  }, [locationSearchOpen, locationSearchTerm, searchManualLocations, serviceAreas]);
+
   const handleLogout = () => {
     setAuth({
       ...auth,
@@ -91,19 +178,84 @@ const Header = () => {
     ? "/dashboard/admin"
     : "/dashboard/user";
 
+  const openLocationPicker = () => {
+    setLocationSearchOpen(true);
+    setLocationSearchTerm("");
+    setLocationSuggestions([]);
+    setLocationModalNotice(null);
+  };
+
   const handleDetectLocation = async () => {
+    setLocationModalNotice(null);
     const response = await detectCurrentLocation({ autoSelect: true });
-    if (response?.success && response?.matchedArea) {
-      toast.success(`Location detected: ${response.matchedArea.label}`);
+    if (response?.success && response?.context?.serviceability?.isServiceable) {
+      toast.success(
+        `Location detected: ${
+          response?.context?.selectedLocationLabel || response?.matchedArea?.label || "selected location"
+        }`
+      );
+      setLocationSearchOpen(false);
       return;
     }
 
     if (response?.success) {
-      toast.error("You are outside our current delivery range");
+      const unavailableLabel =
+        response?.context?.selectedLocationLabel || "this location";
+      setLocationModalNotice({
+        tone: "warning",
+        title: "Service not available",
+        description: `We are not delivering at ${unavailableLabel} yet. We are expanding soon.`,
+      });
       return;
     }
 
-    toast.error("Unable to detect current location");
+    setLocationModalNotice({
+      tone: "error",
+      title: "Unable to detect location",
+      description:
+        response?.error?.response?.data?.message ||
+        response?.error?.message ||
+        "Please search and select your area manually.",
+    });
+  };
+
+  const handleLocationSuggestionSelect = async (suggestion, closeMobile = false) => {
+    setLocationModalNotice(null);
+    setSelectingLocationSuggestion(true);
+    const response = await selectLocationSuggestion(suggestion);
+    setSelectingLocationSuggestion(false);
+
+    if (!response?.success) {
+      setLocationModalNotice({
+        tone: "error",
+        title: "Unable to set location",
+        description:
+          response?.error?.response?.data?.message ||
+          response?.error?.message ||
+          "Please try again with another location.",
+      });
+      return;
+    }
+
+    if (!response?.context?.serviceability?.isServiceable) {
+      setLocationModalNotice({
+        tone: "warning",
+        title: "Service not available",
+        description: `We are not delivering at ${
+          suggestion?.label || "this location"
+        } yet. Please choose another nearby area.`,
+      });
+      return;
+    }
+
+    const resolvedLabel =
+      response?.context?.selectedLocationLabel || suggestion?.label || "selected area";
+    toast.success(`Location set: ${resolvedLabel}`);
+    setLocationSearchTerm("");
+    setLocationSearchOpen(false);
+    if (closeMobile) {
+      setIsMobileMenuOpen(false);
+    }
   };
 
   const desktopNavItemClass = ({ isActive }) =>
@@ -153,33 +305,150 @@ const Header = () => {
             </div>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-2 min-w-[320px]">
-            <label className="flex-1 h-10 rounded-full border border-white/70 bg-white/70 px-3 inline-flex items-center gap-2 text-sm text-primary-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
-              <FiMapPin className="h-4 w-4 text-accent-700 shrink-0" />
-              <select
-                value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
-                disabled={locationLoading || serviceAreas.length === 0}
-                className="w-full bg-transparent text-sm text-primary-900 focus:outline-none"
+          <div className="hidden lg:flex items-center shrink-0 w-[22rem]">
+            <div className="relative w-full" ref={locationPickerRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (locationSearchOpen) {
+                    setLocationSearchOpen(false);
+                    return;
+                  }
+                  openLocationPicker();
+                }}
+                className="w-full h-12 rounded-2xl border border-white/70 bg-white/78 px-3.5 inline-flex items-center gap-2.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] hover:border-accent-200 hover:bg-white transition-colors"
               >
-                {!selectedLocation && <option value="">Select delivery location</option>}
-                {serviceAreas.map((area) => (
-                  <option key={area.id} value={area.id}>
-                    {area.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="button"
-              onClick={handleDetectLocation}
-              disabled={detectingCurrentLocation}
-              className="h-10 px-3.5 rounded-full border border-accent-200/90 bg-gradient-to-r from-accent-50 to-orange-100 text-accent-700 hover:from-accent-100 hover:to-orange-100 text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-              title="Use current location"
-            >
-              <FiNavigation className="h-3.5 w-3.5" />
-              {detectingCurrentLocation ? "Detecting..." : "Detect"}
-            </button>
+                <FiMapPin className="h-4 w-4 text-accent-700 shrink-0" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-primary-500">
+                    {deliveryEta ? `Delivery in ${deliveryEta}` : "Set delivery location"}
+                  </span>
+                  <span className="block text-sm font-semibold text-primary-900 truncate">
+                    {selectedLocationLabel}
+                    {selectedLocationPincode ? ` • ${selectedLocationPincode}` : ""}
+                  </span>
+                </span>
+                <FiChevronDown className="h-4 w-4 text-primary-500 shrink-0" />
+              </button>
+
+              {locationSearchOpen && (
+                <div className="absolute left-0 top-[calc(100%+0.5rem)] z-[70] w-[22rem] rounded-2xl border border-primary-200 bg-white shadow-[0_18px_44px_-28px_rgba(52,43,34,0.58)] p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-primary-900 m-0">
+                      Change Location
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setLocationSearchOpen(false)}
+                      className="h-7 w-7 rounded-full text-primary-500 hover:text-primary-700 hover:bg-primary-50 inline-flex items-center justify-center"
+                      aria-label="Close location modal"
+                    >
+                      <FiX className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  <div className="mt-2 space-y-2">
+                    <button
+                      type="button"
+                      onClick={handleDetectLocation}
+                      disabled={detectingCurrentLocation}
+                      className="w-full h-9 rounded-lg bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white text-xs font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <FiNavigation className="h-4 w-4" />
+                      {detectingCurrentLocation ? "Detecting..." : "Detect my location"}
+                    </button>
+
+                    <div className="h-9 rounded-lg border border-primary-200 bg-primary-50 px-2.5 inline-flex items-center gap-2 w-full">
+                      <FiSearch className="h-4 w-4 text-primary-500 shrink-0" />
+                      <input
+                        type="text"
+                        value={locationSearchTerm}
+                        onChange={(e) => setLocationSearchTerm(e.target.value)}
+                        placeholder="search delivery location"
+                        className="w-full bg-transparent text-sm text-primary-900 placeholder:text-primary-400 focus:outline-none"
+                        autoFocus
+                      />
+                      {locationSearchTerm && (
+                        <button
+                          type="button"
+                          onClick={() => setLocationSearchTerm("")}
+                          className="h-6 w-6 rounded-full text-primary-500 hover:text-primary-700 inline-flex items-center justify-center"
+                          aria-label="Clear location search"
+                        >
+                          <FiX className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-2 max-h-48 overflow-y-auto rounded-lg bg-primary-50/40 border border-primary-100 p-1">
+                    {selectingLocationSuggestion && (
+                      <p className="text-xs text-primary-500 px-2 py-2 m-0">Applying location...</p>
+                    )}
+                    {!selectingLocationSuggestion &&
+                      searchingLocations &&
+                      locationSearchTerm.trim() && (
+                        <p className="text-xs text-primary-500 px-2 py-2 m-0">
+                          Searching locations...
+                        </p>
+                      )}
+                    {!selectingLocationSuggestion &&
+                      !searchingLocations &&
+                      locationSearchTerm.trim() &&
+                      locationSuggestions.length === 0 && (
+                        <p className="text-xs text-primary-500 px-2 py-2 m-0">
+                          No matching locations found.
+                        </p>
+                      )}
+                    {!selectingLocationSuggestion &&
+                      locationSuggestions.map((item) => (
+                        <button
+                          key={`popover-${item.placeId || item.label}`}
+                          type="button"
+                          onClick={() => handleLocationSuggestionSelect(item)}
+                          className="w-full rounded-lg border border-transparent hover:border-accent-200 hover:bg-accent-50/80 px-2.5 py-2 text-left transition-colors"
+                        >
+                          <p className="text-sm font-medium text-primary-900 m-0 line-clamp-1">
+                            {item.label}
+                          </p>
+                          <p className="text-[11px] text-primary-500 m-0 mt-0.5">
+                            {item?.address?.pincode || "India"}
+                          </p>
+                        </button>
+                      ))}
+                  </div>
+
+                  {(locationModalNotice || locationDetectionError) && (
+                    <div
+                      className={`mt-2 rounded-lg px-2.5 py-2 border ${
+                        locationModalNotice?.tone === "error"
+                          ? "border-red-200 bg-red-50"
+                          : "border-amber-200 bg-amber-50"
+                      }`}
+                    >
+                      <p
+                        className={`text-xs font-semibold m-0 ${
+                          locationModalNotice?.tone === "error"
+                            ? "text-red-700"
+                            : "text-amber-800"
+                        }`}
+                      >
+                        {locationModalNotice?.title || "Service notice"}
+                      </p>
+                      <p
+                        className={`text-xs m-0 mt-1 ${
+                          locationModalNotice?.tone === "error"
+                            ? "text-red-700/90"
+                            : "text-amber-800/90"
+                        }`}
+                      >
+                        {locationModalNotice?.description || locationDetectionError}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Desktop navigation */}
@@ -341,36 +610,127 @@ const Header = () => {
                   <FiMapPin className="h-3.5 w-3.5 text-accent-700" />
                   Delivery Location
                 </p>
-                <select
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  disabled={locationLoading || serviceAreas.length === 0}
-                  className="w-full h-9 rounded-xl border border-white/80 bg-white/88 px-2.5 text-sm text-primary-900 focus:outline-none focus:ring-2 focus:ring-accent-300"
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (locationSearchOpen) {
+                      setLocationSearchOpen(false);
+                      return;
+                    }
+                    openLocationPicker();
+                  }}
+                  className="w-full h-9 rounded-xl border border-white/80 bg-white/88 px-2.5 text-sm text-primary-900 inline-flex items-center justify-between gap-2"
                 >
-                  {!selectedLocation && <option value="">Select delivery location</option>}
-                  {serviceAreas.map((area) => (
-                    <option key={area.id} value={area.id}>
-                      {area.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleDetectLocation}
-                    disabled={detectingCurrentLocation}
-                    className="h-7 px-2.5 rounded-full border border-accent-200 bg-gradient-to-r from-accent-50 to-orange-100 text-accent-700 text-[11px] font-semibold inline-flex items-center gap-1 disabled:opacity-60"
-                  >
-                    <FiNavigation className="h-3 w-3" />
-                    {detectingCurrentLocation ? "Detecting..." : "Use Current"}
-                  </button>
-                  <p className="text-[11px] text-primary-600 truncate m-0">
-                    {selectedLocationLabel}
-                    {selectedLocationPincode ? ` • ${selectedLocationPincode}` : ""}
-                  </p>
-                </div>
-                {locationDetectionError && (
-                  <p className="mt-1 text-[11px] text-red-600">{locationDetectionError}</p>
+                  <span className="truncate">Change location</span>
+                  <FiChevronDown className="h-4 w-4 text-primary-500 shrink-0" />
+                </button>
+                <p className="mt-1.5 text-[11px] text-primary-600 truncate m-0">
+                  {selectedLocationLabel}
+                  {selectedLocationPincode ? ` • ${selectedLocationPincode}` : ""}
+                  {deliveryEta ? ` • ETA ${deliveryEta}` : ""}
+                </p>
+
+                {locationSearchOpen && (
+                  <div className="mt-2 rounded-xl border border-primary-200 bg-white p-2.5 space-y-2">
+                    <button
+                      type="button"
+                      onClick={handleDetectLocation}
+                      disabled={detectingCurrentLocation}
+                      className="w-full h-9 rounded-lg bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white text-xs font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <FiNavigation className="h-4 w-4" />
+                      {detectingCurrentLocation ? "Detecting..." : "Detect my location"}
+                    </button>
+
+                    <div className="h-9 rounded-lg border border-primary-200 bg-primary-50 px-2.5 inline-flex items-center gap-2 w-full">
+                      <FiSearch className="h-4 w-4 text-primary-500 shrink-0" />
+                      <input
+                        type="text"
+                        value={locationSearchTerm}
+                        onChange={(e) => setLocationSearchTerm(e.target.value)}
+                        placeholder="search delivery location"
+                        className="w-full bg-transparent text-sm text-primary-900 placeholder:text-primary-400 focus:outline-none"
+                      />
+                      {locationSearchTerm && (
+                        <button
+                          type="button"
+                          onClick={() => setLocationSearchTerm("")}
+                          className="h-6 w-6 rounded-full text-primary-500 hover:text-primary-700 inline-flex items-center justify-center"
+                          aria-label="Clear location search"
+                        >
+                          <FiX className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="max-h-40 overflow-y-auto rounded-lg bg-primary-50/40 border border-primary-100 p-1">
+                      {selectingLocationSuggestion && (
+                        <p className="text-xs text-primary-500 px-2 py-2 m-0">
+                          Applying location...
+                        </p>
+                      )}
+                      {!selectingLocationSuggestion &&
+                        searchingLocations &&
+                        locationSearchTerm.trim() && (
+                          <p className="text-xs text-primary-500 px-2 py-2 m-0">
+                            Searching locations...
+                          </p>
+                        )}
+                      {!selectingLocationSuggestion &&
+                        !searchingLocations &&
+                        locationSearchTerm.trim() &&
+                        locationSuggestions.length === 0 && (
+                          <p className="text-xs text-primary-500 px-2 py-2 m-0">
+                            No matching locations found.
+                          </p>
+                        )}
+                      {!selectingLocationSuggestion &&
+                        locationSuggestions.map((item) => (
+                          <button
+                            key={`mobile-${item.placeId || item.label}`}
+                            type="button"
+                            onClick={() => handleLocationSuggestionSelect(item, true)}
+                            className="w-full rounded-lg border border-transparent hover:border-accent-200 hover:bg-accent-50/80 px-2.5 py-2 text-left transition-colors"
+                          >
+                            <p className="text-sm font-medium text-primary-900 m-0 line-clamp-1">
+                              {item.label}
+                            </p>
+                            <p className="text-[11px] text-primary-500 m-0 mt-0.5">
+                              {item?.address?.pincode || "India"}
+                            </p>
+                          </button>
+                        ))}
+                    </div>
+
+                    {(locationModalNotice || locationDetectionError) && (
+                      <div
+                        className={`rounded-lg px-2.5 py-2 border ${
+                          locationModalNotice?.tone === "error"
+                            ? "border-red-200 bg-red-50"
+                            : "border-amber-200 bg-amber-50"
+                        }`}
+                      >
+                        <p
+                          className={`text-xs font-semibold m-0 ${
+                            locationModalNotice?.tone === "error"
+                              ? "text-red-700"
+                              : "text-amber-800"
+                          }`}
+                        >
+                          {locationModalNotice?.title || "Service notice"}
+                        </p>
+                        <p
+                          className={`text-xs m-0 mt-1 ${
+                            locationModalNotice?.tone === "error"
+                              ? "text-red-700/90"
+                              : "text-amber-800/90"
+                          }`}
+                        >
+                          {locationModalNotice?.description || locationDetectionError}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 

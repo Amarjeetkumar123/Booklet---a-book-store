@@ -29,7 +29,8 @@ const normalizedPrice = (item) => {
 
 const CartPage = () => {
   const [cart, setCart] = useCart();
-  const { selectedLocation, selectedLocationLabel } = useLocationContext();
+  const { selectedLocation, selectedLocationLabel, locationContext, isServiceable } =
+    useLocationContext();
   const confirm = useConfirm();
   const navigate = useNavigate();
 
@@ -64,8 +65,15 @@ const CartPage = () => {
     [cartItems, selectedLocation]
   );
   const hasUnavailableItems = unavailableItems.length > 0;
+  const hasLocationServiceConflict =
+    Boolean(selectedLocation) &&
+    Boolean(locationContext?.contextId) &&
+    !isServiceable;
   const isProceedDisabled =
-    !cartItems.length || !selectedLocation || hasUnavailableItems;
+    !cartItems.length ||
+    !selectedLocation ||
+    hasUnavailableItems ||
+    hasLocationServiceConflict;
 
   const persistCart = (nextCart) => {
     setCart(nextCart);
@@ -302,6 +310,11 @@ const CartPage = () => {
                     {!selectedLocation && (
                       <p className="text-[11px] text-red-600">
                         Select delivery location from header to continue.
+                      </p>
+                    )}
+                    {hasLocationServiceConflict && (
+                      <p className="text-[11px] text-red-600">
+                        Delivery at this location is currently unavailable. Coming Soon.
                       </p>
                     )}
 

@@ -104,6 +104,19 @@ const userSchema = new mongoose.Schema(
       enum: Object.values(ROLE),
       default: ROLE.CUSTOMER,
     },
+    currentDeliveryLocation: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+    currentWarehouseId: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    deliveryLocationUpdatedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

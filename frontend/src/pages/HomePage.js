@@ -544,38 +544,101 @@ const HomePage = () => {
           </div>
         </div>
 
-        <div className={`grid gap-2 pt-1 ${mobile ? "grid-cols-2" : "grid-cols-1"}`}>
-          <button
-            type="button"
-            onClick={() => {
-              handleResetFilters();
-              if (mobile) setSidebarOpen(false);
-            }}
-            className="w-full h-10 rounded-full bg-primary-900 hover:bg-primary-800 text-white text-sm font-semibold transition-colors"
-          >
-            Clear All
-          </button>
-          {mobile && (
+        {!mobile && (
+          <div className="pt-1">
             <button
               type="button"
-              onClick={() => setSidebarOpen(false)}
-              className="w-full h-10 rounded-full bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold transition-colors"
+              onClick={handleResetFilters}
+              className="w-full h-10 rounded-full bg-primary-900 hover:bg-primary-800 text-white text-sm font-semibold transition-colors"
             >
-              Apply
+              Clear All
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   };
 
   return (
-    <Layout>
-      {/* Hero Section */}
-      <section
-        className="relative overflow-hidden bg-gradient-to-br from-[#fff9f2] via-[#fffdfa] to-[#fef2e4]"
-        data-fx="reveal"
-      >
+    <>
+      {/* Mobile floating filter button - rendered outside Layout for true fixed positioning */}
+      {!sidebarOpen && (
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="lg:hidden fixed bottom-20 right-4 z-[9999] h-12 pl-3.5 pr-4 rounded-full bg-accent-500 hover:bg-accent-600 active:scale-[0.98] text-white shadow-[0_12px_32px_-12px_rgba(249,115,22,0.72)] inline-flex items-center gap-2 border border-accent-400 transition-all"
+          style={{ position: 'fixed', bottom: '5rem', right: '1rem' }}
+        >
+          <FiFilter className="h-4.5 w-4.5" />
+          <span className="text-sm font-semibold">Filter</span>
+          {activeFiltersCount > 0 && (
+            <span className="h-5 min-w-[1.25rem] px-1 rounded-full bg-white text-accent-700 text-[11px] font-bold inline-flex items-center justify-center">
+              {activeFiltersCount}
+            </span>
+          )}
+        </button>
+      )}
+
+      {/* Mobile filter drawer */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-[9998] lg:hidden animate-fadeIn">
+          <div
+            className="absolute inset-0 bg-black/45"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className="absolute inset-x-0 bottom-0 max-h-[86vh] rounded-t-3xl bg-white shadow-2xl overflow-hidden animate-slideUp">
+            <div className="pt-2 pb-1 flex justify-center">
+              <span className="h-1 w-10 rounded-full bg-primary-200" />
+            </div>
+            <div className="px-5 py-3 border-b border-primary-200/80">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="py-0.5">
+                  <h3 className="text-sm font-semibold text-primary-900">Filter Results</h3>
+                  <p className="text-xs text-primary-500">
+                    {activeFiltersCount} filter{activeFiltersCount === 1 ? "" : "s"} applied
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(false)}
+                  className="h-9 w-9 rounded-full bg-primary-100 hover:bg-primary-200 text-primary-700 inline-flex items-center justify-center transition-colors"
+                >
+                  <FiX className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleResetFilters();
+                    setSidebarOpen(false);
+                  }}
+                  className="flex-1 h-8 rounded-full bg-primary-900 hover:bg-primary-800 text-white text-xs font-semibold transition-colors"
+                >
+                  Clear All
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(false)}
+                  className="flex-1 h-8 rounded-full bg-accent-500 hover:bg-accent-600 text-white text-xs font-semibold transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+            <div className="max-h-[calc(86vh-9rem)] overflow-y-auto">
+              {renderFilterPanel(true)}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Layout>
+        {/* Hero Section */}
+        <section
+          className="relative overflow-hidden bg-gradient-to-br from-[#fff9f2] via-[#fffdfa] to-[#fef2e4]"
+          data-fx="reveal"
+        >
         <div className="absolute -top-28 -left-24 h-80 w-80 rounded-full bg-primary-100/80 blur-3xl" />
         <div className="absolute -bottom-20 -right-24 h-80 w-80 rounded-full bg-accent-100/80 blur-3xl" />
         <div className="absolute top-1/3 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-white/70 blur-3xl" />
@@ -1130,57 +1193,8 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
-      {/* Mobile floating filter button */}
-      {!sidebarOpen && (
-        <button
-          type="button"
-          onClick={() => setSidebarOpen(true)}
-          className="lg:hidden fixed bottom-6 right-4 z-[55] h-12 pl-3.5 pr-4 rounded-full bg-accent-500 hover:bg-accent-600 active:scale-[0.98] text-white shadow-[0_12px_32px_-12px_rgba(249,115,22,0.72)] inline-flex items-center gap-2 border border-accent-400 transition-all fx-floating-action"
-        >
-          <FiFilter className="h-4.5 w-4.5" />
-          <span className="text-sm font-semibold">Refine</span>
-          {activeFiltersCount > 0 && (
-            <span className="h-5 min-w-[1.25rem] px-1 rounded-full bg-white text-accent-700 text-[11px] font-bold inline-flex items-center justify-center">
-              {activeFiltersCount}
-            </span>
-          )}
-        </button>
-      )}
-
-      {/* Mobile filter drawer */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-[60] lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/45"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <div className="absolute inset-x-0 bottom-0 max-h-[86vh] rounded-t-3xl bg-white shadow-2xl overflow-hidden">
-            <div className="pt-2 pb-1 flex justify-center">
-              <span className="h-1 w-10 rounded-full bg-primary-200" />
-            </div>
-            <div className="h-16 px-5 border-b border-primary-200/80 flex items-center justify-between">
-              <div className="py-0.5">
-                <h3 className="text-sm font-semibold text-primary-900">Refine Results</h3>
-                <p className="text-xs text-primary-500">
-                  {activeFiltersCount} filter{activeFiltersCount === 1 ? "" : "s"} applied
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(false)}
-                className="h-9 w-9 rounded-full bg-primary-100 hover:bg-primary-200 text-primary-700 inline-flex items-center justify-center transition-colors"
-              >
-                <FiX className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="max-h-[calc(86vh-4.75rem)] overflow-y-auto">
-              {renderFilterPanel(true)}
-            </div>
-          </div>
-        </div>
-      )}
-    </Layout>
+      </Layout>
+    </>
   );
 };
 

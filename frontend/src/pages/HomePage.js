@@ -23,7 +23,7 @@ import {
   FiTrendingUp,
   FiX,
 } from "react-icons/fi";
-import { Prices } from "../components/Price";
+import { FaStar } from "react-icons/fa";
 import { isProductAvailableInLocation } from "../utils/locationUtils";
 import "../styles/Homepage.css";
 
@@ -55,7 +55,7 @@ const HomePage = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedPrice, setSelectedPrice] = useState(DEFAULT_PRICE);
   const [selectedRating, setSelectedRating] = useState(0);
   const [sortBy, setSortBy] = useState("newest");
@@ -90,7 +90,7 @@ const HomePage = () => {
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (searchQuery.trim()) count += 1;
-    if (selectedCategory) count += 1;
+    if (selectedCategories.length > 0) count += selectedCategories.length;
     if (
       selectedPrice[0] !== DEFAULT_PRICE[0] ||
       selectedPrice[1] !== DEFAULT_PRICE[1]
@@ -99,7 +99,7 @@ const HomePage = () => {
     }
     if (selectedRating > 0) count += 1;
     return count;
-  }, [searchQuery, selectedCategory, selectedPrice, selectedRating]);
+  }, [searchQuery, selectedCategories, selectedPrice, selectedRating]);
 
   const featuredProducts = useMemo(() => products.slice(0, 4), [products]);
   const rotatedHeroBooks = useMemo(() => {
@@ -190,7 +190,8 @@ const HomePage = () => {
         product?.description?.toLowerCase().includes(query) ||
         getProductCategoryName(product).toLowerCase().includes(query);
 
-      const matchesCategory = !selectedCategory || categoryId === selectedCategory;
+      const matchesCategory =
+        selectedCategories.length === 0 || selectedCategories.includes(categoryId);
       const matchesPrice =
         product?.price >= selectedPrice[0] && product?.price <= selectedPrice[1];
       const matchesRating = selectedRating === 0 || rating >= selectedRating;
@@ -208,7 +209,7 @@ const HomePage = () => {
   }, [
     products,
     debouncedSearchQuery,
-    selectedCategory,
+    selectedCategories,
     selectedPrice,
     selectedRating,
     sortBy,
@@ -216,7 +217,7 @@ const HomePage = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearchQuery, selectedCategory, selectedPrice, selectedRating, sortBy]);
+  }, [debouncedSearchQuery, selectedCategories, selectedPrice, selectedRating, sortBy]);
 
   useEffect(() => {
     setIsFiltering(true);
@@ -225,7 +226,7 @@ const HomePage = () => {
     }, 420);
 
     return () => clearTimeout(filterAnimationTimer);
-  }, [debouncedSearchQuery, selectedCategory, selectedPrice, selectedRating, sortBy]);
+  }, [debouncedSearchQuery, selectedCategories, selectedPrice, selectedRating, sortBy]);
 
   const displayProducts = useMemo(() => {
     return filteredProducts.slice(0, currentPage * ITEMS_PER_PAGE);
@@ -261,7 +262,7 @@ const HomePage = () => {
 
   const handleResetFilters = () => {
     setSearchQuery("");
-    setSelectedCategory("");
+    setSelectedCategories([]);
     setSelectedPrice(DEFAULT_PRICE);
     setSelectedRating(0);
     setSortBy("newest");
@@ -298,13 +299,9 @@ const HomePage = () => {
     toast.success("Item added to cart");
   };
 
-  const isPriceActive = (priceArray) =>
-    selectedPrice[0] === priceArray[0] && selectedPrice[1] === priceArray[1];
-
-  const selectedCategoryLabel = useMemo(() => {
-    if (!selectedCategory) return "";
-    return categories.find((cat) => cat._id === selectedCategory)?.name || "";
-  }, [categories, selectedCategory]);
+  const selectedCategoryMap = useMemo(() => {
+    return new Map((categories || []).map((cat) => [cat._id, cat.name]));
+  }, [categories]);
 
   const selectedPriceLabel = useMemo(() => {
     if (
@@ -313,13 +310,8 @@ const HomePage = () => {
     ) {
       return "";
     }
-    return (
-      Prices.find(
-        (price) =>
-          price.array[0] === selectedPrice[0] &&
-          price.array[1] === selectedPrice[1]
-      )?.name || ""
-    );
+    const maxDisplay = selectedPrice[1] >= 999999 ? '1000+' : selectedPrice[1];
+    return `₹${selectedPrice[0]} - ₹${maxDisplay}`;
   }, [selectedPrice]);
 
   const selectedSortLabel = useMemo(() => {
@@ -363,13 +355,6 @@ const HomePage = () => {
           : "bg-primary-100 text-primary-700 hover:bg-primary-200"
       }`;
 
-    const optionClass = (isActive) =>
-      `w-full min-h-[2.25rem] px-2.5 rounded-lg text-sm font-medium text-left transition-colors inline-flex items-center justify-between ${
-        isActive
-          ? "bg-accent-50 text-accent-700"
-          : "text-primary-700 hover:bg-primary-100/80"
-      }`;
-
     return (
       <div className={`space-y-5 ${mobile ? "px-5 py-4" : "px-1 py-3"}`}>
         {activeFiltersCount > 0 && (
@@ -393,16 +378,21 @@ const HomePage = () => {
                   <FiX className="h-3 w-3" />
                 </button>
               )}
-              {selectedCategory && (
+              {selectedCategories.map((categoryId) => (
                 <button
+                  key={categoryId}
                   type="button"
-                  onClick={() => setSelectedCategory("")}
+                  onClick={() =>
+                    setSelectedCategories((prev) =>
+                      prev.filter((item) => item !== categoryId)
+                    )
+                  }
                   className={chipClass(true)}
                 >
-                  {selectedCategoryLabel || "Category"}
+                  {selectedCategoryMap.get(categoryId) || "Category"}
                   <FiX className="h-3 w-3" />
                 </button>
-              )}
+              ))}
               {selectedPriceLabel && (
                 <button
                   type="button"
@@ -458,59 +448,160 @@ const HomePage = () => {
             <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 m-0">
               Category
             </h4>
-            {selectedCategory && (
+            {selectedCategories.length > 0 && (
               <button
                 type="button"
-                onClick={() => setSelectedCategory("")}
+                onClick={() => setSelectedCategories([])}
                 className="text-[11px] font-semibold text-accent-700 hover:text-accent-800"
               >
                 Clear
               </button>
             )}
           </div>
-          <div className="mt-2.5 flex flex-wrap gap-2 max-h-44 overflow-y-auto pr-1 scrollbar-thin">
-            <button
-              type="button"
-              onClick={() => setSelectedCategory("")}
-              className={chipClass(selectedCategory === "")}
+          <div className="mt-2.5 space-y-2 max-h-52 overflow-y-auto pr-1 scrollbar-thin">
+            <label
+              className={`flex items-center gap-2.5 rounded-lg border px-2.5 py-2 text-sm transition-colors cursor-pointer ${
+                selectedCategories.length === 0
+                  ? "bg-accent-50 border-accent-300 text-accent-700"
+                  : "bg-white/80 border-primary-200 text-primary-700 hover:bg-primary-50"
+              }`}
             >
-              All
-            </button>
-            {categories?.map((cat) => (
-              <button
-                key={cat._id}
-                type="button"
-                onClick={() => setSelectedCategory(cat._id)}
-                className={chipClass(selectedCategory === cat._id)}
-              >
-                {cat.name}
-              </button>
-            ))}
+              <input
+                type="checkbox"
+                checked={selectedCategories.length === 0}
+                onChange={() => setSelectedCategories([])}
+                className="h-4 w-4 accent-accent-600"
+              />
+              <span className="font-medium">All categories</span>
+            </label>
+            {categories?.map((cat) => {
+              const isSelected = selectedCategories.includes(cat._id);
+              return (
+                <label
+                  key={cat._id}
+                  className={`flex items-center gap-2.5 rounded-lg border px-2.5 py-2 text-sm transition-colors cursor-pointer ${
+                    isSelected
+                      ? "bg-accent-50 border-accent-300 text-accent-700"
+                      : "bg-white/80 border-primary-200 text-primary-700 hover:bg-primary-50"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() =>
+                      setSelectedCategories((prev) =>
+                        prev.includes(cat._id)
+                          ? prev.filter((item) => item !== cat._id)
+                          : [...prev, cat._id]
+                      )
+                    }
+                    className="h-4 w-4 accent-accent-600"
+                  />
+                  <span className="font-medium">{cat.name}</span>
+                </label>
+              );
+            })}
           </div>
         </div>
 
         <div className="pb-4 border-b border-primary-100">
-          <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 m-0">
-            Budget
-          </h4>
-          <div className="mt-2 space-y-1.5 max-h-44 overflow-y-auto pr-1 scrollbar-thin">
-            <button
-              type="button"
-              onClick={() => setSelectedPrice(DEFAULT_PRICE)}
-              className={optionClass(isPriceActive(DEFAULT_PRICE))}
-            >
-              <span>All prices</span>
-            </button>
-            {Prices.map((price) => (
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 m-0">
+              Price Range
+            </h4>
+            {(selectedPrice[0] !== DEFAULT_PRICE[0] || selectedPrice[1] !== DEFAULT_PRICE[1]) && (
               <button
-                key={price._id}
                 type="button"
-                onClick={() => setSelectedPrice(price.array)}
-                className={optionClass(isPriceActive(price.array))}
+                onClick={() => setSelectedPrice(DEFAULT_PRICE)}
+                className="text-[11px] font-semibold text-accent-700 hover:text-accent-800"
               >
-                <span>{price.name}</span>
+                Reset
               </button>
-            ))}
+            )}
+          </div>
+          
+          <div className="space-y-3">
+            {/* Price Range Display */}
+            <div className="flex items-center justify-between text-sm font-semibold text-primary-900">
+              <span>₹{selectedPrice[0]}</span>
+              <span className="text-xs text-primary-600">to</span>
+              <span>₹{selectedPrice[1] >= 999999 ? '1000+' : selectedPrice[1]}</span>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="relative h-1.5 bg-primary-100 rounded-full overflow-hidden">
+              <div 
+                className="absolute h-full bg-gradient-to-r from-accent-500 to-accent-600 rounded-full transition-all duration-300"
+                style={{
+                  left: `${(selectedPrice[0] / 10000) * 100}%`,
+                  right: `${100 - (Math.min(selectedPrice[1], 10000) / 10000) * 100}%`
+                }}
+              />
+            </div>
+
+            {/* Dual Range Sliders */}
+            <div className="relative pt-2">
+              <input
+                type="range"
+                min="0"
+                max="10000"
+                step="50"
+                value={selectedPrice[0]}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  if (val < selectedPrice[1]) {
+                    setSelectedPrice([val, selectedPrice[1]]);
+                  }
+                }}
+                className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-accent-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-accent-500 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md"
+              />
+              <input
+                type="range"
+                min="0"
+                max="10000"
+                step="50"
+                value={selectedPrice[1] >= 999999 ? 10000 : selectedPrice[1]}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  if (val > selectedPrice[0]) {
+                    setSelectedPrice([selectedPrice[0], val >= 10000 ? 999999 : val]);
+                  }
+                }}
+                className="absolute w-full h-1.5 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-accent-600 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-accent-600 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md"
+              />
+            </div>
+
+            {/* Quick Price Presets */}
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              <button
+                type="button"
+                onClick={() => setSelectedPrice([0, 200])}
+                className="px-2 py-1 text-[10px] font-medium rounded-full bg-primary-50 hover:bg-accent-50 text-primary-700 hover:text-accent-700 border border-primary-200 hover:border-accent-300 transition-colors"
+              >
+                Under ₹200
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPrice([200, 500])}
+                className="px-2 py-1 text-[10px] font-medium rounded-full bg-primary-50 hover:bg-accent-50 text-primary-700 hover:text-accent-700 border border-primary-200 hover:border-accent-300 transition-colors"
+              >
+                ₹200-500
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPrice([500, 1000])}
+                className="px-2 py-1 text-[10px] font-medium rounded-full bg-primary-50 hover:bg-accent-50 text-primary-700 hover:text-accent-700 border border-primary-200 hover:border-accent-300 transition-colors"
+              >
+                ₹500-1000
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPrice([1000, 999999])}
+                className="px-2 py-1 text-[10px] font-medium rounded-full bg-primary-50 hover:bg-accent-50 text-primary-700 hover:text-accent-700 border border-primary-200 hover:border-accent-300 transition-colors"
+              >
+                Over ₹1000
+              </button>
+            </div>
           </div>
         </div>
 
@@ -518,29 +609,49 @@ const HomePage = () => {
           <h4 className="text-[11px] font-semibold uppercase tracking-wide text-primary-500 m-0">
             Rating
           </h4>
-          <div className="mt-2 space-y-1.5">
-            <button
-              type="button"
-              onClick={() => setSelectedRating(0)}
-              className={optionClass(selectedRating === 0)}
-            >
-              <span>Any rating</span>
-            </button>
-            {[5, 4, 3, 2, 1].map((rating) => (
-              <button
-                key={rating}
-                type="button"
-                onClick={() => setSelectedRating(rating)}
-                className={optionClass(selectedRating === rating)}
-              >
-                <span className="inline-flex items-center gap-0.5">
-                  {[...Array(rating)].map((_, i) => (
-                    <FiStar key={i} className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
-                  ))}
-                </span>
-                <span>{rating}+</span>
-              </button>
-            ))}
+          <div className="mt-2 rounded-xl border border-primary-200 bg-white/85 p-3">
+            <p className="text-xs text-primary-500 m-0">Tap stars to filter by rating</p>
+            <div className="mt-2.5 flex items-center gap-1.5">
+              {[1, 2, 3, 4, 5].map((rating) => {
+                const isActive = selectedRating >= rating;
+                return (
+                  <button
+                    key={rating}
+                    type="button"
+                    aria-label={`${rating} stars and up`}
+                    aria-pressed={selectedRating === rating}
+                    onClick={() =>
+                      setSelectedRating((prevRating) => (prevRating === rating ? 0 : rating))
+                    }
+                    className={`h-9 w-9 rounded-full border inline-flex items-center justify-center transition-all ${
+                      isActive
+                        ? "bg-amber-50 border-amber-200 shadow-[0_8px_16px_-12px_rgba(245,158,11,0.8)]"
+                        : "bg-primary-50 border-primary-200 hover:bg-primary-100"
+                    }`}
+                  >
+                    <FaStar
+                      className={`h-4 w-4 ${
+                        isActive ? "text-amber-400" : "text-primary-300"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-2.5 flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold text-primary-700">
+                {selectedRating > 0 ? `${selectedRating} stars & up` : "Any rating"}
+              </span>
+              {selectedRating > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedRating(0)}
+                  className="text-[11px] font-semibold text-accent-700 hover:text-accent-800"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

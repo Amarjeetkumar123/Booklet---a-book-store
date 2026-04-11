@@ -109,6 +109,40 @@
    - **Frontend**: http://localhost:3000
    - **Backend API**: http://localhost:8080
 
+## 🐳 Docker (No Compose)
+
+Run backend and frontend in separate containers using Node 23.
+
+### Backend container
+
+```bash
+docker build -f backend/Dockerfile -t booklet-backend .
+docker run -d \
+  --name booklet-backend \
+  --env-file backend/.env \
+  -e FRONTEND_URL=http://localhost:3000 \
+  -p 8080:8080 \
+  booklet-backend
+```
+
+### Frontend container
+
+```bash
+docker build -f frontend/Dockerfile -t booklet-frontend ./frontend
+docker run -d \
+  --name booklet-frontend \
+  -e REACT_APP_API_URL=http://localhost:8080 \
+  -p 3000:3000 \
+  booklet-frontend
+```
+
+### Stop and remove containers
+
+```bash
+docker stop booklet-frontend booklet-backend
+docker rm booklet-frontend booklet-backend
+```
+
 ## 📱 Screenshots
 
 ### Homepage

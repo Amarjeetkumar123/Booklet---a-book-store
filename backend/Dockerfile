@@ -5,8 +5,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
-COPY backend ./backend
+COPY . .
 
 EXPOSE 8080
 
-CMD ["node", "backend/server.js"]
+CMD ["node", "server.js"]

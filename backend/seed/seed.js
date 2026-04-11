@@ -11,7 +11,7 @@ import userModel from "../models/userModel.js";
 import { hashPassword } from "../helpers/authHelper.js";
 import { ROLE } from "../utils/roleUtils.js";
 
-const envResult = dotenv.config({ path: "./backend/.env" });
+const envResult = dotenv.config();
 if (envResult.error) {
   console.warn("⚠️  Could not load backend/.env. Using process.env instead.");
 }

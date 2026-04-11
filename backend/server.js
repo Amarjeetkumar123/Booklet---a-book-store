@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 //configure env
-dotenv.config({ path: "./backend/.env" });
+dotenv.config();
 console.log("Environment variables loaded");
 
 import morgan from "morgan";

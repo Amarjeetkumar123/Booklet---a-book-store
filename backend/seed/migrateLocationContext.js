@@ -7,7 +7,7 @@ import serviceAreaModel from "../models/serviceAreaModel.js";
 import { saveLocationContext } from "../services/location/locationContextService.js";
 import { normalizeLocationKey, normalizePincode, toNumberOrNull } from "../utils/locationUtils.js";
 
-dotenv.config({ path: "./backend/.env" });
+dotenv.config();
 
 const resolveAreaByKey = async (areaMap, key = "") => {
   const normalized = normalizeLocationKey(key);

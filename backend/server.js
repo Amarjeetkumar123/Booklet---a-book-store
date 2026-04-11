@@ -24,22 +24,45 @@ connectDB();
 //rest object
 const app = express();
 
-const parseAllowedOrigins = () => {
-  const fromEnv = String(process.env.CORS_ORIGINS || "")
+const parseCsvEnv = (value = "") =>
+  String(value)
     .split(",")
-    .map((origin) => origin.trim())
+    .map((entry) => entry.trim())
     .filter(Boolean);
+
+const normalizeOrigin = (origin = "") => origin.replace(/\/+$/, "");
+
+const isFullOrigin = (value = "") => /^https?:\/\//i.test(value);
+
+const escapeRegex = (value = "") =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const createOriginPattern = (hostOrIp = "") => {
+  const escaped = escapeRegex(hostOrIp);
+  return new RegExp(`^https?:\\/\\/${escaped}(?::\\d+)?$`, "i");
+};
+
+const parseAllowedOrigins = () => {
+  const envEntries = parseCsvEnv(process.env.CORS_ORIGINS);
+  const envOriginEntries = envEntries.filter(isFullOrigin).map(normalizeOrigin);
+  const envHostEntries = envEntries.filter((entry) => !isFullOrigin(entry));
 
   const baseOrigins = [
     process.env.FRONTEND_URL,
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-  ].filter(Boolean);
+  ]
+    .filter(Boolean)
+    .map(normalizeOrigin);
 
-  return Array.from(new Set([...baseOrigins, ...fromEnv]));
+  const exactOrigins = Array.from(new Set([...baseOrigins, ...envOriginEntries]));
+  const hostPatterns = envHostEntries.map(createOriginPattern);
+
+  return { exactOrigins, hostPatterns };
 };
 
-const allowedOrigins = parseAllowedOrigins();
+const { exactOrigins: allowedOrigins, hostPatterns: allowedOriginPatterns } =
+  parseAllowedOrigins();
 const localOriginPatterns = [
   /^https?:\/\/localhost:\d+$/i,
   /^https?:\/\/127\.0\.0\.1:\d+$/i,
@@ -52,7 +75,11 @@ const ngrokOriginPatterns = [
 
 const isAllowedOrigin = (origin = "") => {
   if (!origin) return true;
-  if (allowedOrigins.includes(origin)) return true;
+  const normalizedOrigin = normalizeOrigin(origin);
+  if (allowedOrigins.includes(normalizedOrigin)) return true;
+  if (allowedOriginPatterns.some((pattern) => pattern.test(normalizedOrigin))) {
+    return true;
+  }
   if (localOriginPatterns.some((pattern) => pattern.test(origin))) return true;
   return ngrokOriginPatterns.some((pattern) => pattern.test(origin));
 };
